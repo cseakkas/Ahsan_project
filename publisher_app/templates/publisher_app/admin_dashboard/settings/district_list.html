@@ -1,0 +1,53 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} District List|| Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">  
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">District List <span><a href="/settings/district-add/"> District Entry</a></span></h4>
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="datatablesSimple">
+                            <thead>
+                            <tr>
+                                <th style="width:5%">SL</th>
+                                <th style="width:40%">District Name Bangla</th>
+                                <th style="width:40%">District Name English</th>
+                                <th style="width:10%">Status</th> 
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for dist in distr_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ dist.district_name_bangla }}</td>
+                                    <td>{{ dist.district_name_english }}</td>
+                                    <td>
+                                        {% if dist.status %}
+                                            <p style="margin: 0;color:green">Active</p>
+                                        {% else %}
+                                            <p style="margin: 0;color:red">Inactive</p>
+                                        {% endif %}
+                                    </td> 
+                                </tr> 
+                            {% endfor %}        
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div> 
+
+{% endblock %}

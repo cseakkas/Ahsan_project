@@ -1,0 +1,59 @@
+{% extends 'durbar_shop/base.html' %}
+{% block title %} Cart Items | durbar_shop {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="my_account_menu">
+                    <ul>
+                        <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="/myorder/order-list/"><i class="fa fa-list-ol"></i> Order</a></li>
+                        <li><a href="/my-wishlist/"><i class="fa fa-heart"></i> Wishlist</a></li>
+                        <li><a href="">Wallet</a></li>
+                        <li><a href="">Notification</a></li>
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="my_account_dashboard">
+                    <h3>My Cart Items</h3>
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Publishar</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Photo</th>
+                        </tr>
+                        {% for d in cart_item %}
+                        <tr>
+                            <td style="width: 50px;">{{ forloop.counter }}</td>
+                            <td>{{ d.book_name.book_name_bangla }}</td>
+                            <td>{{ d.book_name.publisher }}</td>
+                            <td>{{ d.quantity }}</td>
+                            <td>Tk. {{ d.total_price }} </td>
+                            <td>
+                                <img src="/static/durbar_shop/media/{{ d.book_name.book_image }}" alt="" style="width:40px;height:48px;">
+                            </td>
+                        </tr>
+
+                        {% endfor%}
+                        <tr>
+                            <td colspan="7"><a href="/checkout/" class="btn btn-success">Check Out</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+

@@ -1,0 +1,47 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} District Add || Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">District Entry <span><a href="/settings/district-list/">District List</a></span></h4>
+                <div class="card-body"> 
+                    <div class="table-responsive">
+                        <form method="POST"> {% csrf_token %}
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 200px;">District Name Bangla</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="district_name_bangla">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">District Name English</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="district_name_english">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> Status</th>
+                                    <td>
+                                        <input type="checkbox" name="checkbox_status" checked>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input type="submit" class="btn btn-info" name="submit" value="District Add">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div>
+
+{% endblock %}

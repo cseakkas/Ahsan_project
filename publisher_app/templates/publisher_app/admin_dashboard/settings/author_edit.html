@@ -1,0 +1,78 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Author Update {% endblock %}
+{% load static %}
+{% block content %} 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Update Author <span><a href="/book-author-list/">Author List</a></span></h4>
+                <div class="card-body">   
+                    <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 200px;">Author Name (Bangla)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="author_name_bangla" value="{{get_auth.writter_name_bangla}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Author Name (English)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="author_name_english" value="{{get_auth.writter_name_english}}">
+                                </td>
+                            </tr>
+                        
+                            <tr>
+                                <th>Email</th>
+                                <td>
+                                    <input type="email" class="form-control" name="author_email" value="{{get_auth.email}}">
+                                </td>
+                            </tr>
+                        
+                            <tr>
+                                <th>Mobile</th>
+                                <td>
+                                    <input type="number" class="form-control" name="author_mobile" value="{{get_auth.mobile}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Qualification</th>
+                                <td>
+                                    <input type="text" class="form-control" name="qualification" value="{{get_auth.qualification}}">
+                                </td>
+                            </tr>
+                        
+                            <tr>
+                                <th>Personal Details</th>
+                                <td>
+                                    <textarea name="personal_details" class="form-control" rows="3">{{get_auth.personal_details}}</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Address</th>
+                                <td>
+                                    <textarea name="author_address" class="form-control" rows="1">{{get_auth.address}}</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Author Photo</th>
+                                <td>
+                                    <input type="file" name="writter_images">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input type="submit" class="btn btn-info" name="submit" value="Update Author">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

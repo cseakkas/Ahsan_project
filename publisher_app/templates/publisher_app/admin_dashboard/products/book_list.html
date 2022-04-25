@@ -1,0 +1,273 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %}  Book List || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %}
+<style>
+    #dataTable_filter{
+        display:none !important;
+    }
+        
+
+    .fg_product_pagination {
+        clear: both;
+        overflow: hidden;
+        width: 100%;
+        text-align: right;
+    }
+    .fg_product_pagination .pagination {
+        width: 455px;
+        margin-right: -15px; 
+        margin-top: 10px;
+    }
+    .fg_product_pagination .pagination li {
+        float: left;
+        margin: 2px;
+    }
+    .pagination > .list {
+        display: inline;
+    }
+
+    .pagination > .list ~ .list {
+        display: none;
+    }
+    .fg_product_pagination .pagination li a,
+    .fg_product_pagination .pagination li span{
+        padding: 0;
+        margin-left: 0px;
+        text-decoration: none;
+        border: 0px solid #ddd;
+        width: 40px;
+        height: 35px;
+    }
+    .fg_product_pagination .pagination li a button{
+        padding: 5px;
+    }
+    .fg_product_pagination .pagination li.active span button {
+        background-color: #449D44;
+        border: 1px solid #ddd;
+    }
+    .fg_product_pagination .pagination li span button:hover,
+    .fg_product_pagination .pagination li a button:hover {
+        background-color: #00c292;
+        color: #ffffff;
+    }
+    .fg_product_pagination .pagination li span button,
+    .fg_product_pagination .pagination li a button {
+        padding: 5px 10px;
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ddd;
+    }
+
+    
+    .fg_product_pagination ul.pagination li.list.first-place {
+        position: relative;
+        margin-right:40px;
+    }
+    .fg_product_pagination ul.pagination li.list.last-place{
+        position: relative;
+    }
+    .fg_product_pagination ul.pagination li.list.first-place::after {
+        content: "...";
+        position: absolute;
+        top: 0px;
+        right: -25px;
+    }
+    .fg_product_pagination ul.pagination li.list.last-place::before {
+        content: "...";
+        position: absolute;
+        top: 0px;
+        left: -25px;
+    }
+    .fg_product_pagination ul.pagination li.list.active{
+        display: inline !important; 
+    }
+    .pagination li.list:lt(5){
+        display: inline;
+    }
+        @media screen and (max-width: 13661px){
+            .table.table-striped>tbody>tr>td, 
+            .table.table-striped>tbody>tr>th, 
+            .table.table-striped>tfoot>tr>td, 
+            .table.table-striped>tfoot>tr>th, 
+            .table.table-striped>thead>tr>td, 
+            .table.table-striped>thead>tr>th {
+                font-size: 13px;
+            }
+            .action-order a.btn {
+                font-size: 11px !important;
+            }
+        }
+        @media screen and (max-width: 991px){
+            .sales-order-list .btn-group.bootstrap-select,
+            .sales-order-list input[type='text'] {
+                margin-bottom: 15px;
+            }
+        }
+        @media screen and (max-width: 767px){
+            .bootstrap-select .btn{
+                font-size: 12px !important;
+            }
+            .filter-apply .btn{
+                font-size: 12px !important;
+                box-shadow: none !important;;
+            }
+            .action-order a.btn {
+                font-size: 10px !important;
+            }
+        }
+        
+        @media screen and (max-width: 660px){
+            .action-order div {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+        }
+        
+        .pagination_first_btn{
+            padding: 5px;
+            margin-top: 2px;
+            background: #cfcfcf;
+        }
+        .all_book_list table tr td{vertical-align: middle;}
+    
+    
+</style>
+<div class="container-fluid page_container">  
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4">
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive all_book_list">  
+                        <h4 style="overflow: hidden;"> Book List ({{total_book }})
+                            <span style="float: right;">
+                                <form method="POST"> {% csrf_token %}
+                                    <input type="text" name="book_content_search" class="form-control" value="{{book_txt}}" placeholder="Search..." style="width:250px;float:right;margin-bottom:10px">
+                                </form> 
+                            </span>
+                        </h4>
+                        
+                        <table class="table table-striped">
+                        <!-- <table class="table table-striped" id="datatablesSimple">  -->
+                            <thead>
+                                <tr style="background-color: rgb(49, 196, 188);color:white">
+                                    <th>ID</th>
+                                    <th>Book Name</th>
+                                    <th>Origin</th>
+                                    <th style="width:150px">Category</th>
+                                    <th>Author</th>
+                                    <th>Publisher</th>
+                                    <th style="width:75px;text-align: center;">Stock</th> 
+                                    <th style="width:100px;text-align: center">Price</th> 
+                                    <th>Photo</th>
+                                    <th style="width:140px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for book in book_list %}
+                                <tr>
+                                    <td>{{ book.id }}</td>
+                                    <td>{{ book.book_name_bangla }}</td>
+                                    <td>{% if book.origin %}{{ book.origin }}{% endif %}</td>
+                                    <td>{{ book.cat_name_bangla }}</td>
+                                    <td>{{ book.writter_name_bangla }}</td>
+                                    <td>{{ book.publisher_name_bangla }}</td> 
+                                    <td style="text-align:center">  {{ book.quantity }} </td>
+                                    <td style="text-align:center"> Tk. {{ book.sale_price }} {% if book.discount == 0 %} {% else %}  <del style="margin-left:5px;color:rgb(215, 25, 25)">{{ book.book_price }}</del> {% endif %} </td>
+                                    <td style="width: 50px;">
+                                        <center>
+                                                <img src="/static/publisher_app/media/{{ book.book_image }}" alt="" style="width:40px;height:50px">
+                                        </center>
+                                    </td> 
+                                    <td style="width:140px">
+                                        <a data-toggle="tooltip" title="" href="/products/book/{{ book.pk }}/update-book/" style="font-size:13px;padding: 4px 10px;" class="btn btn-warning" data-original-title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                        {% if book.status %}
+                                            <a data-toggle="tooltip" title="Active" onclick="return confirm('Are you sure to Inactive this Book?');" href="/products/book/{{ book.pk }}/active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-info" data-original-title="Active">Active</a>
+                                        {% else %}
+                                            <a data-toggle="tooltip" title="In Active" onclick="return confirm('Are you sure to Active this Book?');" href="/products/book/{{ book.pk }}/in-active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-danger" data-original-title="Inactive">Inactive</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>                        
+                            {% endfor %}
+                            </tbody> 
+                        </table> 
+
+                        
+                        
+                        <form method="POST"> {% csrf_token %} 
+                            <input type="text" id="active_page" value="{{ current_page_no }}" hidden />
+                            <input type="text" name="book_content_search" value="{{ book_txt}}" hidden />
+                            <div class="fg_product_pagination">
+                                {% if page_number.has_other_pages %}
+                                    <ul class="pagination">
+                                        {% if page_number.has_previous %}
+                                            <li><a href=""><button type="submit" name="btnPage" value="{{ page_number.previous_page_number }}">&laquo;</button></a></li>
+                                        {% else %}
+                                            <li><strong class="pagination_first_btn"> &laquo; </strong></li>
+                                        {% endif %}
+                                        {% for i in page_number.paginator.page_range %}
+                                            {% if page_number.number == i %}
+                                                <li class="list active"><span><button type="submit" name="btnPage" value="{{ i }}">{{ i }}</button> <span class="sr-only">(current)</span></span></li>
+                                            {% else %}
+                                                <li class="list"><a href=""><button type="submit" name="btnPage" value="{{ i }}">{{ i }}</button></a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if page_number.has_next %}
+                                            <li><a href=""><button type="submit" name="btnPage" value="{{  page_number.next_page_number }}">&raquo;</button></a></li>
+                                            {% else %}
+                                            <li class="disabled"><span>&raquo;</span></li>
+                                        {% endif %}
+                                    </ul>
+                                {% endif%}
+                            </div>
+                        </form> 
+   
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+<script> 
+    function pagination_sales_list(){
+        $(".pagination li.list:lt(5)").css({'display':'inline', 'margin-right':'0px'});
+        $(".pagination li.list").first().css({'display':'inline'});
+        $(".pagination li.active").next().css( "display", "inline" );
+        $(".pagination li.active").prev().css( "display", "inline" );
+        $('.pagination li.list').last().css({'display':'inline', 'margin-left':'40px'});
+        $(".pagination li.list").last().addClass('last-place');
+        $(window).on('load', function() {
+            var current_lenght = $(".pagination li.list").length;
+            current_lenght = current_lenght -4;
+            console.log(current_lenght);
+            var current_id = $("#active_page").val();
+            current_id = parseInt(current_id);
+            if( current_id >=5 ){
+                $(".pagination li.list").first().addClass('first-place');
+                $(".pagination li.list:lt(5)").css({'display':'none'});
+                $(".pagination li.list").first().css({'display':'inline','margin-right':'40px'});
+                $(".pagination li.active").next().css( "display", "inline" );
+                $(".pagination li.active").prev().css( "display", "inline" );
+                if(current_lenght <= current_id){
+                    $('.pagination li.list').last().css({'display':'inline', 'margin-left':'0px'});
+                    $('.pagination li.list').slice(-5).css("display", "inline");
+                }
+            }
+        }); 
+    } 
+    pagination_sales_list();
+ 
+</script>
+{% endblock %}

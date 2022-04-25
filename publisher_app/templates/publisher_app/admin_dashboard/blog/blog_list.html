@@ -1,0 +1,66 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Blog List || Dashboard  {% endblock %}
+{% load static %}
+{% load data_load %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">  
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4>Blog List <span style="float:right;"><a href="/dashboard/blog/add-new-blog/" class="btn btn-info" style="font-size: 13px;padding:3px 8px;">Add New Blog</a></span></h4>
+                    <div class="table-responsive order_table"> 
+                        <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr style="background:#ededed;padding:10px 5px">
+                                    <th style="width:4%;text-align: center;">ID</th>
+                                    <th style="width:10%;">Created Date</th> 
+                                    <th style="width:19%;">BLog Title</th>
+                                    <th style="width:13%;">Category</th>
+                                    <th style="width:6%;text-align: center;">Like</th>
+                                    <th style="width:6%;text-align: center;">View</th>
+                                    <th style="width:6%;text-align: center;">Comment</th>
+                                    <th style="width:10%" >Created By</th>
+                                    <th style="width:7%" >Status</th>
+                                    <th style="width:11%" >Action</th>
+                                </tr>
+                            </thead>
+                            <tbody> 
+                                {% for data in blog_list %}
+                                <tr style="font-weight:bold">
+                                    <td style="text-align: center;">{{ data.id }}</td>
+                                    <td> {{ data.create_date|date:"d-m-y g:i A" }}  </td>
+                                    <td>{{ data.blog_title }}</td>
+                                    <td>{{ data.category.cat_name_bangla }}</td>
+                                    <td style="text-align: center;">{{ data.total_like }}</td>
+                                    <td style="text-align: center;">{{ data.total_view }}</td>
+                                    <td style="text-align: center;">{{ data.total_comments }}</td>
+                                    <td>{{ data.created_by }}</td>
+                                    <td>{% if data.status == 1 %} Active {% else %} <span style="color:red">Inactive</span> {% endif %} </td>
+                                    <td>
+                                        <a style="font-size:13px;" href="#" class="btn btn-success"><i class="fa fa-eye"></i></a>
+                                        <a style="font-size:13px;" href="/dashboard/blog/{{data.pk}}/update/" class="btn btn-warning"><i class="fas fa-pencil-alt"></i></a>
+                                        <a style="font-size:13px;" href="/dashboard/blog/{{data.pk}}/blog-delete/" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>  
+                                {% endfor %}        
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>     
+        </div>
+    </div>
+
+</div> 
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+<script>
+    $(document).ready(function(){
+        $('#dataTable').DataTable({
+            "ordering": false
+        });
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'durbar_shop/base.html' %}
+{% block title %} Registration | durbar_shop {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    
+        .product_image_load{width: 80px;}
+        fieldset 
+        {
+            border: 1px solid #ddd !important;
+            margin: 0;
+            min-width: 0;
+            padding: 10px;       
+            position: relative;
+            border-radius:4px;
+            background-color:#fbfbfb;
+            padding-left:10px!important;
+        }	
+        
+        legend
+        {
+            font-size:14px;
+            font-weight:bold;
+            margin-bottom: 0px; 
+            width: 80%; 
+            border: 1px solid #ddd;
+            border-radius: 4px; 
+            padding: 5px 5px 5px 10px; 
+            background-color: #ffffff;
+        }
+        
+        .userimg_box{
+            width:80px;
+            height:90px;
+            overflow: hidden;border: 1px solid #ccc;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .img_box img{
+            width:85px;height:95px;
+            display:block;
+            margin: 5px auto;
+        }
+        .registration_area{
+            background: #fff;
+            padding: 10px;
+            border-radius: 9px;
+            margin: 30px 0;
+        }
+        label{font-weight: 500;}
+        span{color:red;font-size: 11px}
+        
+        </style>
+        
+        <div class="login_page_pull login_page">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5">
+                        <div class="registration_area">
+                            <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                                {% if messages %}
+                                    <div class="messages">
+                                        {% for message in messages %}
+                                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+        
+                                <h3>New Registration</h3> <hr>
+                                <div class="row">
+                                    <div class="col-sm-12 form-group">
+                                        <label for="FullName">Your Name <span>*</span></label>
+                                        <input type="text" name="user_full_name" class="form-control" required>
+                                    </div>
+                                    <div class="col-sm-12 form-group">
+                                        <label for="Mobile">Mobile <span>*</span></label>
+                                        <input type="text" name="usermobile" class="form-control" maxlength="11" minlength="11"  required>
+                                    </div>
+                                    <div class="col-sm-12 form-group">
+                                        <label for="Useremail">Email</label>
+                                        <input type="email" name="useremail" class="form-control">
+                                    </div>
+                                    <div class="col-sm-12 form-group">
+                                        <label for="Password">User Password <span>*</span></label>
+                                        <input type="password" name="user_password" class="form-control" required>
+                                    </div>
+                                    <div class="col-sm-12 form-group">
+                                        <label for="Password">Confirm Password <span>*</span></label>
+                                        <input type="password" name="confirm_password" class="form-control" required>
+                                    </div>
+                                   
+                                    <div class="col-sm-12 form-group">
+                                        <input type="submit" name="submit" class="btn btn-info" value="Registration">
+                                        <p> <a href="/customer/login/"> <strong> Login </strong> </a> Your Account</p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+
+
+{% endblock %}

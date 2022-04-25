@@ -1,0 +1,65 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Book Author || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %} 
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">  
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Author List <span><a href="/book-author-entry/">Author Entry</a></span></h4>
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive datatableHeading"> 
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                                <tr>
+                                <th>SL</th>
+                                <th>Author Name Bangla</th>
+                                <th>Author Name English</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                                <th style="width:60px">Photo</th>
+                                <th style="width:60px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for auth in dash_author_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="#" style="color:#203040;text-decoration:none">{{ auth.writter_name_bangla }}</a></td>
+                                    <td><a href="#" style="color:#203040;text-decoration:none">{{ auth.writter_name_english }}</a></td>
+                                    <td>{{ auth.mobile }}</td>
+                                    <td>{{ auth.email }}</td>
+                                    <td>{{ auth.address }}</td>
+                                    <td>
+                                        {% if auth.writter_images %}
+                                            <img src="/static/publisher_app/media/{{ auth.writter_images }}" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% else %}
+                                            <img src="/static/publisher_app/images/writter.jpg" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a style="font-size:13px;padding:3px 10px;" href="/book-author-update/{{auth.pk}}/" class="btn btn-info">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+{% endblock %}

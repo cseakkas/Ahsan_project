@@ -1,0 +1,190 @@
+{% extends 'publisher_app/base.html' %}  
+{% block title %} Blog Post {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    .blog_post_details{
+        margin-top: 10px;
+        background-color: white;
+        overflow: hidden;
+        padding:15px
+    }
+    .blog_post_details h2{
+        margin: 0;
+        font-size: 23px;
+        background-color: #f3565c;
+        margin-bottom: 10px;
+        padding: 6px;
+        color: white;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .blog_post_details img{
+        width:100%;
+        margin-bottom: 5px;
+    }
+    .blog_post_details h6{
+        margin-bottom:15px
+    }
+
+    .blog_sidebar_menu{ 
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    .blog_sidebar_menu h3{
+        margin: 0;
+        font-size: 23px;
+        background-color: #f3565c;
+        margin-bottom: 10px;
+        padding: 6px;
+        color: white;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .blog_sidebar_menu ul{
+        background-color: rgb(255, 255, 255);
+        margin: 0;
+        padding:0;
+        list-style: none;
+    }
+    .blog_sidebar_menu ul li{
+        border-bottom: 1px solid #ccc;
+    }
+    .blog_sidebar_menu ul li a{
+        display: block;
+        text-decoration: none;
+        padding:8px 10px;
+    }
+    .blog_sidebar_menu ul li a:hover{
+        background-color: #f65d62;
+        color:white;
+    }
+    .blog_post_comments_section{
+        background-color: white;
+        overflow: hidden;
+        padding:20px;
+        margin-top: 20px;
+    }
+    .blog_comments_list{
+        overflow: hidden;
+        background-color: rgb(230, 230, 230); 
+        margin-top: 15px;
+        padding:15px;
+    }
+    .blog_profile{
+        width:80px;
+        float:left; 
+    }
+    .blog_profile img{
+        width:70px;
+        height:79px;
+        border-radius: 3px;
+    }
+    .blog_comments_item{
+        width: 90%;
+        float: left;
+        border: 1px solid #ccc;
+        padding: 5px;
+        background: white;
+        border-radius: 3px;
+        margin-bottom: 10px;
+    }
+    .blog_comments_item h4{
+        font-size: 15px; 
+        color:#f65d62;
+        margin-bottom: 4px;
+    }
+    .blog_comments_separate{
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+ 
+</style>
+
+<section>
+    <div class="container">
+        <div class="row"> 
+            <div class="col-sm-9">
+                <div class="blog_post_details"> 
+                   <h4>{{ get_blog.blog_title}}</h4>
+                   <img src="/static/publisher_app/media/{{ get_blog.blog_image }}" alt="">
+                   <h6 style="background: #fafafa;padding:8px 5px"><span class="fa fa-calendar-o"> {{ get_blog.create_date|date:'d M Y' }} </span> <span class="fa fa-eye"> {{get_blog.total_view}} </span> <span><i class="fa fa-commenting-o" aria-hidden="true"></i> {{get_blog.total_comments}}</span> <span class="fa fa-heart"> {{get_blog.total_like}}</span></h6>                   
+                   <div class="blog_post_details_para"> 
+                        {{ get_blog.blog_details|safe}}
+                   </div>
+                </div>
+
+                         <!-- Blog Comments Part  -->
+                         {% if comments_list %}
+                         <div class="blog_comments_list">
+                             <div class="row">
+                                 <div class="col-sm-12">
+                                     <h4> Comments List</h4>
+                                 </div>
+                             </div>
+                             {% for data in comments_list %}
+                             <div class="row">
+                                 <div class="col-sm-12 blog_comments_separate">
+                                     <div class="blog_profile">
+                                         <img src="/static/publisher_app/images/support.png" alt="">
+                                     </div>
+                                     <div class="blog_comments_item"> 
+                                         <h4>{{ data.user_name }} | {{ data.create_date|date:'d M Y g:i A' }} </h4>
+                                         <p>{{ data.user_comments }}</p>
+                                      </div>
+                                 </div>
+                             </div>
+                             {% endfor %} 
+                         </div>
+                     {% endif %} 
+
+                <!-- Blog Comments Part  -->
+                <div class="blog_post_comments_section">
+                    <h4>Add Comment</h4>
+                    <h6>Your email address will not be published. Required fields are marked * </h6>
+                    <form method="POST"> {% csrf_token %} 
+                        <div class="row">
+                            <div class="form-group col-lg-6">
+                                <input type="text" name="user_name" class="form-control" placeholder="Name *" required>
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <input type="text" name="user_mobile" class="form-control" placeholder="Mobile *" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <input type="email" name="user_email" class="form-control" placeholder="Email *" style="font-family: arial;" required>
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <textarea name="comments_text" class="form-control" rows="3" placeholder="Comments" required></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <button type="submit" class="btn btn-info">Post Comment</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="blog_sidebar_menu">
+                    <h3> বিষয়সমূহ </h3>
+                    <ul>
+                        {% for data in category_list %}
+                            <li><a href="/CategoryWiseBlogList/{{data.category.id}}/{{data.category.menu_url}}/"><i class="fa fa-hand-o-right" aria-hidden="true"></i> {{ data.cat_name_bangla}} ({{ data.total_blog }})</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+  
+
+{% endblock %}

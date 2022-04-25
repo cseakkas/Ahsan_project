@@ -1,0 +1,60 @@
+.dashboard_custom_page{
+    background: #fff;
+    overflow: hidden;
+    padding: 10px;
+    border: 1px solid rgb(221, 221, 221);
+    margin-top: 5px;
+}
+.dashboard_custom_page h3{
+    margin-top: 0px;
+    margin-bottom: 15px;
+    padding: 8px;
+    background: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #203040;
+
+}
+.messages_box{
+    margin-top: 20px;
+    overflow: hidden;
+}
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+.img_box{
+    width:110px;
+    height:152px;
+    overflow: hidden;border: 1px solid #ccc;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.img_box img{
+    width:100px;height:140px;
+    display:block;
+    margin: 5px auto;
+}
+
+fieldset 
+{
+    border: 1px solid #ddd !important;
+    margin: 0;
+    min-width: 0;
+    padding: 10px;       
+    position: relative;
+    border-radius:4px;
+    background-color:#fbfbfb;
+    padding-left:10px!important;
+}	
+
+legend
+{
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom: 0px; 
+    width: 80%; 
+    border: 1px solid #ddd;
+    border-radius: 4px; 
+    padding: 5px 5px 5px 10px; 
+    background-color: #ffffff;
+}

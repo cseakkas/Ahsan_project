@@ -1,0 +1,135 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Confirmed Order List  {% endblock %}
+{% load static %}
+{% load data_load %}
+{% block content %}
+
+<style>
+    .order_table table tr th{font-size:13.5px;padding:9px 8px}
+    .order_table table tr td{font-size:14px;vertical-align: middle;}
+</style>
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4">
+                <div class="card-body"> 
+                    <h4 style="margin-bottom: 10px;overflow: hidden;"> Sales History  </h4> 
+                    <form method="POST"> {% csrf_token %}
+                        <div class="row">
+                            <div class="form-group col-sm-3">
+                                <label>From Date</label>
+                                <input type="date" class="form-control" name="from_date">
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label>To Date</label>
+                                <input type="date" class="form-control" name="to_date">
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label>Order Status</label>
+                                <select name="order_status" class="form-control">
+                                    <option value="">Select Status</option>
+                                    <option value="1">Pending</option>
+                                    <option value="2">Confirmed</option>
+                                    <option value="3">Packed</option>
+                                    <option value="4">Shipping</option>
+                                    <option value="5">Delivered</option>
+                                    <option value="6">Returned</option>
+                                    <option value="7">Canceled</option>
+                                    <option value="8">Hold</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-3"> 
+                                <input type="submit" class="btn btn-success" name="submit" value="Submit" style="margin-top: 28px;">
+                            </div>
+                        </div>
+                    </form> 
+
+                    <br>
+                    <div class="table-responsive order_table">
+                        <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr style="background: #15a09d;color: white;"> 
+                                    <th style="width:9%;">Order Date</th>
+                                    <th style="width:8%;">OrderID</th>
+                                    <th style="width:13%;">Customer Name</th>
+                                    <th style="width:10%;">Mobile</th>
+                                    <th style="width:11%;">Payment Method</th>
+                                    <th style="width:10%;">Payment Status</th>
+                                    <th style="width:7%;"> Amount </th>
+                                    <th style="width:9%;">Order Status</th> 
+                                    <th style="width:8%" >Action</th>
+                                </tr>
+                            </thead>
+                            <tbody> 
+                                {% for ord in sales_list %}
+                                    <tr> 
+                                        <td>
+                                            {{ ord.order_date|date:"d-m-y" }} <br>
+                                            {{ ord.order_date|date:"g:i A" }} 
+                                        </td>
+                                        <td>{{ ord.order_number }}</td>
+                                        <td>{{ ord.customer_name }}</td>
+                                        <td> 
+                                            <span>{{ ord.customer_mobile }} </span> <br>
+                                            <span>{{ ord.optional_number }}</span>  
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <p style="margin:0px">{{ ord.get_payment_method_display }} </p>
+                                            {% if ord.payment_amount %}<p style="margin:0px">Tk. {{ ord.payment_amount }}</p> {% endif %}
+                                            {% if ord.payment_number %} <p style="margin:0px">{{ ord.payment_number }}</p>{% endif %}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {% if ord.payment_status == '1' %}
+                                                <span class="Pending_button">Pending</span>
+                                            {% elif ord.payment_status == '2' %}
+                                                <span class="Unpaid_button">Unpaid</span>
+                                            {% elif ord.payment_status == '3' %}
+                                                <span class="Paid_button">Paid</span>
+                                            {% elif ord.payment_status == '4' %}
+                                                <span class="Refund_button">Refund</span>
+                                            {% endif %}
+    
+                                        </td>
+                                        <td style="text-align: center;"><span style="font-size: 13px; font-family: serif;">৳ </span>{{ ord.total_amount}}</td>
+                                        <td>
+                                            {% if ord.order_status == '1' %} 
+                                                <span class="pending_button">Pending</span>
+                                            {% elif ord.order_status == '2' %}
+                                                <span class="Confirmed_button">Confirmed</span>
+                                            {% elif ord.order_status == '3' %}
+                                                <span class="Packed_button">Packed</span>
+                                            {% elif ord.order_status == '4' %}
+                                                <span class="Shipping_button">Shipping</span>
+                                            {% elif ord.order_status == '5' %}
+                                                <span class="Delivered_button">Delivered</span>
+                                            {% elif ord.order_status == '6' %}
+                                                <span class="Returned_button">Returned</span>
+                                            {% elif ord.order_status == '7' %}
+                                                <span class="Canceled_button">Canceled</span>
+                                                {% elif ord.order_status == '8' %}
+                                                    <span class="Canceled_button">Hold Order</span>
+                                            {% endif %} 
+                                        </td> 
+                                        
+                                        <td class="positionTableTd">
+                                            <a data-toggle="tooltip" target="_blank" title="View" href="/dashboard/orderWiseView/{{ord.order_number}}/" class="btn btn-info" style="padding: 4px 6px;font-size: 13px;"> <i class="fa fa-eye"></i> </a>
+                                            <button type="button" class="btn btn-primary PrintCustomerInvoice" data-toggle="modal"  data-id="{{ ord.order_number }}" style="padding:2px 10px"><i class="fa fa-print"></i></button>
+                                        </td>
+                                    </tr> 
+                                {% endfor %}        
+                                </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+</div>
+ 
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>
+ 
+
+{% endblock %}

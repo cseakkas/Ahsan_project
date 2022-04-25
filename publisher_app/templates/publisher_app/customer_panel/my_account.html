@@ -1,0 +1,183 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} My Account | publisher_app {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    #profile_picture{
+        width: 150px;
+        height: 150px;
+        border: 5px solid #ccc;
+        border-radius: 50%;
+    }
+    .form-group {
+        margin-bottom: 0;
+    }
+</style>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="my_account_menu">
+                    <ul>
+                        <li><a href="/my-account/" class="my_acc_menu_active"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="/myorder/order-list/"><i class="fa fa-list-ol"></i> Order</a></li>
+                        <li><a href="/my-wishlist/"><i class="fa fa-heart"></i> Wishlist</a></li>
+                        <li><a href="">Wallet</a></li>
+                        <li><a href="">Notification</a></li>
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="my_account_dashboard">
+                    <h4>My Personal Information <span><a href="/cl/profile/{{ customer.id }}/update/" class="btn btn-info"><i class="fa fa-pencil"></i> Edit</a></span></h4>
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="col-sm-6"> 
+                        <table class="table myaccount_profile"> 
+                            <tr>
+                                <th style="border-top: none;">Photo</th>
+                                <td style="border-top: none;">
+                                    {% if customer.profile_images %}
+                                        <img id="profile_picture" src="/static/publisher_app/media/{{ customer.profile_images }}" alt="">
+                                    {% else %}
+                                        <img id="profile_picture" src="/static/publisher_app/images/index.jpg" alt="">
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>
+                                    <input type="text" id="customer_id" value="{{ customer.id }}" hidden>
+                                    <input type="text" class="form-control col-sm-12" value="{{ customer.customer_name }}" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Mobile</th>
+                                <td>
+                                    <input type="text" class="form-control col-sm-12" value="{{ customer.mobile }}" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>
+                                    <input type="text" style="font-family: arial;" class="form-control col-sm-12" value="{{ customer.email }}" readonly>
+                                     
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Full Address</th>
+                                <td> 
+                                    <textarea  class="form-control col-sm-12" rows="3" readonly>{{ customer.address }}</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="form-group" id="change_pass_input_field">
+                                        <label> <h6>Password </h6> </label>
+                                        <button type="button" class="btn btn-primary" id="ChangePassword"> Change Password </button>
+                                    </div>
+                                    
+                                    <!-- Change Password  -->
+                                    <div class="chang_password_field">
+                                        <h5><i class="fa fa-lock"></i> Change Password </h5>
+                                        <label>Current Password</label>
+                                        <div class="form-group  pass_show"> 
+                                            <input type="password" id="current_password" class="form-control" placeholder="Current Password"> 
+                                        </div> 
+                                        <label>New Password</label>
+                                        <div class="form-group pass_show"> 
+                                            <input type="password" id="new_password" class="form-control" placeholder="New Password"> 
+                                        </div> 
+                                        <label>Confirm Password</label>
+                                        <div class="form-group pass_show"> 
+                                            <input type="password" id="confirm_password" class="form-control" placeholder="Confirm Password"> 
+                                        </div> 
+                                        <div class="form-gro"> 
+                                            <br>
+                                            <input type="submit" id="changePassword_btn" value="Change Password">
+                                        </div>
+                                    </div> 
+                                    
+                                </td>
+                            </tr>
+                           
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script>
+    $(".chang_password_field").hide();
+    $("#ChangePassword").click(function(){
+        $(".chang_password_field").show();
+        $("#change_pass_input_field").hide();
+    })
+</script> 
+<script>
+    $(document).ready(function(){
+        $('.pass_show').append('<span class="ptxt">Show</span>');  
+    }); 
+    $(document).on('click','.pass_show .ptxt', function(){ 
+        $(this).text($(this).text() == "Show" ? "Hide" : "Show"); 
+        $(this).prev().attr('type', function(index, attr){return attr == 'password' ? 'text' : 'password'; }); 
+    });  
+</script>
+<script type="text/javascript">
+    $("#confirm_password").change(function(){
+         if($("#confirm_password").val() != $("#new_password").val())
+         {
+            alert("Password Doesn't Match");
+            $("#confirm_password").val('');
+            $("#confirm_password").focus();
+         }
+    });
+    $("#changePassword_btn").click(function(){
+        var confirm_password = $("#confirm_password").val();
+        if(confirm_password ==""){
+            alert("Please Enter Confirm Password");
+        }
+        var customer_id = $("#customer_id").val();
+        var current_password = $("#current_password").val();
+        var confirm_password = $("#confirm_password").val();
+        var url  = "/my-account/";
+         
+        $.ajax({
+            url: url,
+            type:'POST',
+            data : {
+                customer_id : customer_id,
+                current_password : current_password,
+                confirm_password : confirm_password,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data =="Password Change Successful"){
+                    alert(data);
+                    window.location.href = "/my-account/";
+                }
+                else{
+                    alert(data);
+                }
+                
+            },
+            
+        })
+    })
+
+</script> 
+
+{% endblock %}
+

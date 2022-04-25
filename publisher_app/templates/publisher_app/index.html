@@ -1,0 +1,616 @@
+{% extends 'publisher_app/base.html' %}
+<!-- OG image  -->
+<meta property="og:image:width" content="1676"/>
+<meta property="og:image:height" content="867"/>
+{% block og_title %} Best Online Book Shop in Bangladesh | Ahsan.com{% endblock %}
+{% block og_url %}https://Ahsan.com{% endblock %} 
+{% block og_img %}https://Ahsan.com/static/publisher_app/images/durbar_web.jpg {% endblock %} 
+{% block og_description %}Ahsan.com is the largest online bookstore in Bangladesh.
+Buy Islamic Book, Computer Programming and Most popular Novel, Story, Children and youngers, West Bengal, Fiction, Non fiction, Medical,
+Engineering books from the biggest selection of Bangla books at lowest price to upper price. We maintainence Cash on
+delivery, Parsel and courier service & Happy return policy & Free shipping offer available. {% endblock %}
+
+{% block title %} Ahsan || Best Online Book Shop in Bangladesh {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+  
+
+    <section class="website-slider-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                            {% for banner in slider_list  %}
+                                {% if forloop.counter < slider_list.count  %}
+                                    <li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter}}"></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                        <div class="carousel-inner">
+                            {% for data in slider_list %}
+                            {% if forloop.first %}
+                                <div class="carousel-item active">
+                                    <img class="d-block w-100 h-200" src="/static/publisher_app/media/{{ data.slider_images }}" alt="First slide" >
+                                </div>
+                            {% else %}
+                                <div class="carousel-item">
+                                    <img class="d-block w-100 h-200" src="/static/publisher_app/media/{{ data.slider_images }}" alt="Second slide">
+                                </div>
+                            {% endif %}
+                            {% endfor %} 
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </section>
+
+    <section>
+            <div class="sort_statistic_items">
+                <div class="container">
+                    <div class="row">
+                        
+                        <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
+                            <div class="category_items">
+                                <a href="/book/categories/">
+                                    <img src="/static/publisher_app/images/bookicon.png" alt="#">
+                                    <h5> <strong> সকল বই </strong> <span><i class="fa fa-chevron-right"></i></span></h5> 
+                                </a>
+                            </div> 
+                        </div> 
+                        <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
+                            <div class="category_items">
+                                <a href="/comming-soon/">
+                                    <img src="/static/publisher_app/images/ator2.webp" alt="#"> 
+                                    <h5 style="background-color: #DF3C80;"><strong> আতর / পারফিউম </strong>  <span><i class="fa fa-chevron-right"></i></span></h5>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
+                            <div class="category_items">
+                                <a href="/comming-soon/">
+                                    <img src="/static/publisher_app/images/tupi.jpg" alt="#"> 
+                                    <h5 style="background-color: #00A559;"><strong> জায়নামাজ ও টুপি  </strong> <span><i class="fa fa-chevron-right"></i></span> </h5> 
+                                </a>
+                            </div> 
+                        </div>  
+                        <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
+                            <div class="category_items">
+                                <a href="/comming-soon/">
+                                    <img src="/static/publisher_app/images/grosary.png" alt="#">
+                                    <h5 style="background-color: #7879F1;"> <strong> অন্যান্য আইটেম </strong> <span><i class="fa fa-chevron-right"></i></span> </h5>
+                                </a>
+                            </div>
+                        </div> 
+                        
+                    </div>
+                </div>
+            </div>
+    </section>
+ 
+ 
+{% if new_pub_book_list %}
+     <section class="carousel-category-book-items">
+         <div class="container">
+             <div class="row">
+                 <div class="col-sm-12">
+                     <div class="category-book-items">
+                         <h4> নতুন প্রকাশিত বই </h4>
+                         <div class="owl-carousel book-items">
+                            {% for book in new_pub_book_list %}
+                            <div class="category_book_item"> 
+                                <div class="product_image_display">
+                                    {% if book.discount > 0 %}
+                                        <div class="discount_area"> <span>{{ book.discount }}%</span> </div>
+                                    {% endif %}
+                                    <div class="fovarite_icon">
+                                        <i onclick="addTowishListItem('{{book.pk}}')" class="fa fa-heart-o"></i>
+                                    </div>
+                                    {% if book.thumbnail %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.thumbnail }}" ></a>
+                                    {% elif book.book_image %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.book_image }}" ></a>
+                                    {% else %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"><img src="/static/publisher_app/images/book_thamb.jpg" alt="Book Image"></a>
+                                    {% endif %} 
+                                </div>
+                                <div class="product-content"> 
+                                    <p>{{ book.get_cover_type_display}}</p>
+                                    <h3 class=""><a href="/book/{{ book.pk }}/{{book.slug}}/">{{ book.book_name_bangla}}</a></h3>
+                                    <h6 class="writer">{{ book.writter_name_bangla}} sdf </h6> 
+                                    <span class="price"> Tk. {{ book.sale_price}} {% if book.discount == 0 %}  {% else %}  <del>Tk. {{ book.book_price }}</del> {% endif %}</span> 
+                                    <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                        <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                        <input type="text" id="{{ book.pk }}_r_book_id" value="{{ book.pk }}">
+                                        <input type="text" id="{{ book.pk }}_sale_price" value="{{ book.sale_price }}">
+                                        <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                        <input type="text" id="{{ book.pk }}_discount" value="{{ book.discount }}">
+                                    </div>  
+                                </div>
+                                <!-- Cart Button  -->
+                                <div class="overlay_cart_button">
+                                    <center> 
+                                        {% if book.stock_info == '4' %}
+                                                <a href="#" class="add-to-cart-new"> Pre Order </a>
+                                        {% elif book.stock_info == '3' %}
+                                            <a href="#" class="add-to-cart-new">Out of Stock </a>
+                                        {% else %}
+                                            <button style="border:none" class="add-to-cart-new" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+                                        {% endif %}   
+                                    </center>
+                                </div>
+                            </div>
+                             {% endfor %}
+                         </div>
+                         {% for book in new_pub_book_list|slice:"1" %} 
+                                <center><a href="/book/category/{{ book.category_name_id}}/{{ book.menu_url}}/" class="see_more_button">আরও দেখুন</a> </center> 
+                         {% endfor %}
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+ {% endif %}
+ 
+   {% regroup book_list by cat_name_bangla as all_book %}
+   {% for category in all_book %}
+    <section class="carousel-category-book-items">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="category-book-items">
+                        <h4>{{ category.grouper}} </h4>
+                        <div class="owl-carousel book-items">
+                            {% for book in category.list|slice:"12" %}
+                            <div class="category_book_item"> 
+                                <div class="product_image_display">
+                                    {% if book.discount > 0 %}
+                                        <div class="discount_area"> <span>{{ book.discount }}%</span> </div>
+                                    {% endif %}
+                                    {% if wish_list %}
+                                        {% for data in wish_list %}
+                                            {% if data.book_name_id == book.wl_id %}
+                                                <div class="fovarite_icon_active" id="fovarite_icon_active_{{book.pk}}">
+                                                    <i onclick="addTowishListItem('{{book.pk}}', 'active')" class="fa fa-heart"></i>
+                                                </div>
+                                            {% else %}
+                                                <div class="fovarite_icon" id="fovarite_icon_{{book.pk}}">
+                                                    <i onclick="addTowishListItem('{{book.pk}}', 'inactive')" class="fa fa-heart-o"></i>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="fovarite_icon" id="fovarite_icon_{{book.pk}}">
+                                            <i onclick="addTowishListItem('{{book.pk}}', 'inactive')" class="fa fa-heart-o"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if book.thumbnail %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.thumbnail }}" ></a>
+                                    {% elif book.book_image %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.book_image }}" ></a>
+                                    {% else %}
+                                        <a href="/book/{{ book.pk }}/{{book.slug}}/"><img src="/static/publisher_app/images/book_thamb.jpg" alt="Book Image"></a>
+                                    {% endif %} 
+                                </div>
+                                <div class="product-content"> 
+                                    <p>{{ book.get_cover_type_display}}</p>
+                                    <h3><a href="/book/{{ book.pk }}/{{book.slug}}/">{{ book.book_name_bangla}} </a></h3>
+                                    <h6 class="writer">{{ book.writter_name_bangla}} {{book.is_pre_order_book}}</h6>
+                                    <span class="price"> Tk. {{ book.sale_price}} {% if book.discount == 0 %}  {% else %}  <del>Tk. {{ book.book_price }}</del> {% endif %}</span> 
+                                    <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                        <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                        <input type="text" id="{{ book.pk }}_r_book_id" value="{{ book.pk }}">
+                                        <input type="text" id="{{ book.pk }}_sale_price" value="{{ book.sale_price }}">
+                                        <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                        <input type="text" id="{{ book.pk }}_discount" value="{{ book.discount }}">
+                                    </div>  
+                                </div>
+                                <!-- Cart Button  -->
+                                <div class="overlay_cart_button">
+                                    <center> 
+                                        {% if book.stock_info == '4' %}
+                                                <a href="#" class="add-to-cart-new"> Pre Order </a>
+                                        {% elif book.stock_info == '3' %}
+                                            <a href="#" class="add-to-cart-new">Out of Stock </a>
+                                        {% else %}
+                                            <button style="border:none" class="add-to-cart-new" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+                                           
+                                        {% endif %}   
+                                    </center>
+                                </div> 
+                                
+                            </div> 
+                            {% endfor %}
+                        </div>
+                        {% for book in category.list|slice:"1" %}
+                            <center><a href="/book/category/{{ book.category_name_id}}/{{ book.menu_url}}/" class="see_more_button">আরও দেখুন</a> </center>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+      {% if forloop.counter|divisibleby:2 %}
+        {% if forloop.counter == 2 %}
+        <section class="carousel_category_list_homepage_shortfilter">
+            <div class="container">
+                <div class="row"> 
+                    <div class="col-sm-12">
+                        <div class="category_list_homepage"> 
+                            <h4>আপনি কোন বইগুলো দেখতে চান?</h4>
+                            <div class="owl-carousel top_category_item"> 
+                                {% for category in category_load2|book_category2%}
+                                    <div class="category_book_item_shortlist"> 
+                                        <div class="all_category_items_homepage">
+                                            <a href="/book/category/{{ category.pk}}/{{ category.menu_url}}/">
+                                                <h5> {{ category.cat_name_bangla}} </h5>
+                                            </a>
+                                        </div>
+                                    </div>   
+                                {% endfor %} 
+                            </div> 
+                             
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> 
+
+        {% endif %}
+    {% endif %}  
+    {% endfor %}
+ 
+    <section class="carousel_category_list_homepage">
+        <div class="container">
+            <div class="row"> 
+                <div class="col-sm-12">
+                    <div class="category_list_homepage"> 
+                        <h4>গত সপ্তাহের সেরা লেখকবৃন্দ</h4>
+                        <div class="owl-carousel weekly_top_wirtter"> 
+                            
+                            {% for writer in writer_book %} 
+                                <div class="weekly_writter_items">
+                                    <a href="/book/author/{{ writer.pk }}/{{ writer.menu_url }}/">
+                                        {% if writer.writter_images %}
+                                            <img src="/static/publisher_app/media/{{ writer.writter_images }}" >
+                                        {% else %}
+                                            <img src="/static/publisher_app/images/writter.jpg" >
+                                        {% endif %}
+                                        <h5><Center>{{ writer.writter_name_bangla}} </Center></h5>
+                                        <h6><Center>বই সংখ্যা ({{writer.total_book}})</Center></h6>
+                                    </a> 
+                                </div>
+                            {% endfor %} 
+                        </div> 
+                         
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        
+    <!-- Recent View Products  -->
+    {% if recent_book_list|length > 5 %}
+    <section class="carousel-category-book-items">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="category-book-items">
+                        <h4><i class="fa fa-eye"></i> Recently Viewed</h4>
+                        <div class="owl-carousel book-items">
+                            {% for book in recent_book_list %}
+                            <div class="category_book_item"> 
+                                <div class="product-grid2">
+                                    <div class="product-image2">
+                                        {% if book.discount > 0  %} <p class="discount_range">{{ book.discount }}% </p> {% endif %}
+                                          <img class="pic-1" src="/static/publisher_app/media/{{ book.book_name.thumbnail }}">
+                                            {% if book.is_pre_image == 1 %}
+                                                <img src="/static/publisher_app/images/readmore.png" class="readmore_images">
+                                            {% endif %} 
+                                       
+                                        <ul class="social">
+                                            <li><a href="/book/{{ book.book_name.pk }}/{{book.book_name.slug}}/" onclick="recent_function('{{ book.pk }}')"> View Details </a></li>
+                                             
+                                        </ul>
+                                        
+                                    </div> 
+                                </div> 
+                            </div>
+                            {% endfor %}
+                            
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %} 
+  
+
+    <!-- Cart Loader   -->
+    <div class="cart_loader">
+        <img src="/static/publisher_app/images/loader.gif" alt="loader">
+    </div>
+    <div class="cart_loader_exist">
+        <h4>Already Added!</h4>
+    </div>
+ 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:none">
+          <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i>Successfully Added to Cart</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+ 
+    <script type="text/javascript">  
+        $(".cart_loader").hide(); 
+        $(".cart_loader_exist").hide();
+        function cart_function(id){   
+            var book_id   = document.getElementById(id+"_book_id").value;
+            var sale_price   = document.getElementById(id+"_sale_price").value;
+            var book_price   = document.getElementById(id+"_book_price").value;
+            var discount   = document.getElementById(id+"_discount").value;  
+             
+            $.ajax({
+                url: "/",
+                type:'GET',
+                data : {
+                    book_id : book_id,
+                    sale_price : sale_price,
+                    book_price : book_price,
+                    discount : discount,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){ 
+                    if(data == "success")
+                    {   
+                        $(".cart_loader").show();
+                        $(".cart_loader_exist").hide();
+                        window.setTimeout(function () {
+                            $(".cart_loader").hide();
+                        }, 1000);
+                        var count = parseInt($("#cart_items").html()) + 1;
+                        $("#cart_items").html(count); 
+                         
+                        var page_cart_counter = parseInt($("#page_cart").html()) + 1;
+                        $("#page_cart").html(page_cart_counter); 
+                        
+                    }
+                    else{
+                        $(".cart_loader").hide();   
+                        $(".cart_loader_exist").show();   
+                        window.setTimeout(function () {
+                            $(".cart_loader_exist").hide();
+                        }, 1000);
+                         
+                    }
+                    
+                },
+                error: function(data){
+                    alert(data);
+                }
+            });
+           
+            
+        }
+    </script> 
+    <!-- Recent View Books  -->
+    <script type="text/javascript">
+        function recent_function(id){
+            var r_book_id   = document.getElementById(id+"_r_book_id").value;   
+            $.ajax({
+                url: "/book/recent-book/",
+                type:'GET',
+                data : {
+                    r_book_id : r_book_id, 
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){ 
+                },
+                error: function(data){ 
+
+                }
+            });
+        }
+    </script> 
+<script>
+    $(document).ready(function() {
+        $('.top_category_item').owlCarousel({
+            loop: true,
+            navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            nav: true,
+            margin: 25,
+            responsiveClass: true,
+            responsive: {
+            0: {
+                items: 1,
+                nav: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+              300: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            400: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            500: {
+                items: 2,
+                nav: false,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            600: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                loop: true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            800: {
+                items: 4,
+                nav: false,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1000: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1100: {
+                items: 6,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            }, 
+              1200: {
+                items:6,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              }
+            }
+        })
+        $('.weekly_top_wirtter').owlCarousel({
+            loop: true,
+            navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            nav: true,
+            margin: 25,
+            responsiveClass: true,
+            responsive: {
+              0: {
+                items: 1,
+                nav: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              },
+              300: {
+            items: 2,
+            nav: true,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          400: {
+            items: 2,
+            nav: true,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          500: {
+            items: 2,
+            nav: false,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          600: {
+            items: 3,
+            nav: false,
+            autoplay:true,
+            loop: true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          800: {
+            items: 4,
+            nav: false,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          1000: {
+            items: 4,
+            loop: true,
+            margin: 25,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          1100: {
+            items: 6,
+            loop: true,
+            margin: 25,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          }, 
+              1200: {
+                items:6,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              }
+            }
+        })
+    })
+
+    function addTowishListItem(book_id, status){   
+        $.ajax({
+            url: "/addToWishList/",
+            type:'GET',
+            data : {
+                book_id : book_id, 
+                status : status, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                if (data == "active"){
+                    var wishlist_count = parseInt($("#wishlist_items").html()) + 1;
+                    $("#wishlist_items").html(wishlist_count);  
+                    location.reload(); 
+                }
+                else{
+                    var wishlist_count = parseInt($("#wishlist_items").html()) - 1;
+                    $("#wishlist_items").html(wishlist_count);
+                    location.reload();
+                }
+            },
+            error: function(data){ 
+                alert(data);
+            }
+        });
+    }
+</script>
+{% endblock %}

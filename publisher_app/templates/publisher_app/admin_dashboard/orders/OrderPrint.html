@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head> 
+        {% load static %}
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title> Ahsan Dashboard Publisher</title> 
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            p{margin-bottom: 1px;}
+            h4{margin-bottom: 1px;}
+            h5{margin-bottom: 1px;}
+            h6{margin-bottom: 1px;}
+            .printPageArea{
+                width:1000px;
+                margin:0 auto
+            }
+            .product_invoice_table{
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+       
+        <div class="printPageArea" >
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="header" style="border:1px solid #ccc; background:rgb(241, 241, 241);width:100%;margin-bottom:6px;padding:5px;">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="web_logo" style="width:240px;padding:5px;">
+                                    <img src="/static/publisher_app/images/services/footer_logo.PNG" alt="" style="width:170px;height:70px">
+                                </div>
+                            </div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-5">
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;margin-top: 4px;">15 shiddeshwari road Dhaka, Bangladesh.</p>
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;">Email : info@ahsanpublication.com</p>
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;">Phone : 01737-419624, <span style="margin-left:8px">Web : www.ahsan.com.bd</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="billing_address">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                    <h4>Order Info</h4>
+                                    <input type="text" id="order_number" value="{{ get_order_info.order_number }}" hidden>
+                                    <p>Order Date : {{ get_order_info.order_date|date }}</p>
+                                    <p>Order Id : {{ get_order_info.order_number }}</p>
+                                    <p>Payment Status  : {{ get_order_info.get_payment_status_display}}</p>
+                                    <p>Payment Method  : {{ get_order_info.get_payment_method_display}}</p>
+                                    <p>Delivery Method  : {% if get_order_info.delivery_method.courier_name %} {{ get_order_info.delivery_method.courier_name }} {% else %} Pending {% endif%} </p>  
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                    <h4>Delivery Info</h4>
+                                    <p style="font-family: 'AdorshoLipi';"> Name : {{ get_order_info.delivery_per_name}}</p>
+                                    <p>Mobile : {{ get_order_info.customer_mobile}} {% if get_order_info.optional_number %}, {{ get_order_info.optional_number}} {% endif %}</p>
+                                    {% if get_order_info.customer_email %}<p>Email : {{ get_order_info.customer_email}}</p> {% endif %}
+                                    <p style="font-family: 'AdorshoLipi';">Address : {{ get_order_info.shipping_address}}</p> 
+                                    <p>{% if get_order_info.postal_code_id == 1 or get_order_info.postal_code_id == null %} {% else %} Post/Area : {{ get_order_info.postal_code.post_office_english}}, {% endif %} {{ get_order_info.upozilla.upozilla_name_english}}, {{ get_order_info.district.district_name_english}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div class="col-sm-12">
+                    <table class="table table-bordered table table-striped product_invoice_table">
+                        <tr>
+                            <th style="background-color:#efefef !important;width:4%">SL</th>
+                            <th style="background-color:#efefef !important;width:55%">Product Name</th>
+                            <th style="background-color:#efefef !important;width:18%;text-align: center;">Unit Price</th>
+                            <th style="background-color:#efefef !important;width:5%">Qty</th>
+                            <th style="background-color:#efefef !important;width:13%">Total Price</th>
+                        </tr>
+                        {% for value in order_wise_product %}
+                        <tr>
+                            <td> {{ forloop.counter }} </td>
+                            <td>
+                                <p style="font-size:16px;margin: 0;font-family: 'AdorshoLipi';">{{ value.book_name_bangla }} <span style="font-size: 14px;">(লেখকঃ {{ value.writter_name_bangla }} - {{value.publisher_name_bangla}})</span></p>
+                            </td>
+                            <td style="text-align:center;"><span style="font-size: 16px;font-family: sans-serif;">৳</span> {% if value.discount == 0 %} Fixed Price {% else %}<del> {{ value.book_price }}</del>{% endif %} &nbsp;&nbsp; <strong> {{ value.sale_price }}</strong>  </td>
+                            <td style="text-align:center;">{{ value.book_quantity }}</td>
+                            <td style="text-align:center;"><span style="font-size: 16px;font-family: sans-serif;">৳</span> {{ value.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table> 
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <br>
+                            <center><p style="font-family: 'AdorshoLipi';"><strong> <i class="fas fa-hands-helping"></i>  আহসান শপ   </strong>এর সাথে থাকার জন্য ধন্যবাদ।</p></center>
+                            <p style="font-family: 'AdorshoLipi';"> <strong> বিঃদ্রঃ -</strong> কাস্টমারকে ফোনে পাওয়া না গেলে অফিসে যোগাযোগ করুনঃ- <strong style="font-size:20px;">০১৯০২৩৫৩৭৭৩</strong> </p>
+                                    
+                        </div>
+                        <div class="col-sm-4">
+                            <div id="totalSummaryTable" style="position: relative; width:100%;">
+                                <table class="table table-bordered table-striped"  style="float:right">
+                                    <tr class="subtutoa_tr">
+                                        <th colspan="4" style="text-align:right;">Subtotal</th>
+                                        <th style="text-align:center;">Tk. {{ total_order_price }}</th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="4" style="text-align:right;">Shipping Charge</th>
+                                        <th style="text-align:center;">Tk. {{ get_order_info.shipping_charge }}</th>
+                                    </tr>
+                                    <tr class="subtutoa_tr">
+                                        <th colspan="4" style="text-align:right;"><strong>Grand Total</strong></th>
+                                        <th style="text-align:center;">Tk. {{ grand_total }}</th>
+                                    </tr>
+                                    <tr class="subtutoa_tr">
+                                        <th colspan="4" style="text-align:right;"><strong>Less Amount</strong></th>
+                                        <th style="text-align:center;">Tk. {{ get_order_info.less_amount }}</th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align:right;"><strong>Payable Amount</strong></td>
+                                        <th style="text-align:center;">Tk. {{ total_payable }}</th>
+                                    </tr>
+                                </table>
+                                
+                                <div class="paidIcon" style="position: absolute; width: 100%; height: 142px;">
+                                    {% if shipping_info.payment_status == '3' %}
+                                        <img src="/static/publisher_app/images/paidicon.png" alt="" style="width: 226px; opacity: 0.3; float: right; margin: 10px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </body>
+</html>

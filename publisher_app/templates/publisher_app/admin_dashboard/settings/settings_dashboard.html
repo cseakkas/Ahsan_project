@@ -1,0 +1,56 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Author Update {% endblock %}
+{% load static %}
+{% block content %} 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Settings Dashboard </h4>
+                <div class="card-body">   
+                    <div class="row">
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4">
+                                <a href="" class="card-body dashboard_menu_item">Publisher Profile</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4">
+                                <a href="" class="card-body dashboard_menu_item">Slider List</a> 
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4">
+                                <a href="/settings/district-list/" class="card-body dashboard_menu_item">District List</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4"> 
+                                <a href="/settings/upozilla-list/" class="card-body dashboard_menu_item">Upozilla List</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4"> 
+                                <a href="/settings/post-office-list/" class="card-body dashboard_menu_item">Post Office List</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4"> 
+                                <a href="/settings/menu-list/" class="card-body dashboard_menu_item">Menu List</a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <div class="card bg-success text-white mb-4">
+                                <!-- <div class="card-body">User Access Control</div>  -->
+                                <a href="/user-access-control/" class="card-body dashboard_menu_item">User Access Control</a>
+                            </div>
+                        </div>
+                         
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

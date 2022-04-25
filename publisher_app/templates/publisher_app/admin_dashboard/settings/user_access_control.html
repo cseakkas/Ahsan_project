@@ -1,0 +1,72 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Author Update {% endblock %}
+{% load static %}
+{% block content %} 
+
+<style>
+    .access_check_box{
+        width:20px;height:20px;float: left;margin-top: 3px;margin-right: 5px;
+    }
+</style>
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">User Access Set <span><a href="#">User Access List</a></span></h4>
+                <div class="card-body">   
+                    <div class="col-sm-4 form-group">
+                        <label>User Select</label>
+                        <select name="user_id" id="userId" class="form-control">
+                            <option value="">Employee</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4 form-group"> 
+                        <button class="btn btn-success" id="setUserAccessControl">Set User Access Control</button>
+                    </div>
+                    <br>
+                    <table class="table table-striped" id="AccessMenuCheck">
+                        <tr style="background: #cecece;">
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Nemu Name</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Insert Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> View Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Update Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Delete Access</th>
+                        </tr>
+                        {% for data in menu_list %}
+                            <tr>
+                                <td><input type="checkbox" onclick="check_uncheck_all(this.checked, '{{data.id}}')" class="access_check_box"> {{data.menu_name}}</td>
+                                <td class="td_check_data_{{data.id}}"><input type="checkbox" id="insert_{{data.id}}" value="insert" class="access_check_box"> Insert Access</td>
+                                <td class="td_check_data_{{data.id}}"><input type="checkbox" id="view_{{data.id}}" value="view" class="access_check_box"> View Access</td>
+                                <td class="td_check_data_{{data.id}}"><input type="checkbox" id="update_{{data.id}}" value="update" class="access_check_box"> Update Access</td>
+                                <td class="td_check_data_{{data.id}}"><input type="checkbox" id="delete_{{data.id}}" value="delete" class="access_check_box"> Delete Access</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>    
+<script> 
+    function check_uncheck_all(isChecked, menu_id) {   
+        if(isChecked) { 
+            $('#AccessMenuCheck .td_check_data_'+menu_id+' :checkbox').each(function(){ 
+                this.checked = true; 
+                
+            });
+        }
+        else { 
+            $('#AccessMenuCheck .td_check_data_'+menu_id+' :checkbox').each(function(){
+                this.checked = false;
+            }); 
+        } 
+    }
+
+    // $("#setUserAccessControl").click(function(){
+    //     var check_insert = $('#insert_'+menu_id+' :checkbox').this.checked = true 
+    // })
+ 
+</script>
+{% endblock %}

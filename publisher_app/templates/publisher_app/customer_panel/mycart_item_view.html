@@ -1,0 +1,244 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} My Order View  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    .myorderlist tr th{
+        font-size: 13.5px;text-align: center;    padding: 12px 10px;
+    }
+    .myorderlist tr td{
+        font-size: 14px;text-align: center;    padding: 12px 10px;
+    }
+    .myorderlist tr td p{
+        margin: 0;
+    }
+</style>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="my_account_menu">
+                    <ul>
+                        <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="/myorder/order-list/" class="my_acc_menu_active"><i class="fa fa-list-ol"></i> Order</a></li>
+                        <li><a href="/my-wishlist/">Wishlist</a></li>
+                        <li><a href="">Wallet</a></li>
+                        <li><a href="">Notification</a></li>
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="my_account_dashboard">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="view_order_track_point">
+                                {% if order_summary.order_status == '1' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি  প্রক্রিয়াধীন অবস্থায় আছে ।  </strong></h5>
+                                {% elif order_summary.order_status == '8' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি  প্রক্রিয়াধীন অবস্থায় আছে ।  </strong></h5>
+                                {% elif order_summary.order_status == '2' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি সফল হয়েছে । </strong></h5>
+                                {% elif order_summary.order_status == '3' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি প্যাকিং অবস্থায় আছে ।  </strong></h5> 
+                                {% elif order_summary.order_status == '4' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-circle circle_customize"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি কুরিয়ারের কাছে পাঠানো হয়েছে ।  </strong></h5>
+                                {% elif order_summary.order_status == '5' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Deliveryed</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি ডেলিভারি দেওয়া হয়েছে ।  </strong></h5>
+                                    
+                                {% elif order_summary.order_status == '6' %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Confirmed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Packed</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Shipping</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Returned</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি ফেরত পাঠানো হয়েছে ।  </strong></h5> 
+                                {% else %}
+                                    <ul class="col-sm-12">
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Processing</p></li>
+                                        <li><span> <i class="fa fa-check"></i></span> <p>Canceled</p></li>
+                                    </ul>
+                                    <h5><strong>আপনার অর্ডারটি বাতিল করা হয়েছে ।  </strong></h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="information_box_ee">
+                                <div class="row">
+                                        <div class="col-sm-5" id="customer_info">
+                                            <div class="customer_info">
+                                                <h4>Order Info</h4>
+                                                <p> Order Id : {{ order_summary.order_number }} </p>
+                                                <p>Order Date : {{ order_summary.order_date|date:"d-M-Y" }}</p>
+                                                <p>Payment Status : {{ order_summary.get_payment_status_display }}</p>
+                                                <p>Payment Method : {{ order_summary.get_payment_method_display }}</p>
+                                                <p>Delivery Method : {{ order_summary.get_delivery_method_display }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2" id="qr_code_load">
+                                            <div class="qr_code_load">
+                                                <img src="/static/publisher_app/images/durbarshop.jpg" alt="" style="width:140px;">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5" id="delivery_info">
+                                            <div class="delivery_info">
+                                                <h4>Delivery Info</h4>
+                                                <h5> Name : {{ order_summary.delivery_per_name }} </h5>
+                                                <p>Mobile : {{ order_summary.customer_mobile }}{% if order_summary.optional_number %}, {{ order_summary.optional_number}} {% endif %} </p>
+                                                {% if order_summary.customer_email %}<p>Email : {{ order_summary.customer_email }}</p> {% endif %}
+                                                <p>Address : {{ order_summary.shipping_address }}  </p>
+                                                <p>{% if order_summary.postal_code_id == 1 or order_summary.postal_code_id == null %}  {% else %} Area/Post: {{ order_summary.postal_code.post_office_english}},{% endif%} {{ order_summary.upozilla.upozilla_name_english}}, {{ order_summary.district.district_name_english }}</p>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="col-sm-12">
+                                <div id="cart_items_show_costomer_panel">
+                                    {% for data in get_order_items %}
+                                    <div class="cart_items_show_costomer_panel">
+                                        <div class="row ">
+                                            <div class="col-sm-2" id="customer_book_cover_image">
+                                                <div class="customer_book_cover_image">
+                                                    <a target="_blank" href="/book/{{ data.book_id }}/{{data.book_slug}}/">
+                                                        <img src="/static/publisher_app/media/{{ data.book_image }}" alt="{{ data.book_name }}">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-10" id="book_info_content">
+                                                <div class="book_info_content">
+                                                    <div class="book_info_content_book_meta">
+                                                        <h5>
+                                                            <a target="_blank" href="/book/{{ data.book_id }}/{{data.book_slug}}/">
+                                                                {{ data.book_name_bangla}}
+                                                            </a>
+                                                        </h5>
+                                                        <p>{{ data.writter_name_bangla }}<span> - {{ data.publisher_name_bangla }}</span></p>
+                                                    </div>
+                                                    <div class="book_info__content_price">
+                                                        <del>Tk. {{ data.book_price }}</del> <strong>Tk. {{ data.sale_price }}</strong>
+                                                    </div>
+                                                    <div class="info_content_book_quantity">
+                                                        <p>{{ data.book_quantity }}</p>
+                                                    </div> 
+                                                    <div class="book_info__total_price">
+                                                        <strong>Tk. {{ data.total_sales_price }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    <div class="customer_cart_total_amount">
+                                        <div class="row">
+                                            <div class="col-sm-7"></div>
+                                            <div class="col-sm-5">
+                                                <table class="table table-bordered table-striped myorder_items_table" style="margin-bottom: 0px;">
+                                                    <tr>
+                                                        <th style="width:45% !important">Sub Total</th>
+                                                        <td style="width:65%;text-align: right">Tk. {{ subtotal }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Shipping Change</th>
+                                                        <td style="text-align: right">
+                                                            Tk. {{ shipping_charge }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th> Val (7.5%)</th>
+                                                        <td style="text-align: right">
+                                                            Tk. {{ vat_amount }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th> Discount </th>
+                                                        <td style="text-align: right">
+                                                            Tk. {{ discount_amount }}
+                                                        </td>
+                                                    </tr>
+                                                     
+                                                    <tr style="background-color: rgb(168, 238, 168);">
+                                                        <th>Grand Total</th>
+                                                        <th style="text-align: right">
+                                                            Tk. {{ grand_total }}
+                                                        </th>
+                                                    </tr>
+                                                    {% if due_amount > 0 %}
+                                                    <tr>
+                                                        <th style="color:red">Due</th>
+                                                        <th style="text-align: right; color:red;">
+                                                            Tk. {{ due_amount }}
+                                                        </th>
+                                                    </tr>
+                                                    {% endif %}
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script>
+    $("#data_Dismiss_load").click(function(){
+        window.location.href = "/order-list/";
+    })
+</script>
+
+{% endblock %}
+

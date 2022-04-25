@@ -1,0 +1,35 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Order Success  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section class="cart_page_pull">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 order_successful">
+                <center>
+                    <img src="/static/publisher_app/images/success.png" alt="empty Cart Durbar shop" >
+
+                    <h2 style="font-family: lato,sans-serif,siyamrupali,sans-serif;">Order Successfull</h2>
+                    <h4><strong> Order Id - {{ order_number }} </strong></h4>
+                    <h6><strong>Thank you for shopping with us</strong></h6>
+                    <br>
+                    <a href="/" class="add-to-cart2">Continue To Shopping</a>
+                </center>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+    <script>
+        $(document).ready(function () {
+            // Handler for .ready() called.
+            window.setTimeout(function () {
+                location.href = "/";
+            }, 10000);
+        });
+    </script>
+
+{% endblock %}

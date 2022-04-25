@@ -1,0 +1,106 @@
+{% extends 'durbar_shop/base.html' %}
+{% block title %} Islamic Book {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section>
+    <div class="durbar_shop_category_books">
+        <div class="container">
+            <div class="row"  id="durbar_shop_category_books_items_row">
+                <div class="col-sm-12" id="durbar_shop_category_books_items">
+                    <h3 class="category_page_title">
+                          <a href="/"><i class="fa fa-home"></i></a> / <a href="#">Category</a> / ইসলামি বই
+                    </h3>
+                </div>
+            </div>
+            <div class="row" id="durbar_shop_category_books_items_row">
+              {% for book in islamic_books %}  
+              <div class="col-lg-2 col-md-4 col-xs-6" id="durbar_shop_category_books_items">
+                    <div class="durbar_shop_category_books_items">
+                          <div class="durbar_shop_book_image">
+                              <a href="/book/details/{{ book.pk }}/">
+                                
+                                {% if book.discount > 0 %} <p class="discount_range">{{ book.discount }}% </p> {% endif %}
+                                  <img src="/static/durbar_shop/media/{{ book.book_image }}" alt="durbar_shop Books">
+                              </a>
+                          </div>
+                          <div class="durbar_shop_product_title">
+                              <h4>{{ book.book_name_bangla}}</h4>
+                              <h5>{{ book.author}}</h5>
+                              <h6>৳ {{ book.book_price}} {% if book.old_price %} <del>{{ book.old_price }}</del> {% endif %} </h6>
+                          </div>
+                          <div class="add_to_cart_btn">
+                              <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                  <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                  <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                              </div>
+                              <center>
+                                  <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                              </center>
+                              <!-- <a href="#"><i class="fa fa-shopping-cart"></i> Add to Cart</a> -->
+                          </div>
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+ 
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+          <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none">
+              <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i> Successfully Added to Cart</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    
+    <script src="{% static 'durbar_shop/js/jquery.js' %}"></script>  
+    <script type="text/javascript">
+        function cart_function(id){
+            var book_id   = document.getElementById(id+"_book_id").value;
+            var book_price   = document.getElementById(id+"_book_price").value;
+            $.ajax({
+                url: "/",
+                type:'GET',
+                data : {
+                    book_id : book_id,
+                    book_price : book_price,
+                    total_price : book_price
+                },
+                success: function(data){
+                    $('#exampleModal').modal('show')
+                        setTimeout(function(){
+                        $('#exampleModal').modal('hide');
+                    }, 1000);
+
+                    var count = parseInt($("#cart_items").html()) + 1;
+                    $("#cart_items").html(count);
+                    // var total_price = parseInt($("#cart_total_price").html()) + book_price;
+                    // $("#cart_total_price").html(total_price);
+                    
+                },
+                error: function(data){
+                        alert(data);
+                }
+            });
+        }
+    </script> 
+
+<script>
+    $(document).ready(function(){
+     $('#read_more_button').click(function(){
+       $('.author_details_mes').removeClass();
+       $('#read_more_button').hide();
+     });
+    });
+</script>
+
+{% endblock %}

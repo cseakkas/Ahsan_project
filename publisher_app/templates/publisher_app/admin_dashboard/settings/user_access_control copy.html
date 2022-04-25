@@ -1,0 +1,49 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Author Update {% endblock %}
+{% load static %}
+{% block content %} 
+
+<style>
+    .access_check_box{
+        width:20px;height:20px;float: left;margin-top: 3px;margin-right: 5px;
+    }
+</style>
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">User Access Set <span><a href="#">User Access List</a></span></h4>
+                <div class="card-body">   
+                    <div class="col-sm-4 form-group">
+                        <label>User Select</label>
+                        <select name="user_id" id="userId" class="form-control">
+                            <option value="">Employee</option>
+                        </select>
+                    </div>
+                    <br>
+                    <table class="table table-striped">
+                        <tr style="background: #cecece;">
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Nemu Name</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Insert Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> View Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Update Access</th>
+                            <th> <input type="checkbox" onclick="" class="access_check_box"> Delete Access</th>
+                        </tr>
+                        {% for data in menu_list %}
+                            <tr>
+                                <td><input type="checkbox" onclick="" class="access_check_box"> {{data.menu_name}}</td>
+                                <td><input type="checkbox" onclick="" class="access_check_box"> Insert Access</td>
+                                <td><input type="checkbox" onclick="" class="access_check_box"> View Access</td>
+                                <td><input type="checkbox" onclick="" class="access_check_box"> Update Access</td>
+                                <td><input type="checkbox" onclick="" class="access_check_box"> Delete Access</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

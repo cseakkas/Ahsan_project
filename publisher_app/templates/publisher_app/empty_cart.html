@@ -1,0 +1,24 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} My Cart Items  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section class="cart_page_pull">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 cart_empty_area">
+                <center>
+                    <img src="/static/publisher_app/images/empty_cart.png" alt="empty Cart Durbar shop">
+                    
+                    <h2 style="font-family: lato,sans-serif,siyamrupali,sans-serif;">Your Cart is Empty!</h2>
+                    <h5>Looks like you haven't made order yet.</h5>
+                    <br>
+                    <a href="/" class="add-to-cart2">Continue To Shopping</a>
+                </center>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}    

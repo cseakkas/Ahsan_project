@@ -1,0 +1,263 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Registration {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+    <style> 
+        .product_image_load{width: 80px;}
+        fieldset 
+        {
+            border: 1px solid #ddd !important;
+            margin: 0;
+            min-width: 0;
+            padding: 10px;       
+            position: relative;
+            border-radius:4px;
+            background-color:#fbfbfb;
+            padding-left:10px!important;
+        }	 
+        legend
+        {
+            font-size:14px;
+            font-weight:bold;
+            margin-bottom: 0px; 
+            width: 80%; 
+            border: 1px solid #ddd;
+            border-radius: 4px; 
+            padding: 5px 5px 5px 10px; 
+            background-color: #ffffff;
+        }
+        
+        .userimg_box{
+            width:80px;
+            height:90px;
+            overflow: hidden;border: 1px solid #ccc;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .img_box img{
+            width:85px;height:95px;
+            display:block;
+            margin: 5px auto;
+        }
+        .registration_area{
+            background: #fff;
+            padding: 10px;
+            border-radius: 9px;
+            margin: 30px 0;
+        }
+        label{font-weight: 500;}
+        span{color:red;font-size: 11px}
+        #Registration_section{
+            padding: 22px 75px;
+            box-shadow: 0px 0px 3px #505050;
+            background: white;
+            border-radius: 5px;
+
+        }
+        #ExUserChkMsg{
+            background: rgb(252, 141, 141);
+            border-radius: 5px;
+            padding:5px;
+            text-align: center;
+            width: 93%;
+            display: block;
+            margin-left: 17px;
+            font-size: 15px;
+            color: black;
+        } 
+        
+    </style>
+        
+        <div class="login_page_pull login_page">
+            <div class="container"> 
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    
+                    <div class="col-sm-6" id="publisher_app_customer_login"> 
+                        <div id="Registration_section"> 
+                            <div class="login_logo">
+                                <center>
+                                    <img src="/static/publisher_app/images/services/footer_logo.PNG" > <br> <br>
+                                    <h2>Registration</h2>
+                                    <input type="hidden" name="pass_prev_url" value="{{pass_prev_url }}">
+                                </center>
+                            </div>
+                            
+                            <span id="ExUserChkMsg">Already Customer Registered</span>
+                            <br>
+                            <div class="col-sm-12 form-group"> 
+                                    <input type="text" id="user_full_name" class="form-control" placeholder="Your Name "  required>
+                                    <span id="hide_name_message" style="color:red;">Name field required</span>
+                                </div>
+                                <div class="col-sm-12 form-group"> 
+                                    <input type="number" class="form-control" id="mobile_number" placeholder="Mobile" onkeypress="return event.charCode >= 48" min="1" required> 
+                                    <!-- <input type="text" id="mobile_number" name="usermobile" class="form-control" maxlength="11" minlength="11"  placeholder="Mobile" required> -->
+                                    <span id="hide_number_message" style="color:red;">Mobile number field required</span>
+                                </div>
+                                <div class="col-sm-12 form-group"> 
+                                    <input style="font-family: cambria Math;" type="email" id="userEmail" name="useremail" class="form-control" placeholder="Email (Optional)">
+                                </div>
+                                <div class="col-sm-12 form-group"> 
+                                    <input type="password" id="userpass" name="user_password" class="form-control" placeholder="User Password" required>
+                                    <span id="hide_password1_message" style="color:red;">Password field required</span>
+                                </div>
+                                <div class="col-sm-12 form-group"> 
+                                    <input type="password" id="confirm_password" class="form-control" placeholder="Confirm Password" required>
+                                    <span id="hide_password_message" style="color:red;">Confirm Password field required</span>
+                                </div>
+                               
+                                <div class="col-sm-12 form-group"> 
+                                    <button type="submit" class="btn btn-info login_btn" style="width: 150px;" id="RegistrationSubmit">Registration</button>
+                                    <p style="margin-top:20px;">Already have an account! <a href="/customer/login/"> <strong> Login </strong> </a> </p>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        
+    <script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+    <script>
+        $('#mobile_number').on('keyup', function() {
+            limitText(this, 11)
+        });
+        function limitText(field, maxChar){
+            var ref = $(field),
+                val = ref.val();
+            if ( val.length >= maxChar ){
+                ref.val(function() {
+                    console.log(val.substr(0, maxChar))
+                    return val.substr(0, maxChar);       
+                });
+            }
+        }
+        $("#hide_name_message").hide();
+        $("#hide_password1_message").hide();
+        $("#hide_number_message").hide();
+        $("#hide_password_message").hide();
+        $("#RegistrationSubmit").click(function(){ 
+            var user_full_name = $("#user_full_name").val(); 
+            var mobile_number = $("#mobile_number").val(); 
+            
+            var userEmail = $("#userEmail").val();
+            var confirm_password = $("#confirm_password").val();  
+            
+            if (user_full_name == ""){ 
+                $("#hide_name_message").show(); 
+                return false
+            }else{$("#hide_name_message").hide(); }
+            if (mobile_number == ""){
+                $("#hide_number_message").show(); 
+                return false
+            }
+            else{
+                if(mobile_number.length < 11 ){
+                    alert("Enter Correct Number");
+                    $("#hide_number_message").show();
+                    return false
+                }
+                else if(mobile_number.length > 11 ){
+                    alert("Enter Correct Number");
+                    $("#hide_number_message").show();
+                    return false
+                }
+                else{
+                    $("#hide_number_message").hide();  
+                } 
+            }
+            if (confirm_password == ""){
+                $("#hide_password1_message").show(); 
+                $("#hide_password_message").show(); 
+                return false
+            }else{
+                $("#hide_password1_message").hide();
+                $("#hide_password_message").hide();
+         } 
+            
+            $.ajax({
+                url: "/customer/registration/",
+                type:'GET',
+                data : {
+                    user_full_name : user_full_name,
+                    mobile_number : mobile_number, 
+                    userEmail : userEmail, 
+                    confirm_password : confirm_password, 
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){
+                    if(data == "Registration Successful")
+                    { 
+                        window.location.href = "/my-account/";
+                    }
+                    else{ 
+                        alert(data);
+                    }
+                },
+                error: function(data){
+                    alert(data);
+                },
+            })
+             
+        })
+    </script>
+
+        <script>
+            $("#hide_number_message").hide();
+            $("#mobile_number").keyup(function(){
+                var get_key = $("#mobile_number").val();
+                if(get_key.length == 2 && get_key != 01){ 
+                    $("#hide_number_message").show(); 
+                    alert("Please Enter Your Mobile Number");
+                }
+                else{ 
+                    if (get_key.length == 2){
+                        if (get_key != 01){ 
+                            $("#hide_number_message").show(); 
+                            alert("Please Enter Your Mobile Number");
+                        }
+                    }else{
+                        $("#hide_number_message").hide();
+                    }
+                }
+            })
+        
+            $("#userEmail").keyup(function(){
+                var get_key = $("#mobile_number").val(); 
+                var mystring = get_key.substr(0,2); 
+                if (get_key.length == 11 && mystring != 01){  
+                    $("#hide_number_message").show(); 
+                    alert("Please Enter English Mobile Number");
+                    $("#mobile_number").val("");
+                }  
+            }) 
+        </script> 
+        <script>
+            $("#ExUserChkMsg").hide();
+            $("#mobile_number").keyup(function(){
+                var get_mobile_number =  $("#mobile_number").val();
+                $.ajax({
+                url: "/durbar/checkAccounts/",
+                type:'GET',
+                data : { 
+                    get_mobile_number : get_mobile_number,   
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){ 
+                    var ex_mobile = data[0]['ex_mobile'];
+                    if(data){ 
+                        $("#ExUserChkMsg").show();
+                        $("#RegistrationSubmit").hide();
+                        
+                    }    
+                }, 
+                error: function(data){
+                    $("#ExUserChkMsg").hide();
+                    $("#RegistrationSubmit").show();
+                },
+                 
+            })
+        }) 
+        </script>
+{% endblock %}

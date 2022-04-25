@@ -1,0 +1,86 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Book List  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3" style="padding-right: 0;">
+                <div class="author_sidebar">
+                    <div class="author_filter_pull">
+                        <div class="category_filter">
+                            <h5>বিষয় সমূহ</h5>
+                            <ul>
+                                {% for category in category_load|book_category %}
+                                    <li><a href="/book/category/{{ category.pk }}/">{{ category.cat_name_bangla }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="category_filter">
+                            <h5>লেখক সমূহ</h5>
+                            <ul>
+                                {% for writer in writter_load|book_writter %}
+                                    <li><a href="/author/{{ writer.id }}/">{{ writer.writter_name_bangla }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="author_mainarea_pull">
+                    <div class="author_book_list">
+                        {% if get_book_cat_id.category_cover %}
+                            <img src="/static/publisher_app/media/{{ get_book_cat_id.category_cover }}" alt="" style="width:100%;height:100px;margin-bottom:10px;">
+                        {% endif %}
+                        <h4>{{ get_book_cat_id.cat_name_bangla }} এর বই সমূহ </h4> <hr>
+                        
+                        <div class="row" id="publisher_app_category_books_items_row">
+                                {% for book in menu_wise_book %}  
+                                <div class="col-lg-3 col-md-4 col-xs-6" id="publisher_app_category_books_items">
+                                      <div class="publisher_app_category_books_items">
+                                            <div class="publisher_app_book_image">
+                                                <a href="/book/details/{{ book.pk }}/">
+                                                    <div class="book_image_cover">
+                                                        <img src="/static/publisher_app/media/{{ book.book_image }}" alt="publisher_app Books">
+                                                         <span>{{ book.discount }}%</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="publisher_app_product_title">
+                                                <h4>{{ book.book_name_bangla }}</h4>
+                                                <h5>{{ book.author}}</h5>
+                                                <h6>৳ {{ book.sale_price}} {% if book.discount == '0' %}  {% else %}  <del>{{ book.book_price }}</del> {% endif %}</h6> 
+                                            </div>
+                                            <div class="add_to_cart_btn">
+                                                <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                                    <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                                    <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                                </div>
+                                                <center>
+                                                    <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                                                </center>
+                                                <!-- <a href="#"><i class="fa fa-shopping-cart"></i> Add to Cart</a> -->
+                                            </div>
+                                      </div>
+                                  </div>
+                                {% endfor %}
+                              </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,1040 @@
+{% extends 'publisher_app/base.html' %} 
+{% block og_title %}{{ getcatid.book_name_bangla }} {% endblock %}
+{% block og_img %}https://ahsan.com.bd/static/publisher_app/media/{{getcatid.book_image}}{% endblock %}
+{% block og_description %}{{ getcatid.detail|safe }}{% endblock %}
+
+{% block title %} View Details || {{ getcatid.book_name_bangla }} {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    .product_view_images{
+        position: relative;
+    }
+    .actu_pore_dekhun{
+        position: absolute;
+        top: 170px;
+        z-index: 996;
+        left: 70px;
+        right: 0;
+    }
+    .actu_pore_dekhun img{
+        opacity: 0.5;
+        border: 1px solid #ccc;
+        padding: 2px;
+        cursor: pointer;
+    }
+
+    .cardplusminus{
+        width: 117px;
+        border: 1px solid rgb(161, 192, 200);
+        padding: 5px;
+        margin-bottom: 10px;
+        float: left;
+        margin-right: 20px;
+    }
+    .qty .count {
+        color: rgb(165, 165, 165);
+        display: inline-block;
+        vertical-align: top;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 30px;
+        padding: 0 2px
+        ;min-width: 35px;
+        text-align: center;
+    }
+    .qty .plus {
+        cursor: pointer;
+        display: inline-block;
+        vertical-align: top;
+        color: rgb(164, 164, 164);
+        width: 30px;
+        height: 30px;
+        font: 30px/1 Arial,sans-serif;
+        text-align: center; 
+        }
+    .qty .minus {
+        cursor: pointer;
+        display: inline-block;
+        vertical-align: top;
+        color: rgb(164, 164, 164);
+        width: 30px;
+        height: 30px;
+        font: 30px/1 Arial,sans-serif;
+        text-align: center; 
+        background-clip: padding-box;
+    }
+ 
+    .minus:hover{
+        background-color: #c9d2da  !important;
+    }
+    .plus:hover{
+        background-color: #c9d2da  !important;
+    }
+    /*Prevent text selection*/
+    span{
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+    input{  
+        border: 0;
+        width: 2%;
+    }
+    nput::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input:disabled{
+        background-color:white;
+    }
+    .qtycountAndWishlist{
+        width:200px;
+        overflow: hidden;
+    }
+    .cardplusminus span{margin-bottom:0} 
+    .wishlistforViewPage{
+        width:70px;float:left;
+        cursor: pointer;
+    }  
+    .wishlistforViewPage i{
+        font-size: 33px;
+        color: #b4b4b4;
+        padding: 3px;
+    } 
+
+</style>
+
+    <section class="product_view_pull">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ul class="breadcrumb">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/">Books</a></li>
+                            <li><a href="/book/categories/">Categories</a></li>
+                            {% for data in category %}
+                                <li><a href="/book/category/{{data.category_name_id}}/{{ data.category_name.menu_url}}/">{{ data.category_name.cat_name_bangla }}</a></li>
+                            {% endfor %} 
+                            <li>{{ getcatid.book_name_bangla }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3" id="for_responsive_design">
+                        <div class="product_view_images">
+                            {% if getcatid.is_pre_image == 1 %}
+                             <div class="actu_pore_dekhun">
+                                <img data-toggle="modal" data-target="#exampleModal" src="/static/publisher_app/images/read-more.png" alt="">
+                             </div>
+                             {% endif %}
+                            <div class="product_cover_images">
+                                <img src="/static/publisher_app/media/{{ getcatid.book_image }}" alt="product images">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" id="for_responsive_design">
+                        <div class="product_feature_for_mobile">
+                            <h5>{{ getcatid.book_name_bangla }}</h5> 
+                           <center>
+                              by {% for data in writter %}
+                                    <a href="/book/author/{{data.writter_name_id}}/{{ data.writter_name.menu_url}}/" style="color:#235fce"> {{ data.writter_name.writter_name_bangla }}{% if writter|length > 1 %}, {% else %} {% endif %}</a>
+                                {% endfor %}
+                           </center>
+                           <h4><strong>Tk. {{ getcatid.sale_price }} {% if getcatid.discount > 0 %} <del>Tk. {{ getcatid.book_price }} </del> {% endif %}</strong>  <span style="font-size: 11px;margin-left: 5px;color:rgb(173, 35, 35)">{% if save_amount != 0 %} Save TK. {{save_amount}} ({{ getcatid.discount}}%) {% endif %} </span></h4>
+                        </div>
+                        
+                        <div class="product_feature">
+                            <h3>{{getcatid.book_name_bangla}}</h3>
+                            {% if getcatid.origin %} <h4>{{getcatid.origin}}</h4> {% endif %}
+                            <span> <i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star" aria-hidden="true"></i> </span>
+                            <p>
+                                লেখক : 
+                                {% for data in writter %}
+                                    <a href="/book/author/{{data.writter_name_id}}/{{ data.writter_name.menu_url}}/" style="color:#235fce"> {{ data.writter_name.writter_name_bangla }}{% if writter|length > 1 %}, {% else %} {% endif %}</a>
+                                {% endfor %} 
+                            </p>
+                            {% if translator %}
+                            <p>অনুবাদক :  
+                                {% for data in translator %}
+                                    <a href="/book/author/{{ data.translator_name_id }}/{{ data.translator_name.menu_url }}/" style="color:#235fce"> {{ data.translator_name.writter_name_bangla }}{% if translator|length > 1 %}, {% else %} {% endif %} </a>
+                                {% endfor %}
+                            </p> {% endif %}
+                            <p>প্রকাশনী : <a href="/book/publisher/{{getcatid.publisher.id}}/{{ getcatid.publisher.menu_url}}/" style="color:#235fce"> {{ getcatid.publisher }}</a></p>
+                            <p>বিষয় : 
+                                {% for data in category %}
+                                    <a href="/book/category/{{data.category_name_id}}/{{ data.category_name.menu_url}}/" style="color:#235fce"> {{ data.category_name.cat_name_bangla }}{% if category|length > 1 %}, {% else %} {% endif %}</a>
+                                {% endfor %}
+                            </p>
+                            {% if getcatid.ISBN %} <p>আইএসবিএন : {{ getcatid.ISBN }}</p> {% endif %}
+                            {% if getcatid.number_of_page %}<p>পৃষ্ঠা : {{ getcatid.number_of_page }}</p>{% endif %}
+                            {% if getcatid.language %}<p>ভাষা : {{ getcatid.language }}</p>{% endif %}
+                            {% if getcatid.cover_type %}<p>বাঁধাই :  {% if getcatid.cover_type != '3' %} {{ getcatid.get_cover_type_display }} {% endif %}</p>{% endif %}
+                            {% if getcatid.edition %}<p>প্রকাশকাল : {{ getcatid.edition }}</p>{% endif %}
+                             
+                            <div id="qtycountAndWishlist" style="overflow: hidden;display:block">
+                                <div class="cardplusminus">
+                                    <div class="qty">
+                                        <span class="minus">-</span>
+                                        <input type="number" class="count" id="viewbookqty" name="qty" value="1">
+                                        <span onclick="replaceOrderNowUrl()" class="plus">+</span>
+                                    </div>
+                                </div>
+                                <div class="wishlistforViewPage" id="fovarite_icon_{{getcatid.pk}}"> 
+                                    {% if is_wish_list_item.book_name_id == getcatid.pk %}
+                                        <i style="color:rgb(255, 82, 82);" class="fa fa-heart" onclick="addTowishListItem('{{getcatid.pk}}', 'inactive')"></i> 
+                                    {% else %}
+                                        <i class="fa fa-heart-o" onclick="addTowishListItem('{{getcatid.pk}}', 'inactive')"></i> 
+                                    {% endif %}
+                                </div>
+                                {% for data in wish_list %}
+                                    {% if data.book_name_id == book.wl_id %}
+                                        <div class="fovarite_icon_active" id="fovarite_icon_active_{{book.pk}}">
+                                            <i onclick="addTowishListItem('{{book.pk}}', 'active')" class="fa fa-heart"></i>
+                                        </div>
+                                    {% else %}
+                                        <div class="fovarite_icon" id="fovarite_icon_{{book.pk}}">
+                                            <i onclick="addTowishListItem('{{book.pk}}', 'inactive')" class="fa fa-heart-o"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                            </div>
+                            <h6>
+                                 <strong style="font-size: 22px;color:rgb(13, 151, 105)">Price : {{ getcatid.sale_price }} </strong>
+                                {% if getcatid.discount > 0 %}
+                                    <del>{{ getcatid.book_price }}</del> ({{getcatid.discount}}% ছাড়ে)
+                                {% endif %}
+                            </h6>
+                         
+                            {% if getcatid.stock_info == '2' %}
+                                <p style="color:green;"> <i class="fa fa-check-circle" aria-hidden="true"></i>  In Stock </p>
+                            {% endif %} 
+                            <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                <input type="text" id="{{ getcatid.pk }}_book_id" value="{{ getcatid.pk }}">
+                                <input type="text" id="{{ getcatid.pk }}_book_url" value="{{ getcatid.slug }}">
+                                <input type="text" id="{{ getcatid.pk }}_sale_price" value="{{ getcatid.sale_price }}">
+                                <input type="text" id="{{ getcatid.pk }}_wish_book_id" value="{{ getcatid.pk }}">
+                                <input type="text" id="{{ getcatid.pk }}_wish_sale_price" value="{{ getcatid.sale_price }}">
+                                <input type="text" id="{{ getcatid.pk }}_book_price" value="{{ getcatid.book_price }}">
+                                <input type="text" id="{{ getcatid.pk }}_discount" value="{{ getcatid.discount }}">
+                            </div>
+                            
+                            <!-- Stock Info  -->
+                            {% if getcatid.stock_info == '4' %}
+                                {% if getcatid.pre_order_msg %} <p> {{ getcatid.pre_order_msg }}<i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ducimus vel consequuntur"></i></p> {% endif %}
+                                <br>
+                                <a href="#" class="add-to-cart2"> Pre Order </a>
+                            {% elif getcatid.stock_info == '3' %}
+                                <br>
+                                <a href="#" class="add-to-cart2">Out of Stock </a>
+                            {% else %}
+                                <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ getcatid.pk }}')"> Add to cart</button> 
+                                <input type="hidden" id="getBookId" value="{{ getcatid.pk }}">
+                                <a class="btn btn-success" style="padding: 18px 30px;font-size: 15px;font-family: cambria;border-radius: 5px;font-weight: 600;background: #fbac18;border:none" id="ordernowUrl"> অর্ডার করুন </a>
+                                <!-- <a class="btn btn-success" style="padding: 18px 30px;font-size: 15px;font-family: cambria;border-radius: 5px;font-weight: 600;background: #fbac18;border:none" id="ordernowUrl" href="/checkout-order-now/{{getcatid.pk }}/"> অর্ডার করুন </a> -->
+
+                            {% endif %} 
+                            
+
+                        </div>
+                    </div>
+                    <div class="col-sm-3" id="for_responsive_design">
+                        <div class="Services_Supports">
+                            <h4>Services & Supports</h4> 
+                            <h6><i class="fa fa-money"></i> <span>Cash On Delivery</span></h6>
+                            <h6><i class="fa fa-arrows-alt"></i> <span>3 Days Happy Return</span></h6>
+                            <h6><i class="fa fa-car"></i> <span> Delivery Charge Tk. 50  </span></h6>
+                            <h6><i class="fa fa-cc-discover"></i> <span>Purchase & Earn</span> </h6> 
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="for_mobile_responsive_viewdetails_cart_and_wishlist">
+            {% if getcatid.stock_info != '3' %} 
+            {% if getcatid.stock_info == '4' %}
+                {% if getcatid.pre_order_msg %} <p> {{ getcatid.pre_order_msg }}<i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ducimus vel consequuntur"></i></p> {% endif %}
+                <a href="#" class="add-to-cart2"> Pre Order </a>
+            {% else %}
+                <center>
+                    <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ getcatid.pk }}')">Add to cart</button>
+                    <a class="btn btn-success" style="padding: 3px 11px;font-size: 15px;font-family: cambria;border-radius: 27px;font-weight: 600;" href="/checkout-order-now/{{getcatid.pk }}/">Order Now </a>
+                    <button style="border:none" class="btn_wishlish" onclick="wish_function('{{ getcatid.pk }}')"><i class="fa fa-heart"></i> </button>
+                </center>
+            {% endif %}
+            
+            {% else %}
+                <a href="#" class="add-to-cart2"> Not Available</a>
+            {% endif %} 
+        </div>
+        
+        <div class="viewe_details_offer_box">
+            {% for data in book_offer|slice:"2" %}
+                {% if data.link %}
+                     <p style="color:#28a745;margin-bottom: 0px;font-size: 14px;margin-top:  10px;"> <i class="fa fa-thumb-tack"></i> <a href="{{ data.link }}" style="color:#28a745;">{{ data.offer_details }} </a></p>
+                {% else %}
+                    <p style="margin-bottom: 0px;font-size: 14px;margin-top:  10px;"> <i class="fa fa-thumb-tack"></i> {{ data.offer_details }} </p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if package_book_list %}
+        <section class="package_book_list">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="package_book_list" id="desktop_version_package_details"> 
+                            <center><h4 style="padding:8px">Package Details</h4></center>
+                            <table class="table table-hovered" style="background: rgb(255, 255, 255);">
+                                <tr style="background: rgb(199, 199, 199);">
+                                    <th style="width:5%">SL</th>
+                                    <th style="width:15%">Product</th>
+                                    <th style="width:55%">Name</th>  
+                                    <th style="width:25%">Price</th> 
+                                </tr>
+                                {% for data in package_book_list %}
+                                <tr> 
+                                    <td>{{ forloop.counter}}</td>
+                                    <td>
+                                        {% if data.thumbnail %}
+                                            <img src="/static/publisher_app/media/{{ data.thumbnail }}" alt=" Package Image ">
+                                        {% else %}
+                                            <img src="/static/publisher_app/media/{{ data.book_image }}" alt=" Package Image ">
+                                        {% endif %}
+                                     </td>
+                                    <td>
+                                        <a href="/book/{{ data.book_id }}/{{ data.book_url }}/">{{ data.book_name_bangla }} ( <span style="color:rgb(60, 156, 156)">{{ data.writter_name_bangla }}</span> )</a>
+                                    </td> 
+                                    <td>
+                                        TK. <strong>{{ data.sale_price }} </strong>
+                                        {% if data.discount > 0 %}
+                                        <del>{{ data.book_price }}</del><span style="margin-left:8px">({{data.discount}}%)</span>
+                                        {% else %} <span style="font-size: 12px;color:rgb(231, 105, 105)">(Fixed Price)</span> {% endif %}
+                                    </td> 
+                                </tr> 
+                                {% endfor %}
+                                <tr style="box-shadow: 0px 1px 4px #a1a1a1;">
+                                    <th colspan="3" style="color:green"><center>You Save Amount : Tk {{total_save_price|floatformat:"0"}} ({{getcatid.discount}}%)</center></th>
+                                    <th>Total Package Price : Tk. {{ total_sale_price}}</th>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="package_book_list" id="mobile_version_package_details"> 
+                            <center><h4 style="padding:8px">Package Details</h4></center>
+                            <table class="table table-hovered" style="background: rgb(255, 255, 255);">
+                                <tr style="background: rgb(199, 199, 199);"> 
+                                    <td style="width:30%;font-weight:600;" >Product</td>
+                                    <td style="width:70%;font-weight:600;" >Name </td>   
+                                </tr>
+                                {% for data in package_book_list %}
+                                <tr>  
+                                    <td>
+                                        {% if data.thumbnail %}
+                                            <img src="/static/publisher_app/media/{{ data.thumbnail }}" alt=" Package Image ">
+                                        {% else %}
+                                            <img src="/static/publisher_app/media/{{ data.book_image }}" alt=" Package Image ">
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="/book/{{ data.book_id }}/{{ data.book_url }}/">{{ data.book_name_bangla }} <br> ( <span style="color:rgb(60, 156, 156)">{{ data.writter_name_bangla }}</span> )</a>
+                                        <br>
+                                        TK. <strong>{{ data.sale_price }} </strong>
+                                        {% if data.discount > 0 %}
+                                        <del>{{ data.book_price }}</del><span style="margin-left:8px">({{data.discount}}%)</span>
+                                        {% else %} <span style="font-size: 12px;color:rgb(231, 105, 105)">(Fixed Price)</span> {% endif %}
+                                    </td> 
+                                </tr> 
+                                {% endfor %}
+                                <tr style="background:#ededed;">
+                                    <th colspan="2"><h5>Total Package Price : Tk. {{ total_sale_price}}</h5></th>
+                                </tr>
+                                <tr style="background:#ededed">
+                                    <th colspan="2" style="color:green"><center>You Save Amount : Tk {{total_save_price|floatformat:"0"}} ({{getcatid.discount}}%)</center></th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="view_page_tab_pill">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                              <a class="nav-link active" id="ProductDetailsTab" data-toggle="tab" href="#ProductDetails" role="tab" aria-controls="nav-home" aria-selected="true">Summary</a>
+                              <a class="nav-link" id="Reviews-tab" data-toggle="tab" href="#Reviews" role="tab" aria-controls="nav-profile" aria-selected="false">Reviews</a>
+                              <a class="nav-link" id="ShoppingPolicy-tab" data-toggle="tab" href="#ShoppingPolicy" role="tab" aria-controls="nav-contact" aria-selected="false">Shopping Policy</a>
+                            </div>
+                          </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="ProductDetails" role="tabpanel" aria-labelledby="ProductDetailsTab">
+                                {% if  getcatid.video_link  %}
+                                    <h3>"{{ getcatid.book_name_bangla }}" বইটি সম্পর্কে আলোচনা  </h3><hr>
+                                    <center>
+                                        <iframe width="70%" height="440" src="https://www.youtube.com/embed/{{ getcatid.video_link }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </center>
+                                    <br>
+                                {% endif %}
+                                {{ getcatid.detail|safe }}
+                            </div>
+                            <div class="tab-pane fade" id="Reviews" role="tabpanel" aria-labelledby="Reviews-tab"> 
+                                <!-- Start Product Review Section  -->
+                                <section id="product_review_section">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-7">
+                                                <div id="review_success"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="product_review_section">
+                                                    <div class="col-sm-7">
+                                                        <h3>Reviews and Ratings</h3>
+                                                        {% if not request.session.userid %}
+                                                        <div class="review_login_box">
+                                                            <p>Please login for review  
+                                                                <span><button class="btn btn-primary" id="ReviewLoginBtn">Login</button></span>
+                                                                <div id="login_error"></div>
+                                                                <div class="ReviewLoginBtnBox"> 
+                                                                    <div class="form-group"> 
+                                                                        <input type="hidden" id="getbook_id" value="{{ getcatid.pk }}">
+                                                                        <input type="hidden" id="getbook_url" value="{{ getcatid.slug }}">
+                                                                        <input type="number" class="form-control" id="your_mobile" placeholder="Email or Mobile" onkeypress="return event.charCode >= 48" min="1" > 
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <input type="password" class="form-control" id="password" placeholder="Enter Password">
+                                                                    </div>
+                                                                    <div class="form-group"> 
+                                                                        <button type="submit" class="login_btn" id="LoginSubmitFunction">Login</button>
+                                                                    </div>
+                                                                </div>
+                                                            </p>
+                                                        </div>
+                                                        {% else %}
+                                                        <div class="review_submit_box"> 
+                                                            <textarea name="review_message" id="review_message" class="form-control"  rows="5" placeholder="Please Write your Review and give Rating"></textarea>
+                                                            <input type="text" id="review_book_id" value="{{ getcatid.pk }}" hidden>
+                                                            <input type="text" id="review_book_url" value="{{ getcatid.slug }}" hidden>
+                                                            <input type="text" id="review_clients_id" value="{{ request.session.userid }}" hidden>
+                                                            
+                                                            <div class="rating_star">
+                                                                <input class="star star-1" id="star_1" onclick="star_rating('5')" type="radio" name="star" /> 
+                                                                <label class="star star-1" for="star_1"></label>  
+                                                                <input class="star star-2" id="star_2" onclick="star_rating('4')" type="radio" name="star" /> 
+                                                                <label class="star star-2" for="star_2"></label> 
+                                                                <input class="star star-3" id="star_3" onclick="star_rating('3')" type="radio" name="star" /> 
+                                                                <label class="star star-3" for="star_3"></label>
+                                                                <input class="star star-4" id="star_4" onclick="star_rating(2)" type="radio" name="star" /> 
+                                                                <label class="star star-4" for="star_4"></label> 
+                                                                <input class="star star-5" id="star_5" onclick="star_rating(1)" type="radio" name="star" /> 
+                                                                <label class="star star-5" for="star_5"></label>  
+                                                            </div> 
+                                                            <div class="rivew_submit_btn">
+                                                                <button class="btn btn-info pull-right" id="reviewSubmit">Submit</button> 
+                                                            </div>                                    
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="row"> 
+                                            <div class="col-sm-12"> 
+                                                {% for data in get_review %}
+                                                <div class="review_message_items"> 
+                                                    <div class="review_user_profile">
+                                                        <img src="/static/publisher_app/media/{{data.client_name.profile_images}}" alt="">
+                                                        <h5>{{data.client_name.customer_name}}</h5>
+                                                        <p>{{data.create_date|date}}</p>
+                                                        <span>
+                                                            {% if data.rating_count == 5 %}
+                                                                <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> 
+                                                            {% elif data.rating_count == 4 %}
+                                                                <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> 
+                                                            {% elif data.rating_count == 3 %}
+                                                                <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> 
+                                                            {% elif data.rating_count == 2 %}
+                                                            <i class="fa fa-star"></i> <i class="fa fa-star"></i> 
+                                                            {% elif data.rating_count == 1 %}
+                                                            <i class="fa fa-star"></i> 
+                                                            {% endif %}  
+                                                        </span>
+                                                    </div>
+                                                    <div class="review_message_details">
+                                                        <p>{{ data.message }}</p>
+                                                        <h5>Was this review helpful to you?</h5> 
+                                                        <div class="review_action_btn"> 
+                                                            <span id="review_like">
+                                                                <img class="img-fluid" src="/static/publisher_app/images/like.svg"> <strong id="like_count">0</strong>
+                                                            </span>
+                                                            <span>
+                                                                <img class="img-fluid" src="/static/publisher_app/images/dislike.svg"> <strong id="dislike_count">0</strong>
+                                                            </span>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section> 
+                            </div>
+                            <div class="tab-pane fade" id="ShoppingPolicy" role="tabpanel" aria-labelledby="ShoppingPolicy-tab">
+                                <h3>This page is under processing</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> 
+
+        <!-- Releted Category Books  --> 
+        <section class="carousel-category-book-items">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="category-book-items">
+                            <h4>Similar Category Best Selling Books</h4>
+                            <div class="owl-carousel book-items">
+                                {% for book in related_books|slice:"12" %}
+                                <div class="category_book_item"> 
+                                    <div class="product_image_display">
+                                        {% if book.discount > 0 %}
+                                            <div class="discount_area"> <span>{{ book.discount }}%</span> </div>
+                                        {% endif %}
+                                        {% if wish_list %}
+                                            {% for data in wish_list %}
+                                                {% if data.book_name_id == book.wl_id %}
+                                                    <div class="fovarite_icon_active" id="fovarite_icon_active_{{book.pk}}">
+                                                        <i onclick="addTowishListItem('{{book.pk}}', 'active')" class="fa fa-heart"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="fovarite_icon" id="fovarite_icon_{{book.pk}}">
+                                                        <i onclick="addTowishListItem('{{book.pk}}', 'inactive')" class="fa fa-heart-o"></i>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="fovarite_icon" id="fovarite_icon_{{book.pk}}">
+                                                <i onclick="addTowishListItem('{{book.pk}}', 'inactive')" class="fa fa-heart-o"></i>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if book.thumbnail %}
+                                            <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.thumbnail }}" ></a>
+                                        {% elif book.book_image %}
+                                            <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.book_image }}" ></a>
+                                        {% else %}
+                                            <a href="/book/{{ book.pk }}/{{book.slug}}/"><img src="/static/publisher_app/images/book_thamb.jpg" ></a>
+                                        {% endif %} 
+                                    </div>
+                                    <div class="product-content"> 
+                                        <h3 class=""><a href="/book/{{ book.pk }}/{{book.slug}}/">{{ book.book_name_bangla}}</a></h3>
+                                        <h6 class="writer">{{ book.writter_name_bangla}}</h6>
+                                        <span class="price"> Tk. {{ book.sale_price}} {% if book.discount == 0 %}  {% else %}  <del>Tk. {{ book.book_price }}</del> {% endif %}</span> 
+                                         
+                                        <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                            <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                            <input type="text" id="{{ book.pk }}_book_url" value="{{ book.slug }}">
+                                            <input type="text" id="{{ book.pk }}_r_book_id" value="{{ book.pk }}">
+                                            <input type="text" id="{{ book.pk }}_sale_price" value="{{ book.sale_price }}">
+                                            <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                            <input type="text" id="{{ book.pk }}_discount" value="{{ book.discount }}">
+                                        </div>
+                                        <center>
+                                            {% if book.stock_info == '4' %}
+                                                <a href="#" class="add-to-cart-new"> Pre Order </a>
+                                            {% elif book.stock_info == '3' %}
+                                                <a href="#" class="add-to-cart-new">Out of Stock </a>
+                                            {% else %}
+                                                <button style="border:none" class="add-to-cart-new" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+                                            {% endif %}  
+                                             
+                                         </center>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> 
+        <style>
+            .ReviewLoginBtnBox{
+                width:300px;margin:10px auto;
+            }
+        </style>
+  
+    <!-- Recent View Products  -->
+    {% if recent_book_list|length > 5 %}
+    <section class="carousel-category-book-items">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="category-book-items">
+                        <h4><i class="fa fa-eye"></i> Recently Viewed</h4>
+                        <div class="owl-carousel book-items">
+                            {% for book in recent_book_list %}
+                            <div class="category_book_item"> 
+                                <div class="product-grid2">
+                                    <div class="product-image2">
+                                        {% if book.discount > 0  %} <p class="discount_range">{{ book.discount }}% </p> {% endif %}
+                                            {% if book.book_name.thumbnail %}
+                                                <img class="pic-1" src="/static/publisher_app/media/{{ book.book_name.thumbnail }}">
+                                            {% else %}
+                                                <img class="pic-1" src="/static/publisher_app/media/{{ book.book_name.book_image }}">
+                                            {% endif %}
+                                            {% if book.is_pre_image == 1 %}
+                                                <img src="/static/publisher_app/images/readmore.png" alt="" class="readmore_images">
+                                            {% endif %} 
+                                       
+                                        <ul class="social">
+                                            <li><a href="/book/{{ book.book_name.pk }}/{{ book.book_name.slug }}/" onclick="recent_function('{{ book.pk }}')"> View Details </a></li>
+                                        </ul>
+                                        
+                                    </div> 
+                                </div> 
+                            </div>
+                            {% endfor %}
+                            
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %} 
+          
+    {% if preview_file %} 
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog my_modal_preview" role="document" id="read_more_modal_size">
+              <div class="modal-content">
+                <div class="modal-header"  style="padding: 5px 20px;">
+                  <h5 class="modal-title" id="exampleModalLabel"> কিছু অংশ পড়ে দেখুন</h5>
+                  <button type="button" class="btn btn-danger" style="padding:0px 6px;border-radius: 50%" class="close" data-dismiss="modal" aria-label="Close"> X </button>
+                </div>
+                <div class="modal-body">   
+                    <iframe src="/static/publisher_app/media/{{ preview_file.pdf_file }}#toolbar=0" width="100%" height="700px"></iframe>
+                </div>
+                 
+              </div>
+            </div>
+        </div>
+    {% endif %}
+         
+
+
+    <!-- Cart Loader   -->
+    <div class="cart_loader">
+        <img src="/static/publisher_app/images/loader.gif" alt="loader">
+    </div>
+    <div class="cart_loader_exist">
+        <h4>Already Added!</h4>
+    </div>
+
+
+<input type="text" value="{{ request.build_absolute_uri }}" id="get_url" hidden>
+<!-- Modal -->
+<div class="modal fade" id="MycartModel3" tabindex="-1" role="dialog3" aria-labelledby="exampleModalLabel3" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:none">
+          <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i> Successfully Added to Cart</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>    
+ 
+<script> 
+    function star_rating(val){
+        rating_point = val;  
+    }
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();   
+    });
+
+    $("#reviewSubmit").click(function(e){   
+        var review_message = $("#review_message").val(); 
+        var review_book_id = $("#review_book_id").val();  
+        var review_book_url = $("#review_book_url").val();  
+        var review_clients_id = $("#review_clients_id").val(); 
+ 
+        if (rating_point == ""){
+            rtpoint = 0;
+        }else{
+            rtpoint = rating_point;
+        }
+          
+        url = "/cusotmer/client-review/"; 
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                review_book_id : review_book_id,
+                review_message : review_message,
+                review_clients_id : review_clients_id,
+                rating_point : rating_point,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data = "success"){
+                    document.getElementById('review_success').innerHTML = "Thank for writting your review message.";
+                    $("#review_message").val('');
+                    $("#review_success").show();
+                    setInterval(function(){ 
+                        $("#review_success").hide(); 
+                        window.location.reload(); 
+                    }, 1000);
+                    
+                   
+                }
+                else if(data = "Exsit"){
+                    document.getElementById('review_success').innerHTML = "Thank for writting your review message.";
+                }
+            },
+            error: function(data){
+                alert(data);
+            },
+        });
+        e.preventDefault();
+    })
+</script>
+
+
+<script type="text/javascript"> 
+    $(".cart_loader").hide();
+    $(".cart_loader_exist").hide();
+
+    function cart_function(id){  
+        $(".cart_loader").hide();
+        var view_bookqty = 1
+        viewbookqty  = document.getElementById("viewbookqty").value; 
+        if (viewbookqty > 1){
+            view_bookqty = viewbookqty
+        } 
+        var book_id   = document.getElementById(id+"_book_id").value;
+        var book_url   = document.getElementById(id+"_book_url").value; 
+        var sale_price   = document.getElementById(id+"_sale_price").value;
+        var book_price   = document.getElementById(id+"_book_price").value;
+        var discount   = document.getElementById(id+"_discount").value;
+        $.ajax({
+            url: "/book/"+book_id+"/"+book_url+"/",
+            type:'GET',
+            data : {
+            book_id : book_id,
+            view_bookqty : view_bookqty,
+            sale_price : sale_price,
+            book_price : book_price,
+            discount : discount,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "success") {
+                    $(".cart_loader").show();
+                    $(".cart_loader_exist").hide();
+                    window.setTimeout(function () {
+                        $(".cart_loader").hide();
+                    }, 1000);
+                    
+                    var count = parseInt($("#cart_items").html()) + 1;
+                    $("#cart_items").html(count); 
+                    var page_cart_counter = parseInt($("#page_cart").html()) + 1;
+                    $("#page_cart").html(page_cart_counter); 
+                }
+                else{
+                    $(".cart_loader").hide();   
+                    $(".cart_loader_exist").show();   
+                    window.setTimeout(function () {
+                        $(".cart_loader_exist").hide();
+                    }, 1000); 
+                }
+           
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+     
+</script> 
+
+<script type="text/javascript">
+    function order_now_function(id){  
+        var book_id   = document.getElementById(id+"_book_id").value; 
+        var book_url   = document.getElementById(id+"_book_url").value; 
+        var sale_price   = document.getElementById(id+"_sale_price").value;
+        var book_price   = document.getElementById(id+"_book_price").value;
+        var discount   = document.getElementById(id+"_discount").value;
+        $.ajax({
+            url: "/checkout-order-now/",
+            type:'GET',
+            data : {
+                book_id : book_id,
+                sale_price : sale_price,
+                book_price : book_price,
+                discount : discount,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "success")
+                {
+                    let timerInterval
+                    Swal.fire({
+                    title: '<p style="color:#203040;font-size:18px;margin:0px;padding:0px;">Product Add Successful</p>',
+                    // icon: 'success',
+                    width:'250px',
+                    margin:'0px',
+                    padding:'10px 0px',
+                    background:'#d7fbda',
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    timer: 1000,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                        const content = Swal.getContent()
+                        if (content) {
+                            const b = content.querySelector('b')
+                            if (b) {
+                            b.textContent = Swal.getTimerLeft()
+                            }
+                        }
+                        }, 100)
+                    },
+                     
+                })  
+                setInterval(function(){ 
+                        $("#review_success").hide();
+                        window.location.href = "/checkout-order-now/"; 
+                    }, 1500); 
+                }
+                else{
+                    let timerInterval
+                        Swal.fire({
+                        title: '<p style="color:#fff;font-size:18px;margin:0px;padding:0px;padding-top:10px;">You already order one book </p>',
+                        timer: 2000,
+                        width:'250px',
+                        margin:'0px',
+                        padding:'0px 0px',
+                        background:'linear-gradient(to right, #e21d24,#a92930)',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            timerInterval = setInterval(() => {
+                            const content = Swal.getContent()
+                            if (content) {
+                                const b = content.querySelector('b')
+                                if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                                }
+                            }
+                            }, 100)
+                        },
+                    }) 
+                    setInterval(function(){ 
+                        $("#review_success").hide();
+                        window.location.href = "/checkout-order-now/"; 
+                    }, 2000); 
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+     
+</script> 
+      
+<!-- Recent View Books  -->
+<script type="text/javascript">
+    function recent_function(id){
+        var r_book_id   = document.getElementById(id+"_r_book_id").value;  
+        $.ajax({
+            url: "/book/recent-book/",
+            type:'GET',
+            data : {
+                r_book_id : r_book_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+            },
+            error: function(data){ 
+
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    function wish_function(id){
+        var wish_book_id      = document.getElementById(id+"_wish_book_id").value;
+        var wish_sale_price   = document.getElementById(id+"_wish_sale_price").value;
+        var url = "/book/addwishlislproduct/" 
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                wish_book_id : wish_book_id,
+                wish_sale_price : wish_sale_price,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "success"){
+                    let timerInterval
+                    Swal.fire({
+                        title: '<p style="color:#203040;font-size:18px;margin:0px;padding:0px;">Product Add Successful</p>',
+                        // icon: 'success',
+                        width:'250px',
+                        margin:'0px',
+                        padding:'10px 0px',
+                        background:'#a8fda8',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 2000,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            timerInterval = setInterval(() => {
+                            const content = Swal.getContent()
+                            if (content) {
+                                const b = content.querySelector('b')
+                                if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                                }
+                            }
+                            }, 100)
+                        },
+                    })
+                }
+                else{
+                    let timerInterval
+                        Swal.fire({
+                        title: '<p style="color:#fff;font-size:18px;margin:0px;padding:0px;padding-top:10px;">Product Already Added</p>',
+                        timer: 2000,
+                        width:'250px',
+                        margin:'0px',
+                        padding:'0px 0px',
+                        background:'orange',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            timerInterval = setInterval(() => {
+                            const content = Swal.getContent()
+                            if (content) {
+                                const b = content.querySelector('b')
+                                if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                                }
+                            }
+                            }, 100)
+                        },
+                    }) 
+                }
+            },
+            error: function(data){
+                alert(data);
+            },
+        })
+    }
+</script> 
+<script> 
+    $(".ReviewLoginBtnBox").hide();
+    $("#ReviewLoginBtn").click(function(){
+        $(".ReviewLoginBtnBox").slideToggle(300);
+        $("#ReviewLoginBtn").hide();
+    })
+    $("#LoginSubmitFunction").click(function(){ 
+        var your_mobile = $("#your_mobile").val();
+        var password = $("#password").val();   
+        var getbook_id = $("#getbook_id").val();   
+        var getbook_url = $("#getbook_url").val();   
+         
+        $.ajax({
+            url: "/login_for_review/",     
+            type:'GET',
+            data : {
+                your_mobile : your_mobile,
+                password : password, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "Login Successful")
+                { 
+                    // window.location.href = "/book/"+getbook_id+"/"+getbook_url+"/";
+                    window.location.reload();
+                }
+                else{
+                    var login_error = "Login Error";
+                    $("#login_error").html(login_error);
+                }
+            },
+            error: function(login_error){
+                alert("login_error");
+            },
+        })
+    })
+
+    function addTowishListItem(book_id, status){   
+        $.ajax({
+            url: "/addToWishList/",
+            type:'GET',
+            data : {
+                book_id : book_id, 
+                status : status, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                if (data == "active"){
+                    var wishlist_count = parseInt($("#wishlist_items").html()) + 1;
+                    $("#wishlist_items").html(wishlist_count);   
+                    location.reload();
+                }
+                else{
+                    var wishlist_count = parseInt($("#wishlist_items").html()) - 1;
+                    $("#wishlist_items").html(wishlist_count);
+                    location.reload();
+                }
+            },
+            error: function(data){ 
+                alert(data);
+            }
+        });
+    }
+     WebGLActiveInfo
+     
+</script>  
+
+<script>
+        $(document).ready(function(){
+        $('.count').prop('disabled', true);
+        $(document).on('click','.plus',function(){
+            $('.count').val(parseInt($('.count').val()) + 1 );
+        });
+        $(document).on('click','.minus',function(){
+            $('.count').val(parseInt($('.count').val()) - 1 );
+                if ($('.count').val() == 0) {
+                    $('.count').val(1);
+                }
+            });
+    });
+</script>
+<script>
+    $("#ordernowUrl").click(function(){
+        var viewbookqtyChange = $('#viewbookqty').val();
+        var getBookId = $('#getBookId').val(); 
+        url = "/checkout-order-now/"+getBookId+"/"+viewbookqtyChange+"/"
+        window.location.href = url 
+    })
+ 
+</script>
+{% endblock %}

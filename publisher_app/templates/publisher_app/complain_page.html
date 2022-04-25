@@ -1,0 +1,110 @@
+{% extends 'durbar_shop/base.html' %}
+{% block title %} durbar_shop || The Largest Online Books Market Place  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    .conplain_page_area{
+        border:1px solid #ccc;
+        padding:20px;
+        margin-top: 30px;
+        background:rgb(255, 255, 255);
+        border-radius: 5px;
+        margin-bottom: 100px;
+    }
+    .conplain_page_area h5{
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+            <div class="conplain_page_area">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+                <h5>আপনার কোন অভিযোগ/মতামত থাকলে নিচে লিখুন...  </h5> <hr>
+                <form method="POST"> {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label for="MobbileNumber"><strong>মোবাইল <span style="color:red">*</span></strong></label>
+                            <input type="text" name="MobbileNumber" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label for="YourOrderID"><strong>অর্ডার আইডি</strong></label>
+                            <input type="text" class="form-control" name="YourOrderID">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label for="ComplainMessage"><strong>আপনার অভিযোগটি লিখুন  <span style="color:red">*</span></strong></label>
+                            <textarea class="form-control" rows="3" name="ComplainMessage"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" name="submit" id="complain_btn" class="btn btn-info" value="অভিযোগ জমা দিন">
+                        </div>
+                    </div>
+                </form>
+               
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+</div>
+
+<!-- <script src="{% static 'durbar_shop/js/jquery.js' %}"></script>   
+<script>
+        $("#complain_btn").click(function(){
+            var confirm_msg = confirm("Do you want to Send Complain?");
+            if (confirm_msg == true)
+            {   
+                var flag = false;
+                var mobile_number = $("#MobbileNumber").val();
+                var order_id = $("#YourOrderID").val();
+                var complain_msg = $("#ComplainMessage").val();
+                $.ajax({
+                    url: "/complain/",
+                    async: false,
+                    data : {
+                        mobile_number : mobile_number,
+                        order_id : order_id,
+                        complain_msg : complain_msg
+                    },
+                    success: function(data){
+                        if(data == "success"){
+                            flag = true;
+                            window.location.href = "/complain/";
+                        }
+                    },
+                    error: function(data){
+                        flag = false;
+                    }
+                });
+                if(flag == true){
+                    alert("Your Complain Send Successfull.");
+    
+                }
+                else{
+                    alert("Data save failed");
+                }
+            }
+        });
+    </script>
+   -->
+
+{% endblock %}

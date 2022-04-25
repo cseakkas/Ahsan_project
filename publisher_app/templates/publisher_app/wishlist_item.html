@@ -1,0 +1,422 @@
+{% extends 'publisher_app/base.html' %} 
+{% block title %} Wish List Book {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'publisher_app/css/owl.carousel.min.css' %}">
+<section>
+    <div class="container">
+        <div class="row"> 
+            <div class="col-sm-12">
+                <div class="author_mainarea_pull">
+                    <div class="author_book_list"> 
+                        <h4> Wish List Book </h4> <hr>
+                        <input type="text" id="category_id" value="{{ cat_info.id }}" hidden>
+                        <input type="text" id="category_menu_url" value="{{ cat_info.menu_url }}" hidden>
+                        <div class="row" id="publisher_app_category_books_items_row">
+                            {% for book in wishlist_item %}  
+                                <div class="col-lg-2 col-md-2 col-xs-4" id="publisher_app_category_books_items">
+                                    <div class="category_book_item"> 
+                                        <div class="product_image_display">
+                                            <div class="fovarite_icon">
+                                                <i onclick="addTowishListItem('{{book.pk}}')" class="fa fa-heart-o"></i>
+                                            </div>
+                                            {% if book.thumbnail %}
+                                                <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.thumbnail }}"></a>
+                                            {% elif book.book_image %}
+                                                <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.book_image }}"></a>
+                                            {% else %}
+                                                <a href="/book/{{ book.pk }}/{{book.slug}}/"><img src="/static/publisher_app/images/book_thamb.jpg" ></a>
+                                            {% endif %} 
+                                        </div>
+                                        <div class="product-content"> 
+                                            <p>{{ book.cover_type}}</p>
+                                            <h3 class=""><a href="/book/{{ book.pk }}/{{book.slug}}/">{{ book.book_name_bangla}}</a></h3>
+                                            <h6 class="writer">{{ book.writter_name_bangla}}</h6>
+                                            <span class="price"> Tk. {{ book.sale_price}} {% if book.discount == 0 %}  {% else %}  <del>Tk. {{ book.book_price }}</del> {% endif %}</span> 
+                                            <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                                <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                                <input type="text" id="{{ book.pk }}_r_book_id" value="{{ book.pk }}">
+                                                <input type="text" id="{{ book.pk }}_sale_price" value="{{ book.sale_price }}">
+                                                <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                                <input type="text" id="{{ book.pk }}_discount" value="{{ book.discount }}">
+                                            </div>  
+                                        </div>
+                                        <!-- Cart Button  -->
+                                        <div class="overlay_cart_button">
+                                            <center> 
+                                                {% if book.stock_info == '4' %}
+                                                        <a href="#" class="add-to-cart-new"> Pre Order </a>
+                                                {% elif book.stock_info == '3' %}
+                                                    <a href="#" class="add-to-cart-new">Out of Stock </a>
+                                                {% else %}
+                                                    <button style="border:none" class="add-to-cart-new" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+                                                {% endif %}   
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}      
+                            
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+   
+
+<!-- Cart Loader   -->
+<div class="cart_loader">
+    <img src="/static/publisher_app/images/loader.gif" alt="loader">
+</div>
+<div class="cart_loader_exist">
+    <h4>Already Added!</h4>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+        <div class="modal-content">
+        <div class="modal-header" style="border-bottom:none">
+            <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i> Successfully Added to Cart</h5>
+        </div>
+        </div>
+    </div>
+</div>
+    
+    
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script> 
+
+<script src="{% static 'publisher_app/js/owl.carousel.js' %}"></script>  
+<script type="text/javascript">
+    $(".cart_loader").hide();
+    $(".cart_loader_exist").hide();
+    function cart_function(id){ 
+        $(".cart_loader").hide();
+        var book_id   = document.getElementById(id+"_book_id").value;
+        var sale_price   = document.getElementById(id+"_sale_price").value;
+        var book_price   = document.getElementById(id+"_book_price").value;
+        var discount      = document.getElementById(id+"_discount").value;  
+        var url = "/wishlist-item/"
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                book_id : book_id,
+                sale_price : sale_price,
+                book_price : book_price,
+                discount : discount,
+            },
+            success: function(data){
+                if(data == "success"){ 
+                    $(".cart_loader").show();
+                    $(".cart_loader_exist").hide();
+                    window.setTimeout(function () {
+                        $(".cart_loader").hide();
+                    }, 1000);
+                    var count = parseInt($("#cart_items").html()) + 1;
+                    $("#cart_items").html(count); 
+                    var page_cart_counter = parseInt($("#page_cart").html()) + 1;
+                    $("#page_cart").html(page_cart_counter); 
+                
+                }
+                else{
+                    $(".cart_loader").hide();   
+                    $(".cart_loader_exist").show();   
+                    window.setTimeout(function () {
+                        $(".cart_loader_exist").hide();
+                    }, 1000);
+                } 
+            },
+            error: function(data){
+                    alert(data);
+            }
+        });
+    }
+</script> 
+
+<script>
+    $(document).ready(function(){
+        $('#read_more_button').click(function(){
+        $('.author_details_mes').removeClass();
+        $('#read_more_button').hide();
+        });
+    });
+</script>
+
+<!-- Recent Books Items   -->
+<script type="text/javascript">
+    function recent_function(id){
+        var r_book_id   = document.getElementById(id+"_r_book_id").value;  
+        $.ajax({
+            url: "/book/recent-book/",
+            type:'GET',
+            data : {
+                r_book_id : r_book_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+            },
+            error: function(data){ 
+
+            }
+        });
+    }
+</script>  
+<script>
+    $(document).ready(function() {
+        $('.bookItemsForCategory').owlCarousel({
+            loop: true,
+            navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            nav: true,
+            margin: 25,
+            responsiveClass: true,
+            responsive: {
+            0: {
+                items: 1,
+                nav: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+              300: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            400: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            500: {
+                items: 2,
+                nav: false,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            600: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                loop: true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            800: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1000: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1100: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            }, 
+              1200: {
+                items:4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              }
+            }
+        })
+        
+    })
+    $(document).ready(function() {
+        $('.bookItemsForCategory2').owlCarousel({
+            loop: true,
+            navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            nav: true,
+            margin: 25,
+            responsiveClass: true,
+            responsive: {
+            0: {
+                items: 1,
+                nav: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+              300: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            400: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            500: {
+                items: 2,
+                nav: false,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            600: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                loop: true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            800: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1000: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1100: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            }, 
+              1200: {
+                items:4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              }
+            }
+        })
+        
+    })
+    $(document).ready(function() {
+        $('.bookItemsForCategory3').owlCarousel({
+            loop: true,
+            navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            nav: true,
+            margin: 25,
+            responsiveClass: true,
+            responsive: {
+            0: {
+                items: 1,
+                nav: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+              300: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            400: {
+                items: 2,
+                nav: true,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            500: {
+                items: 2,
+                nav: false,
+                loop: true,
+                autoplay:true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            600: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                loop: true,
+                autoplayTimeout:5000,
+                autoplayHoverPause:true
+            },
+            800: {
+                items: 3,
+                nav: false,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1000: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            },
+            1100: {
+                items: 4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+            }, 
+              1200: {
+                items:4,
+                loop: true,
+                margin: 25,
+                autoplay:true,
+                autoplayTimeout:7000,
+                autoplayHoverPause:true
+              }
+            }
+        })
+        
+    })
+
+     
+</script>
+
+{% endblock %}

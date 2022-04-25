@@ -1,0 +1,57 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Menu List|| Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">  
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Menu List <span><a href="/settings/menu-add/"> Menu Add</a></span></h4>
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="datatablesSimple">
+                            <thead>
+                            <tr>
+                                <th style="width:5%">SL</th>
+                                <th style="width:30%">Menu Name</th>
+                                <th style="width:10%">Menu Module</th>
+                                <th style="width:20%">Menu Url</th>
+                                <th style="width:10%">Menu Order</th>
+                                <th style="width:10%">Status</th> 
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for data in menu_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ data.menu_name }}</td>
+                                    <td>{{ data.get_module_name_display }}</td>
+                                    <td>{{ data.menu_url }}</td>
+                                    <td>{{ data.menu_order }}</td>
+                                    <td>
+                                        {% if data.status %}
+                                            <p style="margin: 0;color:green">Active</p>
+                                        {% else %}
+                                            <p style="margin: 0;color:red">Inactive</p>
+                                        {% endif %}
+                                    </td> 
+                                </tr> 
+                            {% endfor %}        
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div> 
+
+{% endblock %}

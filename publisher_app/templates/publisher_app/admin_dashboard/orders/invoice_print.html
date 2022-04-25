@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Invoice Print</title>
+</head>
+<body>
+    <table style="padding:5px;">
+        <tr>
+            <td style="width:38%;border-right:0px">
+                <p style="text-align: right;margin-right: 8px;padding: 0;"><img src="http://127.0.0.1:8000/static/durbar_shop/images/logo.png" alt="" style="width:160px;height:50px;"></p>
+            </td>
+            <td style="width:62%;border-left:1px solid rgb(133, 133, 133)">
+                <p style="font-size: 14px;margin:0px;padding:2px;line-height:16px;font-family: cambria math;">Shorkar Mention, House - 61, Patuatuli Lane, Kotowaly, Dhaka-1100.</p>
+                <p style="font-size: 14px;margin:0px;padding:2px;line-height:16px;font-family: cambria math;">Phone : 0164-344469, Email : info@durbar_shop.com.bd</p>
+                <p style="font-size: 14px;margin:0px;padding:2px;line-height:16px;font-family: cambria math;">Website : www.durbar_shop.com.bd</p>
+            </td>
+            
+        </tr>
+    </table>
+    <table style="margin-top:5px;padding: 5px;">
+        <tr>
+            <td style="padding:8px;width:40%;">
+                <h3 style="margin:0;padding:0;line-height:29px;font-size:22px;font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><u>&nbsp;&nbsp; Order Info &nbsp; &nbsp;</u></h3>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Customer ID: <a href="#" style="color:rgb(15, 100, 116);text-decoration: none;">{{ shipping_info.customer_name.id}}</a></p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Order ID : {{ OrderNumber }}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Order Date : {{ shipping_info.order_date}}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Payment Status : {{ shipping_info.get_payment_status_display}}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Payment Method : {{ shipping_info.get_payment_method_display}}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Delivery Method : {{ shipping_info.get_delivery_method_display}}</p>
+            </td>
+            <td style="width:18%;border-right:0px">
+                <p style="margin: 0;padding: 0;text-align: center;"><img src="http://127.0.0.1:8000/static/durbar_shop/dashboard/icons/qrcode.png" alt="" style="width:90px;height:90px;"></p>
+            </td>
+            <td style="padding:8px;width:42%;">
+                <h3 style="margin:0;padding:0;line-height:29px;font-size:22px;font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><u>&nbsp;&nbsp; Delivery Info &nbsp; &nbsp;</u></h3>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Name : {{ shipping_info.customer_name }}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Mobile :  {{ shipping_info.customer_mobile }}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Email :  {{ shipping_info.customer_name.email }}</p>
+                <p style="margin:0;padding:0;line-height:18px;font-size:14px;font-family:arial;">Address : {{ shipping_info.address }}</p>
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-top:5px;padding:5px 5px 2px 5px">
+        <tr>
+            <th style="border:1px solid #ccc; width:5%">SL</th>
+            <th style="border:1px solid #ccc; width:64%;text-align: left;">Products</th>
+            <th style="border:1px solid #ccc; width:10%;text-align: center;">Quantity</th>
+            <th style="border:1px solid #ccc; width:10%;text-align: right;">Unit Price</th>
+            <th style="border:1px solid #ccc; width:11%;text-align: right;">Total Price</th>
+        </tr>
+        {% for order in get_order_items %}
+        <tr>
+            <td style="border:1px solid #ccc;">{{ forloop.counter }}</td>
+            <td style="border:1px solid #ccc;">{{ order.book_name.book_name_bangla }} ( {{ order.book_name.author }} - {{ order.book_name.publisher }})</td>
+            <td style="border:1px solid #ccc;text-align: center;">{{ order.book_quantity}}</td>
+            <td style="border:1px solid #ccc;text-align: right;">{{ order.book_price }}</td>
+            <td style="border:1px solid #ccc;text-align: right;">{{ order.book_price }}</td>
+        </tr>
+        {% endfor %}
+        
+        <tr>
+            <td colspan="2">
+                <p style="margin:0px;padding:0px;font-weight:bold">durbar_shop Online Shop is the service for everybody & everytimes</p>
+                <p style="margin:0px;padding:0px;font-weight:bold">Thanks you for your orders. </p>
+            </td>
+            <td colspan="3"  style="border:1px solid #ccc;padding:0px;">
+                <table style="padding:4px 4px 1px 4px">
+                    <tr>
+                        <th  style="border:1px solid #ccc;text-align: left;background-color:rgb(233, 233, 233);">Sub Total</th>
+                        <td  style="border:1px solid #ccc;width:35.5%;text-align: right;background-color:rgb(233, 233, 233);">540 Tk</td>
+                    </tr>
+                    <tr>
+                        <th  style="border:1px solid #ccc;text-align: left;">Shipping Charge</th>
+                        <td  style="border:1px solid #ccc;text-align: right;">40 Tk</td>
+                    </tr>
+                    <tr>
+                        <th  style="border:1px solid #ccc;text-align: left;">Total</th>
+                        <td  style="border:1px solid #ccc;text-align: right;">580 Tk</td>
+                    </tr>
+                    <tr>
+                        <th  style="border:1px solid #ccc;text-align: left;background-color:rgb(233, 233, 233);">Customer Payable</th>
+                        <td  style="border:1px solid #ccc;text-align: right;background-color:rgb(233, 233, 233);">580 Tk</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        
+    </table>
+
+</body>
+</html>

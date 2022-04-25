@@ -1,0 +1,67 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Post Office List || Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Post Office List <span><a href="/settings/post-office-add/">Post Office Add</a></span> </h4>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Post Office Name Bangla</th>
+                                    <th>Post Office Name English</th>
+                                    <th>Post Code</th>
+                                    <th>Upozilla</th>
+                                    <th>District</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in post_office_list %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ data.post_office_bangla }}</td>
+                                        <td>{{ data.post_office_english }}</td>
+                                        <td>{{ data.post_code }}</td>
+                                        <td>{{ data.upozilla_name.upozilla_name_bangla }}</td>
+                                        <td>{{ data.upozilla_name.district_name }}</td>
+                                        <td>
+                                            <a href="" class="btn btn-warning">Edit</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'durbar_shop/dashboard/vendor/jquery/jquery.min.js' %}"></script>
+<script>
+        $('#district_name').change(function(){
+            var url = '/bind-district-upozilla/';
+            
+            $.ajax({
+                url: url,
+                data: {
+                    'district_name': $('#district_name :selected').val(),
+                },
+                success: function (data) {
+                    $("#upozilla_name").html(data);
+                }
+            });
+        });
+    
+    </script>
+
+{% endblock %}

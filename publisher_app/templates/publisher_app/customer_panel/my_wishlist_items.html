@@ -1,0 +1,142 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Wishlist Item{% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %} 
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="my_account_menu">
+                    <ul>
+                        <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="/myorder/order-list/"><i class="fa fa-list-ol"></i> Order</a></li>
+                        <li><a href="/my-wishlist/" class="my_acc_menu_active"><i class="fa fa-heart"></i> Wishlist</a></li>
+                        <li><a href="">Wallet</a></li>
+                        <li><a href="">Notification</a></li>
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="my_account_dashboard3">
+                    <div class="cart_items">
+                        <div class="myorder_filtering_box">
+                            <h4>My Wishlist </h4> 
+                            <p style="margin-left:10px;"> You have {{ total_wishlist_item }} product(s) in your wishlist</p>
+                         </div>
+                         
+                        {% for wish in wishlist_item %}
+                        <div class="my_account_wishlist_view">
+                            <div class="wish_list_item_image">
+                                <a href="/book/details/{{ wish.book_name_id }}/" class="text-dark">
+                                    <img src="/static/publisher_app/media/{{ wish.book_image }}" alt="{{ wish.writter_name_bangla }}">
+                                </a>
+                            </div>
+                            <div class="my_account_book_meta">
+                                <h5> <a href="/book/details/{{ wish.book_name_id }}/"> {{ wish.book_name_bangla }} </a></h5>
+                                <p>লেখকঃ {{ wish.writter_name_bangla }}</p>
+                                <p id="publisher_name">প্রকাশনীঃ {{ wish.publisher_name_bangla }}</p>
+                                <div class="my-account-book_price">
+                                    <p>Tk. {{ wish.sale_price }} <strike class="original-price">Tk. {{ wish.book_price }}</strike></p>
+                                </div>
+                                <button style="border:none" class="add-to-cart2" onclick="wish_function('{{ wish.book_name_id }}')"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                            </div>
+                            <div class="my-account-book_action">
+                                <a href="/wishlist/{{wish.book_name_id}}/delete/"> <i class="fa fa-trash"></i> </a>
+                            </div>
+                            <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                <input type="text" id="{{ wish.book_name_id }}_book_id" value="{{ wish.book_name_id }}">
+                                <input type="text" id="{{ wish.book_name_id }}_sale_price" value="{{ wish.sale_price }}">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script type="text/javascript">
+    function wish_function(id){
+        var book_id   = document.getElementById(id+"_book_id").value;
+        var sale_price   = document.getElementById(id+"_sale_price").value;
+        $.ajax({
+            url: "/",
+            type:'GET',
+            data : {
+                book_id : book_id,
+                book_price : sale_price,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "success")
+                {
+                    let timerInterval
+                        Swal.fire({
+                        title: '<p style="color:#203040;font-size:18px;margin:0px;padding:0px;">Product Add Successful</p>',
+                        // icon: 'success',
+                        width:'250px',
+                        margin:'0px',
+                        padding:'10px 0px',
+                        background:'#d7fbda',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 1000,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            timerInterval = setInterval(() => {
+                            const content = Swal.getContent()
+                            if (content) {
+                                const b = content.querySelector('b')
+                                if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                                }
+                            }
+                            }, 100)
+                        },
+                    })
+
+                    var count = parseInt($("#cart_items").html()) + 1;
+                    $("#cart_items").html(count);
+                    }
+                    else{
+                        let timerInterval
+                        Swal.fire({
+                        title: '<p style="color:#fff;font-size:17px;margin:0px;padding:0px;padding-top:10px;">Product Already Added</p>',
+                        timer: 2000,
+                        width:'250px',
+                        margin:'0px',
+                        padding:'0px 0px',
+                        background:'linear-gradient(to right, #e21d24,#a92930)',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            timerInterval = setInterval(() => {
+                            const content = Swal.getContent()
+                            if (content) {
+                                const b = content.querySelector('b')
+                                if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                                }
+                            }
+                            }, 100)
+                        },
+                    })
+                }
+                
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+</script> 
+
+
+{% endblock %}
+

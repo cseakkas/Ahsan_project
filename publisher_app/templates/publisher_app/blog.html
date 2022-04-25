@@ -1,0 +1,171 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Blog Post {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    .blog_post_master{
+        width:100%;
+        margin-top:10px
+    }
+    .blog_post_master h1{
+        margin: 0;
+        font-size: 20px;
+        background-color: #1a9696;
+        margin-bottom: 10px;
+        padding: 6px;
+        color: white;
+        border-radius: 4px;
+    }
+    .blogPostItem{
+        width:100%;
+        padding:20px;
+        overflow: hidden; 
+    }
+    .blog_even{
+        background:white; 
+    }
+    .blog_odd{
+        background:rgb(229, 229, 229); 
+    }
+    .blog_content_area{}
+    .blog_content_area h4{
+        margin:0px;
+        font-size: 20px;
+        color:#3c8787
+    }
+    .blog_content_area h6{
+        border-bottom:1px dashed #5e8b8b;
+    }
+    .blog_content_area h6 span{
+        margin-right:10px;
+        margin-bottom:10px;
+        padding-bottom: 0px;
+    }
+    .blog_content_area p{ 
+    }
+    .blog_content_area a{
+        padding:7px 8px 5px;
+        font-size: 13px;
+    }
+    .blog_thumb_area{}
+    .blog_thumb_area img{
+        width: 100%;
+    }
+    .blog_sidebar_menu{ 
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    .blog_sidebar_menu h3{
+        margin: 0;
+        font-size: 20px;
+        background-color: #1a9696;
+        margin-bottom: 10px;
+        padding: 6px;
+        color: white;
+        border-radius: 4px;
+    }
+    .blog_sidebar_menu ul{
+        background-color: rgb(255, 255, 255);
+        margin: 0;
+        padding:0;
+        list-style: none;
+    }
+    .blog_sidebar_menu ul li{
+        border-bottom: 1px solid #ccc;
+    }
+    .blog_sidebar_menu ul li a{
+        display: block;
+        text-decoration: none;
+        padding:8px 10px;
+    }
+    .blog_sidebar_menu ul li a:hover{
+        background-color: #1a9696;
+        color:white;
+    }
+</style>
+
+<section>
+    <div class="container">
+        <div class="row"> 
+            <div class="col-sm-9">
+                <div class="blog_post_master">
+                    <h1>সম্প্রতি ব্লগ সমূহ</h1>
+                    {% for data in blog_list %}
+                        {% if forloop.counter|divisibleby:2 %}
+                            <div class="blogPostItem blog_odd">
+                                <div class="row"> 
+                                    <div class="col-sm-6">
+                                        <div class="blog_thumb_area">
+                                            <img src="/static/publisher_app/media/{{ data.blog_image }}" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="blog_content_area">
+                                            <h4>{{ data.blog_title }}</h4>
+                                            <h6><span class="fa fa-calendar-o"> {{ data.create_date|date:'d M Y' }} </span> <span class="fa fa-eye"> {{data.total_view}} </span> <span><i class="fa fa-commenting-o" aria-hidden="true"></i> {{data.total_comments}}</span> <span class="fa fa-heart"> {{data.total_like}}</span></h6>
+                                            {{ data.blog_details|slice:"300"|safe }} <br>
+                                            <a href="/ahsan-blog/{{data.pk}}/{{data.blog_url}}/" class="btn btn-info" onclick="BlogPostView('{{data.pk}}')">বিস্তারিত দেখুন...</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="blogPostItem blog_even">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="blog_content_area">
+                                            <h4>{{ data.blog_title }}</h4>
+                                            <h6><span class="fa fa-calendar-o"> {{ data.create_date|date:'d M Y' }} </span> <span class="fa fa-eye"> {{data.total_view}} </span>  <span><i class="fa fa-commenting-o" aria-hidden="true"></i> {{data.total_comments}}</span> <span class="fa fa-heart"> {{data.total_like}}</span></h6>
+                                            {{ data.blog_details|slice:"300"|safe }} <br>
+                                            <a href="/ahsan-blog/{{data.pk}}/{{data.blog_url}}/" class="btn btn-info" onclick="BlogPostView('{{data.pk}}')">বিস্তারিত দেখুন...</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="blog_thumb_area">
+                                            <img src="/static/publisher_app/media/{{ data.blog_image }}" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                     {% endfor %}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="blog_sidebar_menu">
+                    <h3> বিষয়সমূহ </h3>
+                    <ul>
+                        {% for data in category_list %}
+                            <li><a href="/CategoryWiseBlogList/{{data.category.id}}/{{data.category.menu_url}}/"><i class="fa fa-hand-o-right" aria-hidden="true"></i> {{ data.cat_name_bangla}} ({{ data.total_blog }})</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+  
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script>
+    function BlogPostView(blog_id){
+        $.ajax({
+            url: "/BlogPostViewByAjax/",
+            type:'GET',
+            data : {
+                blog_id : blog_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                window.location.href = "/ahsan-blog/"+blog_id+"/"+blog_url+"/";
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

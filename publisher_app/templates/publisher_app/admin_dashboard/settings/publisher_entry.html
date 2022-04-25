@@ -1,0 +1,112 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Publisher List {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Publisher Entry <span><a href="/book-publisher-list/">Publisher List</a></span></h4>
+                <div class="card-body">  
+                    <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 230px;">Publisher Name (Bangla)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="publisher_name_bangla">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Name (English)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="publisher_name_english">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Authorize Person</th>
+                                <td>
+                                    <input type="text" class="form-control" name="authorize_person">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Code</th>
+                                <td>
+                                    <input type="text" class="form-control" name="publisher_code">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>
+                                    <input type="email" class="form-control" name="publisher_email">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Password</th>
+                                <td>
+                                    <input type="password" class="form-control" name="password">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Mobile</th>
+                                <td>
+                                    <input type="number" class="form-control" name="publisher_mobile">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Mobile (optional)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="publisher_mobile2">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Address</th>
+                                <td>
+                                    <textarea name="publisher_address" class="form-control" rows="2"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Discount</th>
+                                <td>
+                                    <input type="number" class="form-control" name="discount_persent" value="0">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Photo</th>
+                                <td>
+                                    <input type="file" name="publisher_logo">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Publisher Cover</th>
+                                <td>
+                                    <input type="file" name="publisher_cover">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Web Address </th>
+                                <td>
+                                    <input type="text" class="form-control" name="web_address">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Facebook Link </th>
+                                <td>
+                                    <input type="text" class="form-control" name="facebook_link">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input type="submit" class="btn btn-info" name="submit" value="Add Publisher">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

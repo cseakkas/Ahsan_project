@@ -1,0 +1,290 @@
+{% extends 'durbar_shop/dashboard/dash_base.html' %}
+{% block title %} Order List || Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+<link href="{% static 'durbar_shop/dashboard/css/select2.css' %}" rel="stylesheet">
+<style>
+        .modal-dialog{
+            width: 65% !important;
+            overflow: hidden;margin: 2% 10% 0 24%;
+        }
+        .select2-dropdown {
+            top: 10px !important;
+            left: 8px !important;
+            height:40px;
+        }
+        #new_book_add_order_hide{
+            overflow: hidden;
+            background: #fff;
+        }
+        .select2-container .select2-selection--single {
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            height: 33px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .select2-container--default .select2-results>.select2-results__options {
+            max-height: 233px;
+            overflow-y: auto;
+            background: white;
+            border:1px solid #ccc;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #444;
+            line-height: 34px;
+        }
+    </style>
+<div class="container-fluid page_container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="page_header_bar"> Customize Order ({{OrderNumber}})
+                <span><a href="/dashboard/all-order/">Order List</a></span> </h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="row" id="new_book_add_order_hide">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td style="width:80%">
+                                        <select class="form-control" id="book_name_id">
+                                            <option value="0"><strong>Select Book</strong></option>
+                                            {% for data in book_list %}
+                                                <option value="{{ data.pk }}">{{ data.book_name_bangla }} <span style="font-size: 13px;">(লেখকঃ {{ data.writter_name_bangla }} - {{data.publisher_name_bangla}})</span></option>
+                                            {% endfor %}
+                                        </select>
+                                        <input hidden type="text" value="{{ OrderNumber }}" id="OrderNumber">
+                                    </td>
+                                    <td style="width:10%">
+                                        <input type="number" class="form-control" id="book_quantity" value="1" style="width:100px;text-align: center">
+                                    </td>
+                                    <td style="width:10%">
+                                        <input type="submit" id="newOrderBook" class="btn btn-success" value="Add Book">
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <table class="table table-bordered product_invoice_table">
+                                <tr>
+                                    <th style="width:3%">SL</th>
+                                    <th style="width:37%">Product Name </th>
+                                    <th style="width:15%;text-align: center;">Unit Price</th>
+                                    <th style="width:9%;text-align: center;">Stock Status</th>
+                                    <th style="width:7%;text-align: center;">Stock Qty</th>
+                                    <th style="width:12%">Qty</th>
+                                    <th style="width:10%">Total Price</th>
+                                    <th style="width:5%">Action</th>
+                                </tr>
+                                {% for data in get_order_items %}
+                                <tr>
+                                    <td> {{ forloop.counter }} </td>
+                                    <td>
+                                        <input type="text" id="booknameid_{{ data.id }}" value="{{ data.book_name_id }}" hidden>
+                                        <p style="font-size:16px;margin: 0;">{{ data.book_name_bangla }} <span style="font-size: 14px;">(লেখকঃ {{ data.writter_name_bangla }} - {{data.publisher_name_bangla}})</span></p>
+                                    </td>
+                                    <td style="text-align:center;"><del> Tk.{{ data.old_price }}</del>&nbsp;&nbsp; <strong>Tk. {{ data.unit_price }}</strong>  </td>
+                                    <td style="text-align: center;"> {% if data.stock_info == '1' %} In Publisher {% elif data.stock_info == '2' %} <span style="color:green;font-weight:bold">In Scock</span> {% elif data.stock_info == '3' %} Out of Stock {% endif %} </td>
+                                    <td style="text-align: center;"> {{ data.quantity }} </td>
+                                    <td> 
+                                        <span onclick="incrementQuantity('{{data.pk}}','minus');" class="fas fa-minus-square"></span>
+                                        <input type="text" style="width:60px;height:30px;border-radius: 3px;text-align: center;border:1px solid rgb(168, 168, 168);" value="{{ data.book_quantity }}">
+                                        <span onclick="incrementQuantity('{{data.pk}}','plus');" class="fas fa-plus-square"></span> 
+                                    </td>
+                                    <td style="text-align:center;">{{ data.total_price }}</td>
+                                    <td>
+                                        {% if total_raw > 1 %}
+                                            <a href="/dashboard/order/{{ data.id }}/delete/" onclick="return confirm('Are you sure Delete it?');" class="btn btn-danger">Del</a>
+                                        {% else %}
+                                            <a href="#" onclick="return confirm('This Item do not deleted!');" class="btn btn-danger">Del</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            <div class="row">
+                                    <div class="col-sm-8">
+                                                
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <table class="table table-bordered table-striped"  style="float:right">
+                                            <tr class="subtutoa_tr">
+                                                <th colspan="4" style="text-align:right;">Subtotal</th>
+                                                <th style="text-align:center;">Tk. {{ totalPrice }}</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="4" style="text-align:right;">Shipping Charge</th>
+                                                <th style="text-align:center;">Tk. <input style="width:60px;text-align: center" id="shipping_charge" type="text" value="{{ shiping_price }}"></th>
+                                            </tr>
+                                            <tr class="subtutoa_tr">
+                                                <th colspan="4" style="text-align:right;"><strong>Grand Total</strong></th>
+                                                <th style="text-align:center;">Tk. {{ grand_total }}</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="4" style="text-align:right;"><strong>Less Amount</strong></th>
+                                                <th style="text-align:center;">Tk. <input style="width:60px;text-align: center" id="less_amount" type="text" value="{{ less_amount }}"></th>
+                                            </tr>
+                                            <tr class="subtutoa_tr">
+                                                <th colspan="4" style="text-align:right;"><strong>Payable Amount</strong></th>
+                                                <th style="text-align:center;">Tk. {{ payable_amount }}</th>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <button class="btn btn-info" id="UpdateOrder" style="float: right;">Update Order</button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+</div>
+
+
+<script src="{% static 'durbar_shop/dashboard/vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'durbar_shop/dashboard/js/select2.js' %}"></script>
+<script>
+    function incrementQuantity(id, status){
+        OrderNumber = $("#OrderNumber").val(); 
+        booknameid = $("#booknameid_"+id).val(); 
+        var url = "/dashboard/incrementDecrementQuantity/" 
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                status : status,
+                booknameid : booknameid,
+                customer_book_id : id,
+                OrderNumber : OrderNumber,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                window.location.href = "/dashboard/order/"+OrderNumber+"/customize/";
+            },
+            error: function(data){
+                alert(data);
+            },
+        })
+    }
+    $("#UpdateOrder").click(function(){
+        var shipping_charge = $("#shipping_charge").val();
+        var less_amount = $("#less_amount").val();
+        var OrderNumber = $("#OrderNumber").val();
+        var url = "/dashboard/UpdateOrder/" 
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                shipping_charge : shipping_charge,
+                less_amount : less_amount, 
+                OrderNumber : OrderNumber,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                alert(data);
+                window.location.href = "/dashboard/order/"+OrderNumber+"/customize/";
+            },
+            error: function(data){
+                alert(data);
+            },
+        })
+        
+    })
+</script> 
+
+<script>
+    $("#book_name_id").select2( {
+        placeholder: "Select A Book",
+        allowClear: true
+        });
+    // $("#new_book_add_order_hide").hide();
+    $("#new_book_add_order_show").click(function(){
+        $("#new_book_add_order_hide").slideToggle(300);
+    })
+
+    $("#newOrderBook").click(function(){
+        book_name_id = $("#book_name_id").val(); 
+        book_quantity = $("#book_quantity").val();
+        OrderNumber = $("#OrderNumber").val();
+        var url = "/dashboard/order/"+OrderNumber+"/customize/"
+        
+        $.ajax({
+            url: url,
+            type:'GET',
+            data: {
+                'book_name_id': book_name_id,
+                'book_quantity': book_quantity,
+                'OrderNumber': OrderNumber,
+            },
+            success: function (data) {
+                alert(data);
+                window.location.href = url;
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+
+    })
+    
+</script>
+<script>
+    $('#district_name').change(function(){
+        var url = '/bind-district-upozilla/';
+        $.ajax({
+            url: url,
+            data: {
+                'district_name': $('#district_name :selected').val(),
+            },
+            success: function (data) {
+                $("#upozilla_name").html(data);
+            }
+        });
+    });
+</script>
+
+<script>
+	$('#upozilla_name').click(function(){
+		var distict_value = $('#district_name').val();
+		if(distict_value == 0){
+			alert("অনুগ্রহ করে জেলা নির্বাচন করুন ।"); 
+		}
+	});
+
+	$('#postal_code').click(function(){
+		var upozilla_name = $('#upozilla_name').val();
+		if(upozilla_name == 0){
+			alert("অনুগ্রহ করে থানা নির্বাচন করুন ।"); 
+		}
+	});
+
+    $('#upozilla_name').change(function(){
+		
+        var url = '/bind-upozilla-wise-post-office/';
+        $.ajax({
+            url: url,
+            data: {
+                'upozilla_name': $('#upozilla_name :selected').val(),
+            },
+            success: function (data) {
+                $("#postal_code").html(data);
+            }
+        });
+    });
+
+</script>
+
+
+
+
+
+{% endblock %}

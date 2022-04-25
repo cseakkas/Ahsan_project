@@ -1,0 +1,53 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Menu Add || Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Menu Entry <span><a href="/settings/menu-add/">Menu List</a></span></h4>
+                <div class="card-body"> 
+                    <div class="table-responsive">
+                        <form method="POST"> {% csrf_token %}
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 200px;">Menu Name</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="menu_name">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Menu Url</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="menu_url">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Module Name</th>
+                                    <td>
+                                         <select name="menu_module" class="form-control">
+                                            <option value="">Select Module</option>
+                                            <option value="HR">HR</option>
+                                            <option value="Attendance">Attendance</option>
+                                            <option value="Payroll">Payroll</option>
+                                            <option value="Ecommerce">Ecommerce</option>
+                                         </select>
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input type="submit" class="btn btn-info" name="submit" value="District Add">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div>
+
+{% endblock %}

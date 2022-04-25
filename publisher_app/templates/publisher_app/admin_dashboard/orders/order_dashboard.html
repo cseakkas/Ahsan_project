@@ -1,0 +1,123 @@
+{% extends 'durbar_shop/dashboard/dash_base.html' %}
+{% block title %} Order Dadhboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <div class="row">
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/all-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/order_icon.png" alt="">
+                    <h5>All Order</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order-list/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/processing.png" alt="">
+                    <h5>Processing</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/confirmed-order-list/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/ddd.png" alt="">
+                    <h5>Confirmed</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order/packed-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/packet.png" alt="">
+                    <h5>Packed</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+          
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order/shipping-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/delivery.png" alt="">
+                    <h5>Shipping</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order/delivery-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/444.png" alt="">
+                    <h5>Delivered</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order/returned-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/return.png" alt="">
+                    <h5>Returned</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <!-- <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="#">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/refund.jpg" alt="">
+                    <h5>Refund </h5>
+                  </center>
+              </a>
+            </div>
+          </div> -->
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="#">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/refund.jpg" alt="">
+                    <h5>Hold Order</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6 mb-4">
+            <div class="dashboard_icons">
+              <a href="/dashboard/order/canceled-order/">
+                  <center>
+                    <img src="/static/durbar_shop/dashboard/icons/cancel_order_icon.jpg" alt="">
+                    <h5>Cancel Order</h5>
+                  </center>
+              </a>
+            </div>
+          </div>
+      
+        </div>
+
+      </div>
+  
+{% endblock %}

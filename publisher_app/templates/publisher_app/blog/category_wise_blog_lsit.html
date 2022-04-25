@@ -1,0 +1,90 @@
+{% extends 'publisher_app/base.html' %} 
+{% block title %} Category Wise Blog Post {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+ 
+
+<section>
+    <div class="container">
+        <div class="row"> 
+            <div class="col-sm-9">
+                <div class="blog_post_master">
+                    <h1>{{category_name}}</h1>
+                    {% for data in blog_list %}
+                        {% if forloop.counter|divisibleby:2 %}
+                            <div class="blogPostItem blog_odd">
+                                <div class="row"> 
+                                    <div class="col-sm-6">
+                                        <div class="blog_thumb_area">
+                                            <img src="/static/publisher_app/media/{{ data.blog_image }}" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="blog_content_area">
+                                            <h4>{{ data.blog_title }}</h4>
+                                            <h6><span class="fa fa-calendar-o"> {{ data.create_date|date:'d M Y' }} </span> <span class="fa fa-eye"> {{data.total_view}} </span> <span><i class="fa fa-commenting-o" aria-hidden="true"></i> {{data.total_comments}}</span> <span class="fa fa-heart"> {{data.total_like}}</span></h6>
+                                            {{ data.blog_details|slice:"300"|safe }} <br>
+                                            <a href="/ahsan-blog/{{data.pk}}/{{data.blog_url}}/" class="btn btn-info" onclick="BlogPostView('{{data.pk}}')">আরো দেখুন...</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="blogPostItem blog_even">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="blog_content_area">
+                                            <h4>{{ data.blog_title }}</h4>
+                                            <h6><span class="fa fa-calendar-o"> {{ data.create_date|date:'d M Y' }} </span> <span class="fa fa-eye"> {{data.total_view}} </span>  <span><i class="fa fa-commenting-o" aria-hidden="true"></i> {{data.total_comments}}</span> <span class="fa fa-heart"> {{data.total_like}}</span></h6>
+                                            {{ data.blog_details|slice:"300"|safe }} <br>
+                                            <a href="/ahsan-blog/{{data.pk}}/{{data.blog_url}}/" class="btn btn-info" onclick="BlogPostView('{{data.pk}}')">আরো দেখুন...</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="blog_thumb_area">
+                                            <img src="/static/publisher_app/media/{{ data.blog_image }}" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                     {% endfor %}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="blog_sidebar_menu">
+                    <h3> বিষয়সমূহ </h3>
+                    <ul>
+                        {% for data in category_list %}
+                            <li><a href="/CategoryWiseBlogList/{{data.category.id}}/{{data.category.menu_url}}/"><i class="fa fa-hand-o-right" aria-hidden="true"></i> {{ data.cat_name_bangla}} ({{ data.total_blog }})</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+  
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script>
+    function BlogPostView(blog_id){
+        $.ajax({
+            url: "/BlogPostViewByAjax/",
+            type:'GET',
+            data : {
+                blog_id : blog_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                window.location.href = "/ahsan-blog/"+blog_id+"/"+blog_url+"/";
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

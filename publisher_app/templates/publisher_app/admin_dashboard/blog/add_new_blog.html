@@ -1,0 +1,89 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Blog List || Dashboard  {% endblock %}
+{% load static %}
+{% load data_load %}
+{% block content %}
+
+<link href="{% static 'publisher_app/admin_dashboard/css/select2.css' %}" rel="stylesheet">
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-10">  
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4>Add New Blog <span style="float:right;"><a href="/dashboard/blog/blog-list/" class="btn btn-info" style="font-size: 14px;padding:5px 8px;">Blog List</a></span></h4>
+                    <hr>
+                    <div class="table-responsive"> 
+                        <form method="POST" enctype="multipart/form-data"> {% csrf_token %} 
+                            <table class="table table-bordered"> 
+                                <tr>
+                                    <th>Blog Category </th>
+                                    <td>
+                                        <select name="blog_category" id="category_id" class="form-control" required>
+                                            <option value="">Select Category</option>
+                                            {% for data in category_list %}
+                                                <option value="{{data.pk}}">{{data.cat_name_bangla}} {% if data.cat_name_english %} - {{data.cat_name_english}}{% endif %}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Blog Title Bangla</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="blog_title" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Blog Title English</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="blog_title_english" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Blog image</th>
+                                    <td>
+                                         <input type="file" name="blog_image" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Blog Details</th>
+                                    <td>
+                                        <textarea name="blog_details" class="form-control" required></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> </th>
+                                    <td>
+                                        <input type="submit" name="submit" value="Submit" class="btn btn-success">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                  
+        </div>
+    </div> 
+</div>
+
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+<script src="//cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>  
+<script src="{% static 'publisher_app/admin_dashboard/js/select2.js' %}"></script>
+
+<script>
+    $(document).ready(function(){
+        $('#dataTable').DataTable({
+            "ordering": false
+        });
+    }) 
+    CKEDITOR.replace('blog_details'); 
+</script>
+<script>
+    $("#category_id").select2({
+        placeholder: "Select Category", 
+        
+        });
+</script>
+{% endblock %}

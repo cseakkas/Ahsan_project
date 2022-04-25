@@ -1,0 +1,73 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Book Publisher || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %}
+ 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Publisher List <span><a href="/book-publisher-entry/"> Publisher Entry</a></span></h4>
+                <div class="card-body">
+                    <div class="table-responsive datatableHeading">
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                                <tr>
+                                    <th style="width:5%;">SL</th>
+                                    <th style="width:30%;">Pubblisher Name Bangla</th>
+                                    <th style="width:10%;">Mobile</th>
+                                    <th style="width:13%;">Purchase Discount (%)</th>
+                                    <th style="width:30%;">Address</th>
+                                    <th style="width:7%;">Photo</th>
+                                    <th style="width:7%;">Cover</th>
+                                    <th style="width:7%;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pub in dash_pub_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="">{{ pub.publisher_name_bangla }}  {% if pub.publisher_code %} - ({{ pub.publisher_code }}) {% endif %}</a></td>
+                                    <td>{{ pub.mobile }}</td>
+                                    <td style="text-align: center;">{{ pub.discount_persent }}</td>
+                                    <td>{{ pub.publisher_address }}</td>
+                                <td>
+                                        {% if pub.publisher_logo %}
+                                            <img src="/static/publisher_app/media/{{ pub.publisher_logo }}" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% else %}
+                                            <img src="/static/publisher_app/images/H-2.png" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if pub.publisher_cover %}
+                                            <img src="/static/publisher_app/media/{{ pub.publisher_cover }}" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% else %}
+                                            <img src="/static/publisher_app/images/H-2.png" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a style="font-size:13px;padding:3px 10px;" href="/book-publisher-update/{{ pub.pk }}/" class="btn btn-info">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div>
+
+
+<script src="{% static 'publisher_app/dashboard/vendor/jquery/jquery.min.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $('#dataTable').DataTable({
+            "ordering": false,
+            // "paging": false
+        }); 
+    })
+</script>
+
+{% endblock %}

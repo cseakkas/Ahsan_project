@@ -1,0 +1,66 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Book Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %} 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Category Entry <span><a href="/book-category-list/">Category List</a></span></h4>
+                <div class="card-body"> 
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                    <form method="POST"> {% csrf_token %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 230px;"> Category Name (Bangla)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="category_name_bangla">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Category Name (English)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="category_name_english">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> Is Homepage</th>
+                                <td>
+                                    <input type="checkbox" name="is_homepage" style="width:20px;height:20px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> Mainmenu</th>
+                                <td>
+                                    <input type="checkbox" name="is_mainmenu" style="width:20px;height:20px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Details</th>
+                                <td>
+                                    <textarea name="category_details" class="form-control" rows="2"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input type="submit" class="btn btn-info" name="submit">
+                                </td>
+                            </tr>
+                        </table>
+                    </form> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

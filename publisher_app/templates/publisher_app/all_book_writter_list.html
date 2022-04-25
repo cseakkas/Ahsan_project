@@ -1,0 +1,83 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %}  Writter List {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section>
+    <div class="sort_statistic_items" style="background: #fff;">
+        <div class="container">
+             
+            <div class="row"> 
+                <div class="col-sm-12">  
+                    <div class="all_writter_category_publisher_search_box">  
+                        <h4 class="favorite_writter_title"> সকল লেখকবৃন্দ </h4>  
+                        <div class="all_search_box">
+                            <input name="search_txt" type="text" id="writter_search_box" placeholder="Search your favorite Author " class="form-control search_form_field awc_search" style="border: 1px solid #ffffff;">
+                            <ul id="search_writter_list">
+                                        
+                            </ul>
+                        </div> 
+                    </div>
+                </div>   
+            </div>  
+            <div class="row">
+                {% for writer in writter_load|book_writter %}
+                <div class="col-lg-2 col-md-4 col-xs-6" id="writter_items">
+                    <div class="writter_items">
+                        <a href="/book/author/{{ writer.pk }}/{{ writer.menu_url }}/">
+                            {% if writer.writter_images %}
+                                <img src="/static/publisher_app/media/{{ writer.writter_images }}" alt="">
+                            {% else %}
+                                <img src="/static/publisher_app/images/writter.jpg" alt="">
+                            {% endif %}
+                            <h5><Center>{{ writer.writter_name_bangla}} </Center></h5>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+  
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>   
+<script>
+    $("#writter_search_box").keyup(function(){
+        if($("#writter_search_box").val().length > 2)
+            {
+                var action_url = "/writter-search/";
+                $.ajax({
+                    url: action_url,
+                    type:'GET',
+                    dataType:"json",
+                    data : {
+                        'src_data': $("#writter_search_box").val()
+                    },
+                    success: function(data){ 
+                        $("#search_writter_list").html("");
+                        $.each(data, function(rowIndex, r) { 
+                            var writter_id = data[rowIndex].id;
+                            var menu_url = data[rowIndex].menu_url;
+                            var writter_name_bangla = data[rowIndex].writter_name_bangla;
+                            var writter_name_english = data[rowIndex].writter_name_english; 
+                            var writter_images = (data[rowIndex].writter_images).toString(); 
+                            $('#search_writter_list').append(
+                                '<li><a href="/book/author/'+writter_id+'/'+menu_url+'"><div class="search_writter_image"><img src="/static/publisher_app/media/'+writter_images+'" /></div> <div class="search_writter_name"> <p>'+data[rowIndex].writter_name_bangla+'</p> </div> </a></li>'
+                                );
+
+                        });
+                    },
+                    error: function(data){     
+                    }
+                });
+            }
+        else{
+            $("#search_writter_list").html("");
+        }
+    });
+</script>
+
+{% endblock %}
+

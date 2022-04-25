@@ -1,0 +1,235 @@
+
+{% extends 'durbar_shop/base.html' %}
+{% block title %} New Publisher Book {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+  
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3" style="padding-right: 0;">
+                <div class="author_sidebar">
+                    <div class="author_filter_pull">
+                        <div class="category_filter">
+                            <h5>লেখকসমূহ</h5>
+                            <ul>
+                                {% for writer in writter_load|book_writter %}
+                                    <li><a href="/book/author/{{ writer.id }}/{{ writer.menu_url }}/">{{ writer.writter_name_bangla }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="category_filter">
+                            <h5>প্রকাশনী সমূহ</h5>
+                            <ul>
+                                {% for publi in publisher_load|book_publisher %}
+                                    <li><a href="/book/publisher/{{ publi.pk }}/{{ publi.menu_url }}/">{{ publi.publisher_name_bangla }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="author_price_pull"></div>
+                    <div class="author_language_pull"></div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="author_mainarea_pull">
+                    <div class="author_book_list">
+                        <ul class="breadcrumb">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/">Books</a></li>
+                            <li><a href="#">Categories</a></li>
+                            <li>{{ cat_info.cat_name_bangla }}</li>
+                          </ul>
+                        <h4>{{ cat_info.cat_name_bangla }}</h4> <hr>
+                        <input type="text" id="category_id" value="{{ cat_info.id }}" hidden>
+                        <input type="text" id="category_menu_url" value="{{ cat_info.menu_url }}" hidden>
+                        <div class="row" id="durbar_shop_category_books_items_row">
+                            {% for book in cat_book_list %}  
+                                <div class="col-lg-3 col-md-3 col-xs-6" id="durbar_shop_category_books_items">
+                                    <div class="durbar_shop_category_books_items">
+                                        <div class="durbar_shop_book_image"> 
+                                                <div class="book_image_cover">
+                                                    <a href="/book/details/{{ book.pk }}/" onclick="recent_function('{{ book.pk }}')">
+                                                        <img src="/static/durbar_shop/media/{{ book.book_image }}" alt="durbar_shop Books">
+                                                        {% if book.is_pre_image == 1 %}
+                                                            <img src="/static/durbar_shop/images/readmore.png" alt="" class="readmore_images">
+                                                        {% endif %}
+                                                    </a>
+                                                    {% if book.discount > 0 %} 
+                                                        <span>{{ book.discount }}%</span>
+                                                    {% endif %}
+                                                </div>
+                                            
+                                        </div>
+                                        <div class="durbar_shop_product_title">
+                                            <h4>{{ book.book_name_bangla }}</h4>
+                                            <h5>{{ book.writter_name_bangla }}</h5>
+                                        </div>
+                                        <div class="product_price">
+                                            <h6 style="font-weight:bold"> {% if book.discount == 0 %}  {% else %}  <del style="font-size:14px;font-weight:normal;"> TK. {{ book.book_price }}</del> {% endif %} TK. {{ book.sale_price}} </h6> 
+                                        </div>
+                                        <div class="add_to_cart_btn">
+                                            <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                                <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                                <input type="text" id="{{ book.pk }}_r_book_id" value="{{ book.pk }}">                                                
+                                                <input type="text" id="{{ book.pk }}_sale_price" value="{{ book.sale_price }}">
+                                                <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                                <input type="text" id="{{ book.pk }}_discount" value="{{ book.discount }}">
+                                            </div>
+                                             <center> 
+                                                {% if book.stock_info == '4' %}
+                                                    <a href="#" class="add-to-cart"> Pre Order </a>
+                                                {% elif book.stock_info == '3' %}
+                                                    <a href="#" class="add-to-cart-new">Out of Stock </a>
+                                                {% else %}
+                                                        <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                                                {% endif %} 
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}      
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+  
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+        <div class="modal-content">
+        <div class="modal-header" style="border-bottom:none">
+            <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i> Successfully Added to Cart</h5>
+        </div>
+        </div>
+    </div>
+</div>
+    
+    
+<script src="{% static 'durbar_shop/js/jquery.js' %}"></script> 
+  
+
+<script type="text/javascript">
+    function cart_function(id){
+        var book_id   = document.getElementById(id+"_book_id").value;
+        var sale_price   = document.getElementById(id+"_sale_price").value;
+        var book_price   = document.getElementById(id+"_book_price").value;
+        var discount      = document.getElementById(id+"_discount").value;
+        var category_id = $("#category_id").val();
+        var category_menu_url = $("#category_menu_url").val();
+        var url = "/new-publisher-book/";
+        $.ajax({
+            url: url,
+            type:'GET',
+            data : {
+                book_id : book_id,
+                sale_price : sale_price,
+                book_price : book_price,
+                discount : discount,
+            },
+            success: function(data){
+                if(data == "success"){
+                let timerInterval
+                Swal.fire({
+                title: '<p style="color:#23040;font-size:18px;margin:0px;padding:0px;">Product Add Successful.</p>',
+                // icon: 'success',
+                width:'250px',
+                margin:'0px',
+                padding:'10px 0px',
+                background:'#d7fbda',
+                showCancelButton: false,
+                showConfirmButton: false,
+                timer: 1000,
+                didOpen: () => {
+                    Swal.showLoading()
+                    timerInterval = setInterval(() => {
+                    const content = Swal.getContent()
+                    if (content) {
+                        const b = content.querySelector('b')
+                        if (b) {
+                        b.textContent = Swal.getTimerLeft()
+                        }
+                    }
+                    }, 100)
+                },
+            })
+            
+            var count = parseInt($("#cart_items").html()) + 1;
+            $("#cart_items").html(count);
+            }
+            else{
+                let timerInterval
+                    Swal.fire({
+                    title: '<p style="color:#fff;font-size:18px;margin:0px;padding:0px;padding-top:10px;">Product Already Added.</p>',
+                    timer: 2000,
+                    width:'250px',
+                    margin:'0px',
+                    padding:'0px 0px',
+                    background:'linear-gradient(to right, #e21d24,#a92930)',
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        timerInterval = setInterval(() => {
+                        const content = Swal.getContent()
+                        if (content) {
+                            const b = content.querySelector('b')
+                            if (b) {
+                            b.textContent = Swal.getTimerLeft()
+                            }
+                        }
+                        }, 100)
+                    },
+                }) 
+            }
+            },
+            error: function(data){
+                    alert(data);
+            }
+        });
+    }
+</script> 
+
+<script>
+    $(document).ready(function(){
+        $('#read_more_button').click(function(){
+        $('.author_details_mes').removeClass();
+        $('#read_more_button').hide();
+        });
+    });
+</script>
+ 
+
+<script>
+    // <i onclick="addTowishListItem('{{book.pk}}')" class="fa fa-heart-o"></i>
+    function addTowishListItem(book_id){ 
+        $.ajax({
+            url: "/addToWishList/",
+            type:'GET',
+            data : {
+                book_id : book_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                if (data == "success"){
+                    var wishlist_count = parseInt($("#wishlist_items").html()) + 1;
+                    $("#wishlist_items").html(wishlist_count);
+                }
+                else{
+                    alert("Already Exist")
+                }
+            },
+            error: function(data){ 
+                alert(data);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

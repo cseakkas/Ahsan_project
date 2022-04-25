@@ -1,0 +1,9 @@
+<option value="">Post Office/Area </option> 
+{% for post in upozila_wise_post %} 
+    {% if postal_code_id ==  post.pk %}
+        <option value="{{post.pk}}" selected>{{ post.post_office_bangla }} </option> 
+    {% else %}
+        <option value="{{post.pk}}">{{ post.post_office_bangla }} </option> 
+    {% endif %}
+{% endfor %}
+ 

@@ -1,0 +1,10 @@
+<option value=""> থানা </option>  
+{% for data in district_wise_upozilla %}
+    {% if get_upozilla_id == data.id %}
+        <option value="{{ data.pk }}" selected> {{ data.upozilla_name_bangla }} </option> 
+    {% else %} 
+        <option value="{{ data.pk }}"> {{ data.upozilla_name_bangla }} </option>  
+    {% endif %}
+{% endfor %}
+
+ 

@@ -1,0 +1,89 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Post Office Add || Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Post Office Add <span><a href="/settings/post-office-list/">Post Office List</a></span> </h4>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <form method="POST"> {% csrf_token %}
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 200px;">District Name</th>
+                                    <td>
+                                        <select name="district_name"  id="district_name" class="form-control">
+                                            <option value="0">Select District</option>
+                                            {% for data in show_dist_list %}
+                                                <option value="{{ data.pk }}">{{ data.district_name_bangla }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Upozilla Name</th>
+                                    <td>
+                                        <select name="upozilla_id" id="upozilla_name" class="form-control">
+                                            <option value="0">Select Upozilla</option>
+                                            {% for data in show_upozi_list %}
+                                                <option value="{{ data.pk }}">{{ data.upozilla_name_bangla }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Post Office Bangla</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="post_office_name_bangla">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Post Office English</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="post_office_name_english">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 200px;">Post Code</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="post_office_code">
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input type="submit" class="btn btn-info" name="submit" value="Post Office Add">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>  
+<script>
+        $('#district_name').change(function(){
+            var url = '/bind-district-upozilla/';
+            
+            $.ajax({
+                url: url,
+                data: {
+                    'district_name': $('#district_name :selected').val(),
+                },
+                success: function (data) {
+                    $("#upozilla_name").html(data);
+                }
+            });
+        });
+    
+    </script>
+
+{% endblock %}

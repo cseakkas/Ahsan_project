@@ -1,0 +1,114 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %}  Category Book  {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+  <section>
+      <div class="publisher_app_category_books">
+          <div class="container">
+              <div class="row"  id="publisher_app_category_books_items_row">
+                  <div class="col-sm-12" id="publisher_app_category_books_items">
+                      <h3 class="category_page_title">
+                            <a href="/"><i class="fa fa-home"></i></a>/<a href="#">Category</a> / {{ getcatid.cat_name_bangla }}
+                      </h3>
+                  </div>
+              </div>
+              <div class="row" id="publisher_app_category_books_items_row">
+                {% for book in cat_book_list %}  
+                <div class="col-lg-2 col-md-4 col-xs-6" id="publisher_app_category_books_items">
+                      <div class="publisher_app_category_books_items">
+                            <div class="publisher_app_book_image">
+                                    {% if book.discount > 0 %} <p class="discount_range">{{ book.discount }}% </p> {% endif %}
+                                <a href="/book/{{ book.pk }}/{{book.slug}}/">
+                                    <img src="/static/publisher_app/media/{{ book.book_image }}" alt="publisher_app Books">
+                                </a>
+                            </div>
+                            <div class="publisher_app_product_title">
+                                <h4>{{ book.book_name_bangla}}</h4>
+                                <h5>{{ book.author}}</h5>
+                                <h6>৳ {{ book.book_price}} {% if book.old_price %} <del>{{ book.old_price }}</del> {% endif %} </h6>
+                            </div>
+                            <div class="add_to_cart_btn">
+                                <div class="cart_submit_add" id="cart_submit_add" hidden>
+                                    <input type="text" id="{{ book.pk }}_book_id" value="{{ book.pk }}">
+                                    <input type="text" id="{{ book.pk }}_book_price" value="{{ book.book_price }}">
+                                </div>
+                                <center>
+                                    <button style="border:none" class="add-to-cart2" onclick="cart_function('{{ book.pk }}')"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                                </center>
+                                <!-- <a href="#"><i class="fa fa-shopping-cart"></i> Add to Cart</a> -->
+                            </div>
+                      </div>
+                  </div>
+                {% endfor %}
+              </div>
+          </div>
+      </div>
+  </section>
+    
+
+<!-- Cart Loader   -->
+<div class="cart_loader">
+    <img src="/static/publisher_app/images/loader.gif" alt="loader">
+</div>
+<div class="cart_loader_exist">
+    <h4>Already Added!</h4>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+          <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none">
+              <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i> Successfully Added to Cart</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    
+        <script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+        <script type="text/javascript">
+            $(".cart_loader").hide();
+            $(".cart_loader_exist").hide();
+            function cart_function(id){
+                $(".cart_loader").hide();
+                var book_id   = document.getElementById(id+"_book_id").value;
+                var book_price   = document.getElementById(id+"_book_price").value;
+                $.ajax({
+                    url: "/",
+                    type:'GET',
+                    data : {
+                        book_id : book_id,
+                        book_price : book_price,
+                        total_price : book_price
+                    },
+                    success: function(data){
+                        if(data == "success"){ 
+                            $(".cart_loader").show();
+                            $(".cart_loader_exist").hide();
+                            window.setTimeout(function () {
+                                $(".cart_loader").hide();
+                            }, 1500);
+                            var count = parseInt($("#cart_items").html()) + 1;
+                            $("#cart_items").html(count); 
+                        }
+                        else{
+                            $(".cart_loader").hide();   
+                            $(".cart_loader_exist").show();   
+                            window.setTimeout(function () {
+                                $(".cart_loader_exist").hide();
+                            }, 1500);
+                        } 
+                    },
+                    error: function(data){
+                         alert(data);
+                    }
+                });
+            }
+        </script> 
+    
+
+  {% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Book Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %}
+  
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Category List <span><a href="/book-category-entry/">Category Entry</a></span></h4>
+                <div class="card-body">
+                    <div class="table-responsive datatableHeading"> 
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                            <tr>
+                            <th>SL</th>
+                            <th>Category Name Bangla</th> 
+                            <th>IS Homepage</th>
+                            <th>IS Mainmenu</th>
+                            <th style="width:60px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in dash_cat_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="/dashboard/books/{{ cat.pk }}/category-wise-book-list/">{{ cat.cat_name_bangla }}</a></td> 
+                                <td>
+                                    {% if cat.Is_homepage %}
+                                        <p style="margin: 0;color:green;">Show Homepage</p>
+                                    {% else %}
+                                        <p style="margin: 0;color:#333;">Hide Homepage</p>
+                                    {% endif %}
+                                    
+                                </td>
+                                <td>
+                                    {% if cat.Is_mainmenu %}
+                                        <p style="margin: 0;color:green;">Show Mainmenu</p>
+                                    {% else %}
+                                        <p style="margin: 0;color:#333;">Hide Mainmenu</p>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a style="font-size:13px;padding:3px 10px;" href="/book-category-update/{{cat.pk}}/" class="btn btn-info">Edit</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+{% endblock %}

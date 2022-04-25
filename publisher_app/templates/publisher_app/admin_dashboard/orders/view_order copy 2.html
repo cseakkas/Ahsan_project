@@ -1,0 +1,670 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Order Details  {% endblock %}
+{% load static %}
+{% load data_load %}
+{% block content %}
+
+<link href="{% static 'publisher_app/admin_dashboard/css/styles.css' %}" rel="stylesheet" />
+<style>
+    .order_table table tr th{font-size:13.5px;padding:9px 8px}
+    .order_table table tr td{font-size:14px;vertical-align: middle;}
+</style>
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="page_header_bar">    
+                            <button style="padding:2px 10px" class="btn btn-primary" onclick="printDiv('printableArea')"><i class="fa fa-print"></i> Print Invoice</button>   
+                        </h4>  
+                       <br>
+                    </div>
+                </div>
+
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        
+            <!-- Update Code  -->
+            <form method="post" style="padding:0px 10px"> {% csrf_token %}
+                <div class="row"> 
+                    <div class="col-sm-6">
+                        <h3>Order Info</h3>
+                        <table class="table"> 
+                            <tr>
+                                <th style="width:200px;">Order Date</th>
+                                <td> 
+                                    <input type="text" class="form-control" value="{{ get_order_info.order_date|date:'d M Y'}}  {{ get_order_info.order_date|date:"g:i A"}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Order Id</th>
+                                <td> 
+                                    {% if request.session.previous_url_get %}
+                                        <input type="hidden" name="previous_url_get" value="{{request.session.previous_url_get }}">
+                                    {% else %}
+                                        <input type="hidden" name="previous_url_get" value="{{request.META.HTTP_REFERER }}">
+                                    {% endif %}
+                                    <input type="number" name="order_number" class="form-control" value="{{ get_order_info.order_number }}" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Order Status</th>
+                                <td>
+                                    <select name="order_status"  class="form-control">
+                                        <option value="1" {% if get_order_info.order_status == '1' %} selected {% endif %}>Pending</option>
+                                        <option value="2" {% if get_order_info.order_status == '2' %} selected {% endif %}>Confirmed</option>
+                                        <option value="3" {% if get_order_info.order_status == '3' %} selected {% endif %}>Packed</option>
+                                        <option value="4" {% if get_order_info.order_status == '4' %} selected {% endif %}>Shipping</option>
+                                        <option value="5" {% if get_order_info.order_status == '5' %} selected {% endif %}>Delivered</option>
+                                        <option value="6" {% if get_order_info.order_status == '6' %} selected {% endif %}>Returned</option>
+                                        <option value="8" {% if get_order_info.order_status == '8' %} selected {% endif %}>Hold</option>
+                                        <option value="7" {% if get_order_info.order_status == '7' %} selected {% endif %}>Canceled</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr> 
+                                <th>Payment Status</th>
+                                <td>
+                                    <select name="payment_status" id="" class="form-control">
+                                        <option value="1" {% if get_order_info.payment_status == '1' %} selected {% endif %}>Pending</option>
+                                        <option value="2" {% if get_order_info.payment_status == '2' %} selected {% endif %}>Unpaid</option>
+                                        <option value="3" {% if get_order_info.payment_status == '3' %} selected {% endif %}>Paid</option>
+                                        <option value="4" {% if get_order_info.payment_status == '4' %} selected {% endif %}>Refund</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Payment Method</th>
+                                <td>
+                                    <select name="payment_method" id="payment_method"  class="form-control">
+                                        <option value="1" {% if get_order_info.payment_method == '1' %} selected {% endif %}>Cash on Delivery</option>
+                                        <option value="2" {% if get_order_info.payment_method == '2' %} selected {% endif %}>Bkash </option>
+                                        <option value="3" {% if get_order_info.payment_method == '3' %} selected {% endif %}>Rocket</option>
+                                        <option value="4" {% if get_order_info.payment_method == '4' %} selected {% endif %}>Nagad</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="hidePaymentRow">  
+                                <th> </th>
+                                <td> 
+                                    <input type="text" style="width:200px" name="payment_number" value="{{ get_order_info.payment_number }}" placeholder="Payment Number">
+                                    <input type="text" style="width:100px" name="payment_amount" value="{{ get_order_info.payment_amount }}" placeholder="Amount">
+                                </td> 
+                            </tr>
+                        
+                            <tr>
+                                <th>Delivery Method</th>
+                                <td>
+                                    <select name="delivery_method"  class="form-control">
+                                        <option value="1" {% if get_order_info.delivery_method == '1' %} selected {% endif %} >Pending</option>
+                                        <option value="2" {% if get_order_info.delivery_method == '2' %} selected {% endif %} >Durbar Courier</option>
+                                        <option value="3" {% if get_order_info.delivery_method == '3' %} selected {% endif %} >Sundarban Courier</option>
+                                        <option value="4" {% if get_order_info.delivery_method == '4' %} selected {% endif %} >Post Office</option>
+                                        <option value="5" {% if get_order_info.delivery_method == '5' %} selected {% endif %} >Delivery Tiger</option>
+                                        <option value="7" {% if get_order_info.delivery_method == '7' %} selected {% endif %} >PaperFly</option>
+                                        <option value="6" {% if get_order_info.delivery_method == '6' %} selected {% endif %} >Others</option>
+                                    </select>
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th>Service Code</th>
+                                <td>
+                                    <input type="text" class="form-control" name="service_code" value="{{ get_order_info.service_code }}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Service Charge</th>
+                                <td>
+                                    <input type="text" class="form-control" name="service_charge" value="{{ get_order_info.service_charge }}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Note</th>
+                                <td>
+                                    <textarea name="customer_note" class="form-control" rows="2">{{get_order_info.order_remarks}}</textarea>
+                                </td>
+                            </tr>
+                        </table>
+                    </div> 
+
+                    <!-- Delivery Info  -->
+                    <div class="col-sm-6">
+                        <h3>Delivery Info</h3>
+                        <table class="table"> 
+                            <tr>
+                                <th>Customer Name </th>
+                                <td><input type="text" class="form-control" name="del_per_name" value="{{ get_order_info.delivery_per_name}}"></td>
+                            </tr>
+                            <tr>
+                                <th>Mobile</th>
+                                <td><input type="number" class="form-control" id="mobile_number" name="customer_mobile" value="{{ get_order_info.customer_mobile}}" onkeypress="return event.charCode >= 48" min="1"></td>
+                            </tr> 
+                            <tr>
+                                <th>Mobile (Optional )</th>
+                                <td><input type="number" class="form-control" id="mobile_number_optional" name="optional_number" value="{{ get_order_info.optional_number }}" onkeypress="return event.charCode >= 48" min="1"></td>
+                            </tr> 
+                            <tr>
+                                <th>Email</th>
+                                <td><input type="email" class="form-control" name="customer_email" value="{{ get_order_info.customer_email }}"></td>
+                            </tr> 
+                            <tr>
+                                <th>District</th>
+                                <td>   
+                                    <select  name="district_name" id="district_name" class="form-control">
+                                        <option value="0">জেলা সমূহ </option> 
+                                        {% for dis in district %}
+                                            {% if get_order_info.district_id == dis.id %}
+                                                <option value="{{ dis.pk }}" selected>{{ dis.district_name_bangla }}</option>
+                                            {% else %}
+                                                <option value="{{ dis.pk }}">{{ dis.district_name_bangla }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Thana </th>
+                                <td>    
+                                    <select name="upozilla_name" id="upozilla_name" class="form-control upozilla_name">
+                                        <option value="">Upozilla </option>   
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> Post/Area</th>
+                                <td>    
+                                    <select name="postal_code" id="postal_code" class="form-control"> 
+            
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Full Adress</th>
+                                <td>
+                                    <textarea name="address"  class="form-control" rows="2">{{get_order_info.shipping_address}}</textarea>
+                                </td>
+                            </tr>
+                            
+                        </table>
+                    </div> 
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3>Order Customize</h3>
+                    </div>
+                </div>
+                        
+                <div class="row" id="new_book_add_order_hide">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td style="width:78%">
+                                    <select class="form-control" id="book_name_id">
+                                        <option value="0"><strong>Select Book</strong></option>
+                                        {% for data in book_list %}
+                                            <option value="{{ data.pk }}">{{ data.book_name_bangla }} <span style="font-size: 13px;">(লেখকঃ {{ data.writter_name_bangla }} - {{data.publisher_name_bangla}})</span></option>
+                                        {% endfor %}
+                                    </select>
+                                    <input hidden type="text" value="{{ OrderNumber }}" id="OrderNumber">
+                                </td>
+                                <td style="width:8%">
+                                    <input type="number" class="form-control" id="book_quantity" value="1" style="width:100px;text-align: center">
+                                </td>
+                                <td style="width:14%">
+                                    <!-- <input type="submit" id="newOrderBook" class="btn btn-success" value="Add Book"> -->
+                                    <span id="newOrderBook2" class="btn btn-success">Add Book </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+                        <table class="table table-bordered product_invoice_table" id="product_invoice_table22">
+                            <tr>
+                                <th style="width:3%">SL</th>
+                                <th style="width:37%">Product Name </th>
+                                <th style="width:15%;text-align: center;">Unit Price</th> 
+                                <th style="width:12%">Qty</th>
+                                <th style="width:10%">Total Price</th>
+                                <th style="width:5%">Action</th>
+                            </tr>
+                            {% for data in order_wise_product %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td>
+                                    <input type="text" id="booknameid_{{ data.id }}" value="{{ data.book_name_id }}" hidden>
+                                    <p style="font-size:16px;margin: 0;">{{ data.book_name_bangla }} <span style="font-size: 14px;">(লেখকঃ {{ data.book_name.writter_name_bangla }} - {{data.publisher_name_bangla}})</span></p>
+                                </td>
+                                <td style="text-align:center;"><del> Tk. {{data.book_price}}</del> &nbsp;&nbsp; <strong>Tk. {{ data.sale_price }}</strong>  </td>
+                                 
+                                <td> 
+                                    <span onclick="incrementQuantity('{{data.pk}}','minus');" class="fas fa-minus-square"></span>
+                                    <input id="refrash_qty" type="text" style="width:60px;height:30px;border-radius: 3px;text-align: center;border:1px solid rgb(168, 168, 168);" value="{{ data.book_quantity }}">
+                                    <span onclick="incrementQuantity('{{data.pk}}','plus');" class="fas fa-plus-square"></span> 
+                                </td>
+                                <td style="text-align:center;">{{ data.total_price }}</td>
+                                <td>
+                                    {% if order_wise_product|length > 1 %}
+                                        <a href="/dashboard/orders/{{ data.id }}/delete/" onclick="return confirm('Are you sure Delete it?');" class="btn btn-danger"> <i class="fa fa-trash"></i> </a>
+                                    {% else %}
+                                        <a href="#" onclick="return confirm('This Item do not deleted!');" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        <div class="row">
+                                <div class="col-sm-8"> 
+                                </div>
+                                <div class="col-sm-4">
+                                    <table class="table table-bordered table-striped"  style="float:right">
+                                        <tr class="subtutoa_tr">
+                                            <th colspan="4" style="text-align:right;">Subtotal</th>
+                                            <th style="text-align:center;">Tk. {{ total_order_price }}</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="4" style="text-align:right;">Shipping Charge</th>
+                                            <th style="text-align:center;">Tk. <input style="width:60px;text-align: center" name="shipping_charge" id="shipping_charge" type="text" value="{{ get_order_info.shipping_charge }}"></th>
+                                        </tr>
+                                        <tr class="subtutoa_tr">
+                                            <th colspan="4" style="text-align:right;"><strong>Grand Total</strong></th>
+                                            <th style="text-align:center;">Tk. {{ grand_total }}</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="4" style="text-align:right;"><strong>Less Amount</strong></th>
+                                            <th style="text-align:center;">Tk. <input style="width:60px;text-align: center" name="less_amount" id="less_amount" type="text" value="{{ get_order_info.less_amount }}"></th>
+                                        </tr>
+                                        <tr class="subtutoa_tr">
+                                            <th colspan="4" style="text-align:right;"><strong>Payable Amount</strong></th>
+                                            <th style="text-align:center;">Tk. {{ total_payable }}</th>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"> 
+                                                <button type="submit" onclick="return confirm('Are you sure update it?')" class="btn btn-info" id="UpdateOrderOff" style="float: right;">Update Order</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                    </div>
+                </div> 
+            </form>   
+            </div>           
+        </div>
+    </div>
+
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" data-keyboard="false" data-backdrop="static" id="OrderItemUpdateModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog purchase_order_book_modal" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel"> Order Details</h5>
+          <button type="button" class="close" id="close_modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="overflow-y:auto"  id="printableArea">  
+            
+            <div class="row" id="printableArea">
+                <div class="col-sm-12">
+                    <div class="header" style="border:1px solid #ccc; background:rgb(241, 241, 241);width:100%;margin-bottom:6px;padding:5px;">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="web_logo" style="width:240px;padding:7px;">
+                                    <img src="/static/durbar_shop/images/DurbarShop.png" alt="" style="width:230px;">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;margin-top: 4px;">66 Paridas Road, Banglabazar, Dhaka-1100 </p>
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;">Email : info@durbarshop.com</p>
+                                <p style="text-align: right;margin: 0px;padding-right: 10px;line-height: 21px;">Phone : 01614-344469, <span style="margin-left:8px">Web : www.durbarshop.com</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="billing_address">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                    <h6 class="">Order Info</h6>
+                                    <input type="text" id="order_number" value="{{ OrderNumber }}" hidden>
+                                    <p>Order Date : {{ shipping_info.order_date|date }}</p>
+                                    <p>Order Id : {{ OrderNumber }}</p>
+                                    <p>Payment Status  : {{ shipping_info.get_payment_status_display}}</p>
+                                    <p>Payment Method  : {{ shipping_info.get_payment_method_display}}</p>
+                                    <p>Delivery Method  : {{ shipping_info.get_delivery_method_display }}</p>  
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="qr_code_load">
+                                    <br>
+                                    <center><img src="/static/durbar_shop/images/durbarshop.jpg" alt="" style="width:150px;"></center>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                    <h6>Delivery Info</h6>
+                                    <h4 style="font-family: 'AdorshoLipi';"> Name : {{ shipping_info.del_per_name}}</h4>
+                                    <h4>Mobile : {{ shipping_info.customer_mobile}} {% if shipping_info.optional_number %}, {{ shipping_info.optional_number}} {% endif %}</h4>
+                                    <!-- {% if shipping_info.customer_email %}<h4>Email : {{ shipping_info.customer_email}}</h4> {% endif %} -->
+                                    <h4 style="font-family: 'AdorshoLipi';">Address : {{ shipping_info.address}}</h4> 
+                                    <h4>{% if shipping_info.postal_code_id == 1 or shipping_info.postal_code_id == null %} {% else %} Post/Area : {{ shipping_info.postal_code.post_office_english}}, {% endif %} {{ shipping_info.upozilla.upozilla_name_english}}, {{ shipping_info.district.district_name_english}}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div class="col-sm-12">
+                    <table class="table table-bordered product_invoice_table">
+                        <tr>
+                            <th style="width:3%">SL</th>
+                            <th style="width:59%">Product Name</th>
+                            <th style="width:18%;text-align: center;">Unit Price</th>
+                            <th style="width:5%">Qty</th>
+                            <th style="width:10%">Total Price</th>
+                        </tr>
+                        {% for dd in get_order_items %}
+                        <tr>
+                            <td> {{ forloop.counter }} </td>
+                            <td>
+                                <p style="font-size:16px;margin: 0;font-family: 'AdorshoLipi';">{{ dd.book_name_bangla }} <span style="font-size: 14px;">(লেখকঃ {{ dd.writter_name_bangla }} - {{dd.publisher_name_bangla}})</span></p>
+                            </td>
+                            <td style="text-align:center;">{% if dd.discount == 0 %} Fixed Price {% else %}<del> Tk.{{ dd.old_price }}</del>{% endif %} &nbsp;&nbsp; <strong>Tk. {{ dd.unit_price }}</strong>  </td>
+                            <td style="text-align:center;">{{ dd.book_quantity }}</td>
+                            <td style="text-align:center;">{{ dd.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table> 
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <br>
+                            <center><p style="font-family: 'AdorshoLipi';"><strong> <i class="fas fa-hands-helping"></i>  দুর্বার শপ  </strong>এর সাথে থাকার জন্য ধন্যবাদ।</p></center>
+                            <p style="font-family: 'AdorshoLipi';"> <strong> বিঃদ্রঃ -</strong> কাস্টমারকে ফোনে পাওয়া না গেলে অফিসে যোগাযোগ করুনঃ- <strong style="font-size:20px;">01614-344469</strong> </p>
+                                    
+                        </div>
+                        <div class="col-sm-4">
+                            <div id="totalSummaryTable" style="position: relative; width:100%;">
+                                <table class="table table-bordered table-striped"  style="float:right">
+                                    <tr class="subtutoa_tr">
+                                        <th colspan="4" style="text-align:right;">Subtotal</th>
+                                        <th style="text-align:center;">Tk. {{ totalPrice }}</th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="4" style="text-align:right;">Shipping Charge</th>
+                                        <th style="text-align:center;">Tk. {{shiping_price}}</th>
+                                    </tr>
+                                    <tr class="subtutoa_tr">
+                                        <th colspan="4" style="text-align:right;"><strong>Grand Total</strong></th>
+                                        <th style="text-align:center;">Tk. {{ grand_total }}</th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align:right;"><strong>Payable Amount</strong></td>
+                                        <th style="text-align:center;">Tk. {{ pay_amount }}</th>
+                                    </tr>
+                                </table>
+                                
+                                <div class="paidIcon" style="position: absolute; width: 100%; height: 142px;">
+                                    {% if shipping_info.payment_status == '3' %}
+                                        <img src="/static/durbar_shop/images/paidicon.png" alt="" style="width: 226px; opacity: 0.3; float: right; margin: 10px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div> 
+            </div> 
+        </div> 
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+<script src="{% static 'publisher_app/admin_dashboard/js/select2.js' %}"></script>
+<script>  
+    $('#mobile_number').on('keyup', function() {
+        limitText(this, 11)
+    });
+    $('#mobile_number_optional').on('keyup', function() {
+        limitText(this, 11)
+    });
+    function limitText(field, maxChar){
+        var ref = $(field),
+            val = ref.val();
+        if ( val.length >= maxChar ){
+            ref.val(function() {
+                console.log(val.substr(0, maxChar))
+                return val.substr(0, maxChar);       
+            });
+        }
+    }
+$(document).ready(function(){  
+    var payment_method = $("#payment_method").val();  
+    if(payment_method == 2 || payment_method == 3 || payment_method == 4){
+        $("#hidePaymentRow").show();
+    }else{
+        $("#hidePaymentRow").hide();
+    } 
+    var url = '/dashboard/bind-district-upozilla/';
+    $.ajax({
+        url: url,
+        data: {
+            'district_name': $('#district_name :selected').val(),
+        },
+        success: function (data) { 
+            $("#upozilla_name").html(data);
+        }
+    });
+    
+});
+
+$('#district_name').change(function(){  
+    var url = '/dashboard/bind-district-upozilla/';
+    $.ajax({
+        url: url,
+        data: {
+            'district_name': $('#district_name :selected').val(),
+        },
+        success: function (data) {
+            $("#upozilla_name").html(data);
+        }
+    });
+    
+});
+
+</script>
+
+<script>
+$("#hidePaymentRow").hide();
+$("#payment_method").change(function(){
+    var payment_method = $("#payment_method").val();  
+    $("#hidePaymentRow").show();
+     
+})
+</script>
+
+<script>
+$('#upozilla_name').click(function(){
+    var distict_value = $('#district_name').val();
+    if(distict_value == 0){
+        alert("অনুগ্রহ করে জেলা নির্বাচন করুন ।"); 
+    }
+});
+
+$('#postal_code').click(function(){
+    var upozilla_name = $('#upozilla_name').val();
+    if(upozilla_name == 0){
+        alert("অনুগ্রহ করে থানা নির্বাচন করুন ।"); 
+    }
+}); 
+$(document).ready(function(){  
+    $('#upozilla_name').on('load', function(){   
+        
+    });
+}); 
+$('#upozilla_name').change(function(){  
+    var url = '/dashboard/bind-upozilla-wise-post-office/'; 
+    $.ajax({
+        url: url,
+        data: {
+            'upozilla_name': $('#upozilla_name :selected').val(),
+        },
+        success: function (data) {
+            $("#postal_code").html(data);
+        }
+    });
+});
+
+window.onload = function(){
+    setTimeout(loadAfterTime, 400)
+};
+
+function loadAfterTime() { 
+    var url = '/dashboard/bind-upozilla-wise-post-office/';
+    $.ajax({
+        url: url,
+        data: {
+            'upozilla_name': $('#upozilla_name :selected').val(),
+        },
+        success: function (data) {
+            $("#postal_code").html(data);
+        }
+    }); 
+} 
+</script>
+
+<script>
+  function incrementQuantity(id, status){
+      OrderNumber = $("#OrderNumber").val(); 
+      booknameid = $("#booknameid_"+id).val(); 
+      var url = "/dashboard/incrementDecrementQuantity/" 
+      $.ajax({
+          url: url,
+          type:'GET',
+          data : {
+              status : status,
+              booknameid : booknameid,
+              customer_book_id : id,
+              OrderNumber : OrderNumber,
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          success: function(data){ 
+              window.location.href = "/dashboard/order/"+OrderNumber+"/view-details/";
+        
+          },
+          error: function(data){
+              alert(data);
+          },
+      })
+  }
+  $("#UpdateOrder").click(function(){
+      var shipping_charge = $("#shipping_charge").val();
+      var less_amount = $("#less_amount").val();
+      var OrderNumber = $("#OrderNumber").val();
+      var url = "/dashboard/UpdateOrder/" 
+      $.ajax({
+          url: url,
+          type:'GET',
+          data : {
+              shipping_charge : shipping_charge,
+              less_amount : less_amount, 
+              OrderNumber : OrderNumber,
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          success: function(data){ 
+
+              window.location.href = "/dashboard/order/"+OrderNumber+"/view-details/";
+          },
+          error: function(data){
+              alert(data);
+          },
+      })
+      
+  })
+</script>  
+<script>
+  $("#book_name_id").select2( {
+      placeholder: "Select A Book",
+      allowClear: true
+      });
+  // $("#new_book_add_order_hide").hide();
+  $("#new_book_add_order_show").click(function(){
+      $("#new_book_add_order_hide").slideToggle(300);
+  })
+
+  $("#newOrderBook2").click(function(){ 
+    book_name_id = $("#book_name_id").val();  
+    if (book_name_id != "0"){ 
+        book_quantity = $("#book_quantity").val();
+        OrderNumber = $("#OrderNumber").val();
+        var url = "/dashboard/order/customize/" 
+        $.ajax({
+            url: url,
+            type:'GET',
+            data: {
+                'book_name_id': book_name_id,
+                'book_quantity': book_quantity,
+                'OrderNumber': OrderNumber,
+            },
+            success: function (data) {  
+              window.location.href = "/dashboard/order/"+OrderNumber+"/view-details/";
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+    else{
+        alert("Please Select A Book");
+    }
+  })
+  
+</script>
+
+
+<script>
+    function printDiv(divName) {
+        $(".add_new_book_for_customer").hide();
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+</script>
+ 
+
+<script>
+$("#ClickAddNewBookBtn").click(function(){
+     
+    var order_number = $("#order_number").val();
+    var book_nameid = $("#book_nameid").val();
+    var book_name = $("#book_name").val();
+    var quantity = $("#quantity").val();
+    var url = "/dashboard/order/"+ order_number +"/view-details/";
+    $.ajax({
+        url: url,
+        type:'GET',
+        data : {
+            order_number : order_number,
+            book_nameid : book_nameid,
+            quantity : quantity,
+        },
+        success: function(data){ 
+            window.location.href = "/dashboard/order/"+ order_number +"/view-details";
+        },
+        error: function(data){
+            alert(data);
+        }
+    });
+})
+</script>
+
+{% endblock %}

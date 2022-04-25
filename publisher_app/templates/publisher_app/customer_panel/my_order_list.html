@@ -1,0 +1,544 @@
+
+{% extends 'publisher_app/base.html' %}
+{% block title %} My Order List {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+ 
+<style>
+    .myorderlist tr th{
+        font-size: 13.5px; 
+        text-align: center;
+        padding: 8px 1px;
+        background: rgb(28 82 96);
+        color:#fff;
+    }
+    .myorderlist tr td{
+        font-size: 14.5px !important;
+        text-align: center;
+        padding: 5px 1px;
+    }
+    .myorderlist tr td p{
+        margin: 0;
+    }
+    
+.fg_product_pagination {
+    clear: both;
+    overflow: hidden;
+    width: 100%;
+    text-align: right;
+}
+.fg_product_pagination .pagination {
+    width: 455px;
+    margin-right: -15px; 
+    margin-top: 10px;
+}
+.fg_product_pagination .pagination li {
+    float: left;
+    margin: 2px;
+}
+.pagination > .list {
+    display: inline;
+}
+
+.pagination > .list ~ .list {
+    display: none;
+}
+.fg_product_pagination .pagination li a,
+.fg_product_pagination .pagination li span{
+    padding: 0;
+    margin-left: 0px;
+    text-decoration: none;
+    border: 0px solid #ddd;
+    width: 40px;
+    height: 35px;
+}
+.fg_product_pagination .pagination li a button{
+    padding: 5px;
+}
+.fg_product_pagination .pagination li.active span button {
+    background-color: #449D44;
+    border: 1px solid #ddd;
+}
+.fg_product_pagination .pagination li span button:hover,
+.fg_product_pagination .pagination li a button:hover {
+    background-color: #00c292;
+    color: #ffffff;
+}
+.fg_product_pagination .pagination li span button,
+.fg_product_pagination .pagination li a button {
+    padding: 5px 10px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ddd;
+}
+
+ 
+.fg_product_pagination ul.pagination li.list.first-place {
+    position: relative;
+    margin-right:40px;
+}
+.fg_product_pagination ul.pagination li.list.last-place{
+    position: relative;
+}
+.fg_product_pagination ul.pagination li.list.first-place::after {
+    content: "...";
+    position: absolute;
+    top: 0px;
+    right: -25px;
+}
+.fg_product_pagination ul.pagination li.list.last-place::before {
+    content: "...";
+    position: absolute;
+    top: 0px;
+    left: -25px;
+}
+.fg_product_pagination ul.pagination li.list.active{
+    display: inline !important; 
+}
+.pagination li.list:lt(5){
+    display: inline;
+}
+    @media screen and (max-width: 13661px){
+        .table.table-striped>tbody>tr>td, 
+        .table.table-striped>tbody>tr>th, 
+        .table.table-striped>tfoot>tr>td, 
+        .table.table-striped>tfoot>tr>th, 
+        .table.table-striped>thead>tr>td, 
+        .table.table-striped>thead>tr>th {
+            font-size: 13px;
+        }
+        .action-order a.btn {
+            font-size: 11px !important;
+        }
+    }
+    @media screen and (max-width: 991px){
+        .sales-order-list .btn-group.bootstrap-select,
+        .sales-order-list input[type='text'] {
+            margin-bottom: 15px;
+        }
+    }
+    @media screen and (max-width: 767px){
+        .bootstrap-select .btn{
+            font-size: 12px !important;
+        }
+        .filter-apply .btn{
+            font-size: 12px !important;
+            box-shadow: none !important;;
+        }
+        .action-order a.btn {
+            font-size: 10px !important;
+        }
+    }
+    
+    @media screen and (max-width: 660px){
+        .action-order div {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    }
+       
+    .pagination_first_btn{
+        padding: 5px;
+        margin-top: 2px;
+        background: #cfcfcf;
+    }
+</style>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="my_account_menu">
+                    <ul>
+                        <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="/myorder/order-list/" class="my_acc_menu_active"><i class="fa fa-list-ol"></i> Order</a></li>
+                        <li><a href="/my-wishlist/"><i class="fa fa-heart"></i> Wishlist</a></li>
+                        <li><a href="">Wallet</a></li>
+                        <li><a href="">Notification</a></li>
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="my_account_dashboard3">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <!-- {% if request.session.redirect_session %}
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                    <strong>Success!</strong> This alert box could indicate a successful or positive action.
+                                </div>
+                            {% endif %} -->
+                            <div class="myorder_filtering_box">
+                               <h4>My Order List {% if order_number %} {{order_number}} {% endif %} </h4> 
+                               <p>Your Total Order :{% if total_order_list %} {{ total_order_list|length}} {% else %} {{ order_list_len }} {% endif %} </p> 
+                            </div>
+                            
+                            <form method="POST"> {% csrf_token %}
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto search_input_box">
+                                        <label class="sr-only" for="inlineFormInput">Order ID</label>
+                                        <input type="text" class="form-control mb-2" name="order_number" id="inlineFormInput" placeholder="Order ID" {% if order_number %} value="{{ order_number }}" {% endif %}>
+                                    </div>
+                                    <div class="col-auto select_status_items">
+                                        <label class="sr-only" for="inlineFormInputGroup">Status</label>
+                                        <div class="input-group mb-2">
+                                            <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="order_status">
+                                                <option value="">Status Any</option>
+                                                <option value="1" {% if order_status == '1' %} selected {% endif %} >Pending</option>
+                                                <option value="2" {% if order_status == '2' %} selected {% endif %} >Confirmed</option>
+                                                <option value="3" {% if order_status == '3' %} selected {% endif %} >Packed</option>
+                                                <option value="4" {% if order_status == '4' %} selected {% endif %} >Shipping</option>
+                                                <option value="5" {% if order_status == '5' %} selected {% endif %} >Delivered</option>
+                                                <option value="6" {% if order_status == '6' %} selected {% endif %} >Returned</option>
+                                                <option value="7" {% if order_status == '7' %} selected {% endif %} >Canceled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto search_box_icon">
+                                        <button type="submit" name="submit" class="btn btn-primary mb-2 search_order_for_desktop">Search</button>
+                                        <button type="submit" name="submit" class="btn btn-primary mb-2 search_order_for_mobile"><i class="fa fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% if my_order_list %}
+                        <h5>Your Search Result - {{ my_order_list_len }}</h5> 
+                        <table class="for_mobile_desktop_table table table-hover table-striped myorderlist">
+                            <tr>
+                                <th style="width:10.5%;">Order Date</th>
+                                <th style="width:9%">Order ID</th>
+                                <th style="width:12%">Payable Amount</th>
+                                <th style="width:15%">Delivery Method</th>
+                                <th style="width:15%">Pyment Method</th>
+                                <th style="width:13.5%">Pyment Status</th>
+                                <th style="width:11.5%">Order Status</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                            {% for d in my_order_list %}
+                            <tr style="text-align: center">
+                                <td style="font-size: 12px">{{ d.order_date|date }}</td>
+                                <td>{{ d.order_number }}</td>
+                                <td>Tk. {{ d.total_amount }}</td>
+                                <td><p>{{ d.get_delivery_method_display}}</p></td>
+                                <td><p>{{ d.get_payment_method_display}}</p></td>
+                                <td style="text-align: center;">
+                                    {% if d.payment_status == '1' %}
+                                        <span class="Pending_button">Pending</span>
+                                    {% elif d.payment_status == '2' %}
+                                        <span class="Unpaid_button">Unpaid</span>
+                                    {% elif d.payment_status == '3' %}
+                                        <span class="Paid_button">Paid</span>
+                                    {% elif d.payment_status == '4' %}
+                                        <span class="Refund_button">Refund</span>
+                                    {% endif %} 
+                                </td>
+                                <td  style="text-align: center;"> 
+                                    {% if d.order_status == '1' %} 
+                                        <span class="pending_button">Pending</span>
+                                    {% elif d.order_status == '2' %}
+                                        <span class="Confirmed_button">Confirmed</span>
+                                    {% elif d.order_status == '3' %}
+                                        <span class="Packed_button">Packed</span>
+                                    {% elif d.order_status == '4' %}
+                                        <span class="Shipping_button">Shipping</span>
+                                    {% elif d.order_status == '5' %}
+                                        <span class="Delivered_button">Delivered</span>
+                                    {% elif d.order_status == '6' %}
+                                        <span class="Returned_button">Returned</span>
+                                    {% elif d.order_status == '7' %}
+                                        <span class="Canceled_button">Canceled</span>
+                                    {% elif d.order_status == '8' %}
+                                        <span class="Canceled_button">Hold Order</span>
+                                    {% endif %} 
+                                </td>
+                                <td>
+                                    {% if d.order_status == '1' %}
+                                        <button class="btn btn-danger cancel_order_btn" style="padding: 2px 6px;font-size: 12px;">
+                                            <span onclick="order_cancel_button('{{ d.order_number }}')">Cancel</span>
+                                        </button>
+                                        <!-- <a href="/myorder/{{ d.order_number }}/cancel/" onclick="return confirm('Are you sure Canceled it?');" class="btn btn-danger" style="padding: 2px 6px;font-size: 12px;">Cancel</a>  -->
+                                    {% endif %}
+                                    <a href="/myorder/{{ d.order_number }}/view/" class="btn btn-info" style="padding: 2px 6px;font-size: 12px;">View</a>
+                                </td>
+                            </tr>
+                            {% endfor%}
+                        </table>
+                            
+                        <table class="for_mobile_version_table table table-striped myorderlist">
+                            <tr>
+                                <th style="width:9%">Order ID</th>
+                                <th style="width:11.5%">Order Status</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                            {% for d in my_order_list %}
+                            <tr style="text-align: center">
+                                <td>{{ d.order_number }}</td>
+                                <td  style="text-align: center;"> 
+                                    {% if d.order_status == '1' %} 
+                                        <span class="pending_button">Pending</span>
+                                    {% elif d.order_status == '2' %}
+                                        <span class="Confirmed_button">Confirmed</span>
+                                    {% elif d.order_status == '3' %}
+                                        <span class="Packed_button">Packed</span>
+                                    {% elif d.order_status == '4' %}
+                                        <span class="Shipping_button">Shipping</span>
+                                    {% elif d.order_status == '5' %}
+                                        <span class="Delivered_button">Delivered</span>
+                                    {% elif d.order_status == '6' %}
+                                        <span class="Returned_button">Returned</span>
+                                    {% elif d.order_status == '7' %}
+                                        <span class="Canceled_button">Canceled</span>
+                                    {% elif d.order_status == '8' %}
+                                        <span class="Canceled_button">Hold Order</span>
+                                    {% endif %} 
+                                </td>
+                                <td>
+                                    {% if d.order_status == '1' %}
+                                        <button class="btn btn-danger cancel_order_btn" style="padding: 2px 6px;font-size: 12px;">
+                                            <span onclick="order_cancel_button('{{ d.order_number }}')">Cancel</span>
+                                        </button>
+                                        <!-- <a href="/myorder/{{ d.order_number }}/cancel/" onclick="return confirm('Are you sure Canceled it?');" class="btn btn-danger" style="padding: 2px 6px;font-size: 12px;">Cancel</a>  -->
+                                    {% endif %}
+                                    <a href="/myorder/{{ d.order_number }}/view/" class="btn btn-info" style="padding: 2px 6px;font-size: 12px;">View</a>
+                                </td>
+                            </tr>
+                            {% endfor%}
+                        </table>
+                         
+                    {% elif order_list %}    
+                        
+                        <table class="for_mobile_desktop_table table table-hover table-striped myorderlist">
+                            <tr>
+                                <th style="width:10.5%;">Order Date</th>
+                                <th style="width:9%">Order ID</th>
+                                <th style="width:12%">Payable Amount</th>
+                                <th style="width:15%">Delivery Method</th>
+                                <th style="width:15%">Pyment Method</th>
+                                <th style="width:13.5%">Pyment Status</th>
+                                <th style="width:11.5%">Order Status</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                            {% for d in order_list %}
+                            <tr style="text-align: center">
+                                <td style="font-size: 12px">{{ d.order_date|date }}</td>
+                                <td>{{ d.order_number }}</td>
+                                <td>Tk. {{ d.total_amount }}</td>
+                                <td><p>{{ d.get_delivery_method_display}}</p></td>
+                                <td><p>{{ d.get_payment_method_display}}</p></td>
+                                <td style="text-align: center;">
+                                    {% if d.payment_status == '1' %}
+                                        <span class="Pending_button">Pending</span>
+                                    {% elif d.payment_status == '2' %}
+                                        <span class="Unpaid_button">Unpaid</span>
+                                    {% elif d.payment_status == '3' %}
+                                        <span class="Paid_button">Paid</span>
+                                    {% elif d.payment_status == '4' %}
+                                        <span class="Refund_button">Refund</span>
+                                    {% endif %} 
+                                </td>
+                                <td style="text-align: center;"> 
+                                    {% if d.order_status == '1' %} 
+                                        <span class="pending_button">Pending</span>
+                                    {% elif d.order_status == '2' %}
+                                        <span class="Confirmed_button">Confirmed</span>
+                                    {% elif d.order_status == '3' %}
+                                        <span class="Packed_button">Packed</span>
+                                    {% elif d.order_status == '4' %}
+                                        <span class="Shipping_button">Shipping</span>
+                                    {% elif d.order_status == '5' %}
+                                        <span class="Delivered_button">Delivered</span>
+                                    {% elif d.order_status == '6' %}
+                                        <span class="Returned_button">Returned</span>
+                                    {% elif d.order_status == '7' %}
+                                        <span class="Canceled_button">Canceled</span>
+                                    {% elif d.order_status == '8' %}
+                                        <span class="Canceled_button">Hold Order</span>
+                                    {% endif %} 
+                                </td>
+                                <td>
+                                    {% if d.order_status == '1' %}
+                                        <button class="btn btn-danger cancel_order_btn" style="padding: 2px 6px;font-size: 12px;">
+                                            <span onclick="order_cancel_button('{{ d.order_number }}')">Cancel</span>
+                                        </button>
+                                        <!-- <a href="/myorder/{{ d.order_number }}/cancel/" onclick="return confirm('Are you sure Canceled it?');" class="btn btn-danger" style="padding: 2px 6px;font-size: 12px;">Cancel</a>  -->
+                                    {% endif %}
+                                    <a href="/myorder/{{ d.order_number }}/view/" class="btn btn-info" style="padding: 2px 6px;font-size: 12px;">View</a>
+                                </td>
+                            </tr>
+                            {% endfor%}
+                        </table>
+                            
+                        <table class="for_mobile_version_table table table-striped myorderlist">
+                            <tr>
+                                <th style="width:9%">Order ID</th>
+                                <th style="width:11.5%">Order Status</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                            {% for d in order_list %}
+                            <tr style="text-align: center">
+                                <td>{{ d.order_number }}</td>
+                                <td style="text-align: center;"> 
+                                    {% if d.order_status == '1' %} 
+                                        <span class="pending_button">Pending</span>
+                                    {% elif d.order_status == '2' %}
+                                        <span class="Confirmed_button">Confirmed</span>
+                                    {% elif d.order_status == '3' %}
+                                        <span class="Packed_button">Packed</span>
+                                    {% elif d.order_status == '4' %}
+                                        <span class="Shipping_button">Shipping</span>
+                                    {% elif d.order_status == '5' %}
+                                        <span class="Delivered_button">Delivered</span>
+                                    {% elif d.order_status == '6' %}
+                                        <span class="Returned_button">Returned</span>
+                                    {% elif d.order_status == '7' %}
+                                        <span class="Canceled_button">Canceled</span>
+                                    {% elif d.order_status == '8' %}
+                                        <span class="Canceled_button">Hold Order</span>
+                                    {% endif %} 
+                                </td>
+                                <td>
+                                    {% if d.order_status == '1' %}
+                                        <button class="btn btn-danger cancel_order_btn" style="padding: 2px 6px;font-size: 12px;">
+                                            <span onclick="order_cancel_button('{{ d.order_number }}')">Cancel</span>
+                                        </button>
+                                        <!-- <a href="/myorder/{{ d.order_number }}/cancel/" onclick="return confirm('Are you sure Canceled it?');" class="btn btn-danger" style="padding: 2px 6px;font-size: 12px;">Cancel</a>  -->
+                                    {% endif %}
+                                    <a href="/myorder/{{ d.order_number }}/view/" class="btn btn-info" style="padding: 2px 6px;font-size: 12px;">View</a>
+                                </td>
+                            </tr>
+                            {% endfor%}
+                        </table>
+                    {% else %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>Data Not Found</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" id="data_Dismiss_load">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div> 
+
+                    {% endif %} 
+
+                    <form method="POST"> {% csrf_token %}
+                        <input type="text" id="active_page" value="{{ current_page_no }}" hidden />
+                        <input type="text" name="order_number" value="{{order_number}}" hidden>
+                        <input type="text" name="order_status" value="{{order_status}}" hidden>
+                        <div class="fg_product_pagination">
+                            {% if page_number.has_other_pages %}
+                            <ul class="pagination">
+                                {% if page_number.has_previous %}
+                                <li><a href=""><button type="submit" name="btnPage"
+                                            value="{{ page_number.previous_page_number }}">&laquo;</button></a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in page_number.paginator.page_range %}
+                                {% if page_number.number == i %}
+                                <li class="list active"><span><button type="submit" name="btnPage" value="{{ i }}">{{ i }}</button> <span
+                                            class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li class="list"><a href=""><button type="submit" name="btnPage" value="{{ i }}">{{ i }}</button></a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if page_number.has_next %}
+                                <li><a href=""><button type="submit" name="btnPage"
+                                            value="{{  page_number.next_page_number }}">&raquo;</button></a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                            {% endif%}
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Modal -->
+
+<div class="alert_box">
+
+</div>
+
+<div class="modal fade" id="CancalOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 340px; margin: 10rem auto;">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:green;text-align:center"><i class="fa fa-check-square-o" aria-hidden="true"></i>Order Cancel Successful.</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<!-- <script src="sweetalert2.all.min.js"></script> -->
+
+<script>
+    function order_cancel_button(OrderId){
+        if (confirm("Are You Sure Cancel it?")) {
+            $.ajax({
+                url: "/myorder/order-list/",
+                type:'GET',
+                data : {
+                    OrderId : OrderId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){ 
+                    if(data){ 
+                        $('#CancalOrderModal').modal('show')
+                        setTimeout(function(){
+                            $('#CancalOrderModal').modal('hide');
+                            if($('#CancalOrderModal').modal('hide')){
+                                window.location.href = "/myorder/order-list/";
+                            }
+                        }, 2000 );
+                         
+                    }
+                },
+                error: function(data){
+                    alert(data);
+                }
+            });
+        }
+    }
+
+</script>
+
+<script> 
+    function pagination_sales_list(){
+        $(".pagination li.list:lt(5)").css({'display':'inline', 'margin-right':'0px'});
+        $(".pagination li.list").first().css({'display':'inline'});
+        $(".pagination li.active").next().css( "display", "inline" );
+        $(".pagination li.active").prev().css( "display", "inline" );
+        $('.pagination li.list').last().css({'display':'inline', 'margin-left':'40px'});
+        $(".pagination li.list").last().addClass('last-place');
+        $(window).on('load', function() {
+            var current_lenght = $(".pagination li.list").length;
+            current_lenght = current_lenght -4;
+            console.log(current_lenght);
+            var current_id = $("#active_page").val();
+            current_id = parseInt(current_id);
+            if( current_id >=5 ){
+                $(".pagination li.list").first().addClass('first-place');
+                $(".pagination li.list:lt(5)").css({'display':'none'});
+                $(".pagination li.list").first().css({'display':'inline','margin-right':'40px'});
+                $(".pagination li.active").next().css( "display", "inline" );
+                $(".pagination li.active").prev().css( "display", "inline" );
+                if(current_lenght <= current_id){
+                    $('.pagination li.list').last().css({'display':'inline', 'margin-left':'0px'});
+                    $('.pagination li.list').slice(-5).css("display", "inline");
+                }
+            }
+        }); 
+    } 
+    pagination_sales_list(); 
+</script>
+
+{% endblock %}
+
