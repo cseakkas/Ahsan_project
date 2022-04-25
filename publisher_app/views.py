@@ -33,6 +33,7 @@ import datetime
 from num2words import num2words
 
 # This is test 
+# This is test Project by akkas.
 
 def check_user_permission(request, menu_url):
     chk_privilege    = models.UserAccessControl.objects.filter(user_id = int(request.session.get("user_id")), menu_id__menu_url = menu_url, menu_id__status = True, status = True).first()
