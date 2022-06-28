@@ -20,6 +20,21 @@
                     <form method="POST"> {% csrf_token %}
                         <table class="table table-bordered">
                             <tr>
+                                <th style="width: 230px;">Master Category </th>
+                                <td>
+                                    <select name="master_category_id" class="form-control" id="category_name" required>
+                                        <option value="">----Master Category Select---- </option>
+                                        {% for data in master_cat_list %}
+                                            {% if get_category.master_category_id == data.id %}
+                                                <option value="{{ data.pk }}" selected>{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                                {% else %}
+                                                <option value="{{ data.pk }}">{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
                                 <th style="width: 230px;">Category Name (Bangla)</th>
                                 <td>
                                     <input type="text" class="form-control" name="category_name_bangla" value="{{ get_category.cat_name_bangla }}">
@@ -38,11 +53,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th> Mainmenu</th>
-                                <td> 
-                                    <input type="checkbox" {% if get_category.Is_mainmenu == 1 %}  checked="checked" {% endif %} name="is_mainmenu" style="width:20px;height:20px;">
+                                <th> Is Topmenu</th>
+                                <td>
+                                    <input type="checkbox"  {% if get_category.Is_top_category == 1 %} checked="checked"  {% endif %} name="is_topmenu" style="width:20px;height:20px;">
                                 </td>
-                            </tr>
+                            </tr> 
                             <tr>
                                 <th>Details</th>
                                 <td>

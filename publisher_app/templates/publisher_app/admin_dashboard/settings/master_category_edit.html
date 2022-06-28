@@ -1,0 +1,66 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Master Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %} 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Master Category Update <span><a href="/master-category-list/">Master Category List</a></span></h4>
+                    <div class="card-body"> 
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %} 
+                    <form method="POST"> {% csrf_token %}
+                        <table class="table table-bordered"> 
+                            <tr>
+                                <th style="width: 230px;">Category Name (Bangla)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="category_bangla" value="{{ get_category.cat_name_bangla }}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Category Name (English)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="category_english" value="{{ get_category.cat_name_english }}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> Is Homepage</th>
+                                <td>
+                                    <input type="checkbox" {% if get_category.Is_homepage == 1 %} checked {% endif %} name="is_homepage" style="width:20px;height:20px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Is Mainmenu</th>
+                                <td>
+                                    <input type="checkbox" name="is_mainmenu" {% if get_category.Is_mainmenu == 1 %} checked {% endif %} style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th>Is Book</th>
+                                <td>
+                                    <input type="checkbox" {% if get_category.Is_book == 1 %} checked {% endif %} name="is_book" style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input type="submit" class="btn btn-info" name="submit">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+   
+
+{% endblock %}

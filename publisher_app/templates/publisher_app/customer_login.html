@@ -28,32 +28,22 @@
                     <div class="login_logo">
                         <center>
                             <img src="/static/publisher_app/images/services/footer_logo.PNG" alt="Ahsan Logo"> <br>
-                            <h2>Login</h2> 
+                            <h2>Customer Login </h2> 
                         </center>
-                    </div>
-                    <!-- <div class="api_login">
-                        <center>
-                            <button class="facebook_btn"><img src="/static/publisher_app/images/Facebook_Logo.png" alt=""> Facebook </button>
-                            <button class="google_btn"><img src="/static/publisher_app/images/google_icon.png" alt=""> Google</button><br>
-                        </center>
-                        <div class="login_content">
-                            <p>Enter mobile number and password to login</p>
-                            <p><strong>OR</strong></p>
-                        </div>
+                    </div>  
+                    <div class="form-group" id="mobile_number_box"> 
+                        <label>Mobile Number </label>
+                        <input type="number" class="form-control" id="your_mobile" placeholder="Mobile" onkeypress="return event.charCode >= 48" min="1" > 
+                    </div> 
+                    <!-- <div class="form-group" id="confirm_otp_box"> 
+                        <h3>Use your One Time Password (OTP) for your login request. Valid for 1 minute.</h3>
+                        <label>OTP Number</label>
+                        <input type="number" id="confirm_otp" class="form-control" placeholder="4 Digit OTP Number"> 
                     </div> -->
-                    
-                     <h4 id="login_error_msg"></h4>
-                    <br>
                     <div class="form-group"> 
-                        <input type="number" class="form-control" id="your_mobile" placeholder="Email or Mobile" onkeypress="return event.charCode >= 48" min="1" > 
+                        <button type="submit" class="login_btn" id="LoginSubmit" style="width: 130px;" >Send OTP</button>             
+                        <!-- <button type="submit" class="btn btn-info" id="ConfirmOTPNumber" style="width: 150px;" >Confirm OTP</button>              -->
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="password" placeholder="Enter Password">
-                    </div>
-                    <div class="form-group"> 
-                        <button type="submit" class="login_btn" id="LoginSubmit" style="width: 100px;" >Login</button>
-                    </div>
-                    <span>Don't have an account? <a href="/customer/registration/"> Registration</a></span>
                     
                 </div>
             </div>
@@ -63,27 +53,35 @@
 </section>
 
 <script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
-<script>
-    $("#login_error_msg").hide();
+<script> 
+    // $("#confirm_otp_box").hide();
+    // $("#ConfirmOTPNumber").hide();
     $("#LoginSubmit").click(function(){
-        var your_mobile = $("#your_mobile").val();
-        var password = $("#password").val(); 
+        var your_mobile = $("#your_mobile").val(); 
         $.ajax({
             url: "/customer/login/",
             type:'GET',
             data : {
-                your_mobile : your_mobile,
-                password : password, 
+                your_mobile : your_mobile, 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function(data){
-                if(data == "Login Successful")
+                if(data == "Sent OTP")
                 { 
-                    window.location.href = "/my-account/";
+                    alert("OTP Send Successfull.")
+                    // $("#confirm_otp_box").show();
+                    // $("#ConfirmOTPNumber").show();
+                    // $("#mobile_number_box").hide();
+                    // $("#LoginSubmit").hide();
+
+                    window.location.href = "/confirm-otp/";
                 }
                 else{
-                    $("#login_error_msg").show();
-                    $("#login_error_msg").html(data);
+                    // $("#mobile_number_box").show();
+                    // $("#LoginSubmit").show();
+                    // $("#confirm_otp_box").hide();
+                    // $("#ConfirmOTPNumber").hide();
+                    alert(data);
                 }
             },
             error: function(data){

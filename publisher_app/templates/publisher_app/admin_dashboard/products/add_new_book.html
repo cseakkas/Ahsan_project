@@ -51,25 +51,25 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Book Name (Bangla)</label>
                                             <input type="text" name="book_name_bangla" class="form-control" required >
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Book Name (English)</label>
                                             <input type="text" name="book_name_english" class="form-control" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Book Sub Name</label>
                                             <input type="text" name="book_origin" class="form-control">
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Book Publisher</label>
                                             <select class="form-control" name="publisher_name" id="publisher_name" required>
@@ -88,7 +88,6 @@
                                                     <label>Book Category <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewCategory">Add New</span></label>
                                                     <select class="form-control" id="category_name" required>
                                                         <option value="0"><strong>Select Category</strong></option> 
-                                                        <option value="80"><strong>No Category</strong></option>
                                                         {% for cat in cate_list %}
                                                             <option value="{{ cat.pk }}">{{ cat.cat_name_bangla }}</option>
                                                         {% endfor %}
@@ -100,6 +99,26 @@
                                             </tr>
                                         </table>
                                     </div>
+                                     
+                                    <div class="col-sm-6">
+                                        <table id="SubCategorylistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Book Sub Category </label>
+                                                    <select class="form-control" id="subcategory_name" required>
+                                                        <option value="0"><strong>Select Sub Category</strong></option> 
+                                                        {% for cat in subcate_list %}
+                                                            <option value="{{ cat.pk }}">{{ cat.sub_category_bangla }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_subcategory">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
                                     <div class="col-sm-6">
                                         <table id="WritterlistAppand" class="col-sm-12">
                                             <tr>
@@ -474,11 +493,16 @@
 <script> 
     $("#AddBookBtn").click(function () {
         var category_name = $("#category_name").val();
+        var subcategory_name = $("#subcategory_name").val();
         var writter_name = $("#writter_name").val();
         var publisher_name = $("#publisher_name").val();
 
         if (category_name == "0") {
             alert("Please Enter Category Name");
+            return false
+        }
+        else if (subcategory_name == "0") {
+            alert("Please Enter Sub Category Name");
             return false
         }
         else if (writter_name == "0") {
@@ -505,6 +529,10 @@
 <script>
     $("#category_name").select2({
         placeholder: "Select Category",
+
+    });
+    $("#subcategory_name").select2({
+        placeholder: "Select Sub Category",
 
     });
 </script>
@@ -623,6 +651,22 @@
         }
         $(".delete-row").click(function () {
             $(this).closest("#CategorylistAppand tr").remove();
+
+        });
+    });
+
+    $("#appnd_subcategory").click(function () {
+        var subcategory_name_id = $("#subcategory_name option:selected").val();
+        var subcategory_name = $("#subcategory_name option:selected").text();
+        if (subcategory_name_id == 0) {
+            alert("Please Select a Sub Category");
+        }
+        else {
+            var markup = "<tr id='" + subcategory_name_id + "' class='tr_class cartItem_" + subcategory_name_id + "'> <td><input name='subcategory_name' type='text' value='" + subcategory_name_id + "' hidden>  <span>" + subcategory_name + "</span></td>  <td><i class='fas fa-trash delete-row'  style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#SubCategorylistAppand").append(markup); 
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#SubCategorylistAppand tr").remove();
 
         });
     });

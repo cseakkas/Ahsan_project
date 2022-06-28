@@ -4,83 +4,195 @@
 {% block content %}
  
 <div class="container-fluid page_container">        
-    <div class="row">
+    <div class="row" style="background-color: #edeaea;padding:20px 10px 0"> 
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/master-subcategory-list/">
+                    <img src="/static/publisher_app/dashboard_icon/category.png" alt="">
+                    <h4>Master Category</h4>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/book-category-list/">
+                    <img src="/static/publisher_app/dashboard_icon/regular_category.png" alt="">
+                    <h4>Regular Category</h4>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/master-subcategory-list/">
+                    <img src="/static/publisher_app/dashboard_icon/sub_category.png" alt="">
+                    <h4>Sub Category</h4>
+                </a>
+            </div>
+        </div>
          
-        
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Total Order</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/book-author-list/">
+                    <img src="/static/publisher_app/dashboard_icon/auth.png" alt="">
+                    <h4>Writer List</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Total Order Amount</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/book-publisher-list/">
+                    <img src="/static/publisher_app/dashboard_icon/publications.png" alt="">
+                    <h4>Publisher List</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Total Sales</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/dashboard/orders/all-order/">
+                    <img src="/static/publisher_app/dashboard_icon/sales_order.jpg" alt="">
+                    <h4>Sales Order List</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Total Sales Amount</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/dashboard/orders/delivery-orders/">
+                    <img src="/static/publisher_app/dashboard_icon/delivery.jpg" alt="">
+                    <h4>Order Delivery List</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Today Orders</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="#">
+                    <img src="/static/publisher_app/dashboard_icon/sales_amount.png" alt="">
+                    <h4>Sales Amount</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">This Week Orders</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="/dashboard/customerList/">
+                    <img src="/static/publisher_app/dashboard_icon/customer.jpg" alt="">
+                    <h4>Customer List</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">This Month Orders</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="#">
+                    <img src="/static/publisher_app/dashboard_icon/report.png" alt="">
+                    <h4>Top Item Sales</h4>
+                </a>
+            </div>
+        </div> 
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="#">
+                    <img src="/static/publisher_app/dashboard_icon/accounts.png" alt="">
+                    <h4>Accounts</h4>
+                </a>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">This Year Orders</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
+        <div class="col-sm-2">
+            <div class="dashboard_menu_icon">
+                <a href="#">
+                    <img src="/static/publisher_app/dashboard_icon/inventory.png" alt="">
+                    <h4>Inventory</h4>
+                </a>
             </div>
-        </div>
-      
+        </div> 
     </div> 
+ 
+    <div class="row" style="background-color: #edeaea;padding:20px 10px 0px; margin-top: 20px;">
+        <div class="col-lg-7">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i> This Year's Order
+                </div>
+                <div class="card-body"><canvas id="myBarChart" width="100%" height="50"></canvas></div> 
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Order Information Chart
+                </div>
+                <div class="card-body"><canvas id="myPieChart" width="100%" height="50"></canvas></div> 
+            </div>
+        </div>
+    </div> <br>
+
+    
 </div>
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script> 
+    // Order Information Chart 
+    Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#292b2c';
+
+        // Pie Chart Example
+        var ctx = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ["Pending", "Confirmed", "Shipping", "Delivered", "Cancel", "Return", "Refund"],
+            datasets: [{
+            data: [ {% for data in order_status_list %} {{ data.total_order }}, {% endfor %} ],
+            backgroundColor: ['#007bff', '#02bcda', '#ffc107', '#28a745', '#dc3545', "#203040", "#ff006c"],
+            }],
+        },
+        });
+</script>
+
+<script>
+
+// Set new default font family and font color to mimic Bootstrap's default styling
+Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = '#292b2c';
+
+// Bar Chart Example
+var ctx = document.getElementById("myBarChart");
+var myLineChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: [ {% for data in month_wise_sale %} "{{ data.month_name }}",  {% endfor %} ],
+    datasets: [{
+      label: "Monthly Sales",
+      backgroundColor: "rgba(2,117,216,1)",
+      borderColor: "rgba(2,117,216,1)",
+      data: [ {% for data in month_wise_sale %} {% if  data.total_amount %} {{ data.total_amount }}, {% endif %} {% endfor %} ],
+    }],
+  },
+  options: {
+    scales: {
+      xAxes: [{
+        time: {
+          unit: 'month'
+        },
+        gridLines: {
+          display: false
+        },
+        ticks: {
+          maxTicksLimit: 12
+        }
+      }],
+      yAxes: [{
+        ticks: {
+          min: 100,
+          max: 20000,
+          maxTicksLimit: 1
+        },
+        
+      }],
+    },
+    legend: {
+      display: true
+    }
+  }
+});
+</script>
         
  {% endblock %}

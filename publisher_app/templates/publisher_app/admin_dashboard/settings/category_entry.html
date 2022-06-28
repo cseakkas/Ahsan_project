@@ -17,17 +17,28 @@
                 {% endif %}
 
                     <form method="POST"> {% csrf_token %}
-                        <table class="table table-bordered">
+                        <table class="table table-bordered"> 
+                            <tr>
+                                <th style="width: 230px;">Master Category </th>
+                                <td>
+                                    <select name="master_category_id" class="form-control" id="category_name" required>
+                                        <option value="">----Master Category Select---- </option>
+                                        {% for data in master_cat_list %}
+                                            <option value="{{ data.pk }}">{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                        {% endfor %}
+                                    </select> 
+                                </td>
+                            </tr>
                             <tr>
                                 <th style="width: 230px;"> Category Name (Bangla)</th>
                                 <td>
-                                    <input type="text" class="form-control" name="category_name_bangla">
+                                    <input type="text" class="form-control" name="category_name_bangla" required>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Category Name (English)</th>
                                 <td>
-                                    <input type="text" class="form-control" name="category_name_english">
+                                    <input type="text" class="form-control" name="category_name_english" required>
                                 </td>
                             </tr>
                             <tr>
@@ -35,19 +46,13 @@
                                 <td>
                                     <input type="checkbox" name="is_homepage" style="width:20px;height:20px;">
                                 </td>
-                            </tr>
+                            </tr> 
                             <tr>
-                                <th> Mainmenu</th>
+                                <th> Is Topmenu</th>
                                 <td>
-                                    <input type="checkbox" name="is_mainmenu" style="width:20px;height:20px;">
+                                    <input type="checkbox" name="is_topmenu" style="width:20px;height:20px;">
                                 </td>
-                            </tr>
-                            <tr>
-                                <th>Details</th>
-                                <td>
-                                    <textarea name="category_details" class="form-control" rows="2"></textarea>
-                                </td>
-                            </tr>
+                            </tr> 
                             <tr>
                                 <th></th>
                                 <td>

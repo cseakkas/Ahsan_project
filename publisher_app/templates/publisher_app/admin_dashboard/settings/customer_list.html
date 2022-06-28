@@ -1,0 +1,60 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Book Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %}
+  
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Customer List </h4>
+                <div class="card-body">
+                    <div class="table-responsive datatableHeading"> 
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                                <tr>
+                                    <th class="text-center">SL</th>
+                                    <th>Customer Name</th> 
+                                    <th>Mobile</th>  
+                                    <th>Email</th>
+                                    <th>Address</th> 
+                                    <th class="text-center">Culstomer Level</th> 
+                                    <th class="text-center">Total Point</th> 
+                                    <th class="text-center">Used Point</th> 
+                                    <th class="text-center">Available Point</th>  
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in customer_list %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>{{ data.customer_name }}</td> 
+                                    <td>{{ data.mobile }}</td>  
+                                    <td>{% if data.email %} {{ data.email }} {% else %} N/A {% endif %} </td>
+                                    <td> {{ data.address }}</td>
+                                    <td class="text-center"> {{ data.customer_level }}</td>
+                                    <td class="text-center"> {{ data.total_point|floatformat:0 }}</td>
+                                    <td class="text-center"> {{ data.used_point|floatformat:0 }}</td>
+                                    <td class="text-center"> {{ data.available_point|floatformat:0 }}</td> 
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
+
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script>
+    $('#datatablesSimple').dataTable( {
+       "pageLength": 25
+   });
+   
+ </script>
+{% endblock %}

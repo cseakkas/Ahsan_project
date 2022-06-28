@@ -2,6 +2,7 @@ import os
 from django.conf import settings
 from django.contrib.messages import constants as messages
 
+from .jazzmin import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,6 +23,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,7 +81,7 @@ WSGI_APPLICATION = 'publisher_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecom_ahsan',
+        'NAME': 'ecom3_ahsan',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -143,3 +145,5 @@ MESSAGE_TAGS = {
     messages.DEBUG: 'alert alert-info',
 }
 
+JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
+JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS

@@ -8,16 +8,19 @@ def shop_profile_load(request):
     profile = models.PublisherProfile.objects.filter(status=True)
     if profile:
         return profile
-
-
+ 
 @register.filter(name='topmenu')
 def topmenu_load(request):
-    top_menu = models.BookCategory.objects.filter(Is_mainmenu=True)
-    if top_menu:
-        return top_menu
+    website_menu = models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category')
+    if website_menu:
+        return website_menu
 
+# @register.filter(name='topmenu')
+# def topmenu_load(request):
+#     top_menu = models.BookCategory.objects.filter(Is_mainmenu=True)
+#     if top_menu:
+#         return top_menu
  
-
 @register.filter(name='book_category2')
 def category_load2(request):
     book_catagory = models.BookCategory.objects.filter(status=True, Is_top_category=1, Is_homepage = False).order_by('Is_top_category')[:20]

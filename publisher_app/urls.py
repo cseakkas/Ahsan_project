@@ -6,6 +6,10 @@ from . import order_views
 
 urlpatterns = [ 
     path('', views.index_page, name="index_page"),
+    path('contact-us/', views.contact_page, name="contact_page"),
+    path('about-us/', views.about_us, name="about_us"),
+    path('complain/', views.complain_page, name="complain_page"),
+    path('refund-policy/', views.refund_policy, name="refund_policy"),
     path('book/<int:id>/<str:slug>/', views.book_details, name="book_details"),
     path('my-cart/', views.add_to_cart_page),
     path('cart/delete-item/', views.delete_to_cart),
@@ -40,6 +44,11 @@ urlpatterns = [
     path('wishlist-item/', views.wishList_cart_item, name="wishList_cart_item"), 
      
     path('ajaxQuantityUpDown/', views.ajaxQuantityUpDown, name="ajaxQuantityUpDown"), 
+    path('confirm-otp/', views.confirm_otp, name="confirm_otp"),   
+
+
+    # Bkash API Payment 
+    # path('ajaxQuantityUpDown/', views.ajaxQuantityUpDown, name="ajaxQuantityUpDown"), 
 
 
     # Customer Panel
@@ -73,7 +82,7 @@ urlpatterns = [
     path('NewBookWriterEntry/', views.NewBookWriterEntry, name="NewBookWriterEntry"),
     path('book-author-update/<int:id>/', views.book_author_update, name="book_author_update"),
     path('book-author-list/', views.book_author_list, name="book_author_list"),
-    path('book-category-list/', views.book_category_list, name="book_category_list"),
+    # path('book-category-list/', views.book_category_list, name="book_category_list"),
 
     path('book-publisher-entry/', views.book_publisher_add, name="book_publisher_add"),
     path('book-publisher-update/<int:id>/', views.book_publisher_update, name="book_publisher_update"),
@@ -124,7 +133,7 @@ urlpatterns = [
 
     # Sales Reports 
     path('dashboard/sales/sales-history/', order_views.dashboard_sales_history), 
-
+    path('dashboard/customerList/', order_views.dashboardCustomerList), 
     
     #blog POSt List
     path('ahsan-blog/', views.ahsan_blog),
@@ -136,7 +145,15 @@ urlpatterns = [
     path('dashboard/blog/blog-list/', order_views.dashboard_blog_list),
     path('dashboard/blog/<int:id>/update/', order_views.dashboard_blog_update),
     path('dashboard/blog/<int:id>/blog-delete/', order_views.dashboard_blog_delete),
-    
- 
 
+    path('master-category-list/', order_views.master_category_list),
+    path('master-category-add/', order_views.master_category_add),
+    path('master-category/<int:id>/edit/', order_views.master_category_update),
+    path('master-subcategory-list/', order_views.master_subcategory_list),
+    path('master-subcategory-add/', order_views.master_subcategory_add), 
+    path('master-subcategory/<int:id>/edit/', order_views.master_subcategory_update), 
+    path('payment-success/', order_views.payment_success), 
+    path('payment-cancel/', order_views.payment_cancel), 
+    path('payment-failed/', order_views.payment_failed), 
+    
 ]

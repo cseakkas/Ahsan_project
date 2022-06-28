@@ -858,35 +858,35 @@
         
     })
  
-    // function loadBooklistByAjax(){
-    //     pub_list = ""
-    //     aut_list = "" 
-    //     cat_list = []  
+    function loadBooklistByAjax(){
+        pub_list = ""
+        aut_list = "" 
+        cat_list = []  
         
-    //     $("#chk_auth_list .chk_auth_list:checked").each(function(i){  
-    //         auth_id = this.id 
-	//			alert(auth_id)
-	// 			aut_list += auth_id
-	
-	
-    //     }) 
-	
-    //     $.ajax({
-    //         url: "/loadPublisherWiseBook/",
-    //         type:'GET',
-    //         data : {
-    //             auth_id : auth_id,  
-    //             csrfmiddlewaretoken: '{{ csrf_token }}',
-    //         },
-    //         success: function(results){
-    //             alert("Success") 
-    //         },
-    //         error: function(data){
-    //             alert(data);
-    //         }
-    //     });  
+        $("#chk_auth_list .chk_auth_list:checked").each(function(i){  
+            auth_id = this.id  
+			aut_list +=  auth_id +', '
+        })
            
-    // }  
+        // $.ajax({
+        //     url: "/loadPublisherWiseBook/",
+        //     type:'GET',
+        //     data : {
+        //         auth_id : aut_list,  
+        //         csrfmiddlewaretoken: '{{ csrf_token }}',
+        //     },
+        //     success: function(results){
+        //         for (i = 0; i < results.length; i++)
+        //         {
+                     
+        //         }
+        //     },
+        //     error: function(data){
+        //         alert(data);
+        //     }
+        // });  
+           
+    }  
  
 </script>
 

@@ -34,13 +34,15 @@
     <link rel="stylesheet" href="{% static 'publisher_app/css/jquery-ui.css' %}">
     <link rel="stylesheet" href="{% static 'publisher_app/css/sweetalert2.css' %}">
     <link rel="stylesheet" href="{% static 'publisher_app/css/responsive_popup.css' %}">
-    <!-- <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet"> -->
+    <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Hind Siliguri' rel='stylesheet'>
     <link rel="stylesheet" href="{% static 'publisher_app/css/jquery-ui.css' %}"> 
     <link rel="stylesheet" href="{% static 'publisher_app/css/pagination.css' %}"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/css/ion.rangeSlider.min.css"/> 
- 
- 
+  
+	<link rel="stylesheet" id="brk-direction-offsets" href="{% static 'publisher_app/css/assets/offsets.css' %}">
+	<link id="brk-css-min" rel="stylesheet" href="{% static 'publisher_app/css/assets/style.css' %}">
+
 </head>
 
 <body>
@@ -171,67 +173,110 @@
 					
 				</div>
             </div>	
-            <div class="website_main_menu">
-                <div class="container">
-                    <div class="row" style="padding: 0 15px;">
-                        <div class="col-sm-12">
-                                <ul>
-                                        <li><a href="/book/writter-list/">লেখক <i class="fa fa-angle-down"></i></a>
-                                            <ul>
-                                                {% for writer in writter_load|book_writter|slice:"8" %}
-                                                   <li class="col-sm-3"><a href="/book/author/{{ writer.id }}/{{ writer.menu_url }}/"><i class="fa fa-address-book"></i> {{ writer.writter_name_bangla }} </a></li>
-                                                {% endfor %}
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <center><a href="/book/writter-list/" class="see_more_category">আরো দেখুন</a> </center>
-                                                    </div>
-                                                </div>
-                                            </ul>
-                                        </li>
-
-                                        <li><a href="/book/categories/">বিষয় <i class="fa fa-angle-down"></i></a>
-                                            <ul>
-                                                {% for category in category_load|book_category|slice:"8" %}
-                                                <li class="col-sm-3">
-                                                    <a href="/book/category/{{ category.pk}}/{{ category.menu_url}}/"><i class="fa fa-check-circle"></i> {{ category.cat_name_bangla }} </a>
-                                                </li>
-                                                {% endfor %}
-                                                <!-- <li class="col-sm-12">
-                                                    <center></center><a href="/book/categories/" style="color:rgb(4, 92, 133);"><i class="fa fa-hand-o-right"></i> আরো দেখুন...</a>
-                                                </li> -->
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                            <center><a href="/book/categories/" class="see_more_category">আরো দেখুন</a> </center>
-                                                    </div>
-                                                </div>
-                                            </ul>
-                                        </li>
-                                        <li><a href="/book/pulisher-list/">প্রকাশনী <i class="fa fa-angle-down"></i></a>
-                                            <ul>
-                                                {% for publi in publisher_load|book_publisher|slice:"8" %}
-                                                    <li class="col-sm-3"><a href="/book/publisher/{{ publi.pk}}/{{ publi.menu_url }}/"><i class="fa fa-book" ></i> {{ publi.publisher_name_bangla}} </a></li>
-                                                {% endfor %}
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <center><a href="/book/pulisher-list/" class="see_more_category">আরো দেখুন</a> </center>
-                                                    </div>
-                                                </div>
-                                            </ul>
-                                        </li>
-                                        {% for menu in topmenu_load|topmenu %}
-                                            <li><a href="/book/category/{{ menu.pk}}/{{ menu.menu_url}}/">{{ menu.cat_name_bangla}} </a></li>
-                                        {% endfor %}
-
-                                        <!-- <li> <a href="/ahsan-blog/">ব্লগ</a></li> -->
-                                    </ul>
+              
+            <div class="main-wrapper">
+                <main class="main-container">
+                    <div class="brk-header-mobile">
+                        <div class="brk-header-mobile__open brk-header-mobile__open_white">
+                            <span></span>
                         </div>
                     </div>
-                </div>
+                    <header class="brk-header brk-header_style-2 brk-header_color-white brk-header_skin-2 d-lg-flex flex-column" style="background:#1399A0" data-logo-src="img/logo-dark-2.png" data-bg-mobile="img/brk-bg-mobile-menu.jpg" data-brk-library="component__header">
+                        <div class="brk-header__main-bar brk-header_border-top order-lg-2 order-1">
+                            <div class="container">
+                                <div class="row align-items-center justify-content-between pl-lg-15 pr-lg-5"> 
+                                    <div class="col-lg-auto align-self-lg-stretch"> 
+                                        <nav class="brk-nav brk-header__item">
+                                            <ul class="brk-nav__menu"> 
+                                                {% regroup website_menu by master_category as top_menu %}
+                                                {% for menu in top_menu %} 
+                                                <li class="brk-nav__children brk-nav__full-width">
+                                                    <a href="#" data-brk-library="component__tabs">
+                                                        <span>{{ menu.grouper }}</span>
+                                                    </a>
+                                                    <div class="brk-nav__mega-menu brk-nav-drop-down">
+                                                        <div class="bg-white">
+                                                            <div class="brk-tabs brk-tabs-hovers" data-index="0">  
+                                                                {% regroup menu.list by regular_category as regular_menu %}
+                                                                <ul class="brk-tabs-nav font__family-open-sans"> 
+                                                                    {% for submenu in regular_menu %}
+                                                                        <li class="brk-tab font__weight-bold">
+                                                                            <i class="fa fa-tasks"></i>
+                                                                            {{ submenu.grouper }}
+                                                                        </li>
+                                                                    {% endfor %} 
+                                                                </ul>
+                                                                <div class="brk-tabs-content">
+                                                                    {% for submenu in regular_menu %}
+                                                                    <div class="brk-tab-item">
+                                                                        <div class="row no-gutters"> 
+                                                                            <div class="col-lg"> 
+                                                                                <div class="brk-header_border-right pt-lg-20 pb-lg-30 pb-10 brk-header_h-100">
+                                                                                    <ul class="brk-header-list font__family-montserrat">
+                                                                                        {% for data in submenu.list|slice:16 %}
+                                                                                            <li>
+                                                                                                <a href="/book/category/{{ data.pk}}/{{ data.menu_url}}/">
+                                                                                                    <span class="brk-header-list__icon">
+                                                                                                        <i class="fa fa-book"></i>
+                                                                                                    </span>
+                                                                                                    {{ data.sub_category_bangla }}
+                                                                                                </a>
+                                                                                            </li>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                        </div>
+                                                                    </div>
+                                                                    {% endfor %} 
+                                                                     
+                                                                </div>  
+                                                            </div>
+                                                        </div>
+                                                        <div class="allMenushowUnderDropdown">
+                                                            <a href="/book/categories/">সবগুলো দেখুন</a>
+                                                        </div>
+                                                    </div>  
+                                                </li>
+                                                {% endfor %}  
+                                                <li class="brk-nav__children brk-nav__full-width" style="position: relative;">
+                                                    <a href="#" data-brk-library="component__tabs">
+                                                        <span> বই সম্পর্কিত তথ্য</span>
+                                                    </a>
+                                                    <div class="brk-nav__mega-menu brk-nav-drop-down"  style="width:300px;position: absolute;padding:10px 0;background-color: #fafafa;">  
+                                                        <ul class="brk-tabs-nav bookMeneInformation" >
+                                                            <li class="brk-tab">
+                                                                <a href="/book/writter-list/"><i class="fa fa-user"></i> লেখক</a>
+                                                            </li>
+                                                            <li class="brk-tab">
+                                                                <a href="/book/categories/"><i class="fa fa-book"></i> বিষয় </a>
+                                                            </li> 
+                                                            <li class="brk-tab">
+                                                                <a href="/book/pulisher-list/"><i class="fa fa-home"></i> প্রকাশনী </a>
+                                                            </li> 
+                                                        </ul>  
+                                                    </div>
+                                                </li>  
+                                                <li><a href="#"> প্যাকেজ ও অফার সমূহ </a></li>
+                                                <li><a href="#"> জায়নামাজ ও টুপি </a></li>
+                                                <li><a href="#"> অন্যান্য আইটেম </a></li> 
+                                            </ul> 
+                                        </nav>
+                                    </div> 
+                                </div>
+                                 
+                            </div>
+                        </div>
+                    </header>
+                
+                </main>
             </div>
-			
+    
 		</div>
     </header>
-    
+
+
 {% block content %}
 
 {% endblock %}
@@ -328,12 +373,12 @@
                             <div class="footer_menu">
                                 <h4>শর্তাবলী ও নীতিমালা</h4>
                                 <ul>  
-                                    <li><a href="">ব্লগ</a></li>
-                                    <li><a href="">শপিং ব্যাগ </a></li>
-                                    <li><a href="">আপনার পছন্দের তালিকা </a></li>
-                                    <li><a href=""> শর্তাবলী </a></li>
-                                    <li><a href=""> প্রশ্নোত্তর </a></li>
-                                    <li><a href=""> রিফান্ড নীতিমালা </a></li>
+                                    <li><a href="#">ব্লগ</a></li>
+                                    <li><a href="/my-cart/">শপিং ব্যাগ </a></li>
+                                    <li><a href="/wishlist-item/">আপনার পছন্দের তালিকা </a></li>
+                                    <li><a href="#"> শর্তাবলী </a></li>
+                                    <li><a href="#"> প্রশ্নোত্তর </a></li>
+                                    <li><a href="/refund-policy/"> রিফান্ড নীতিমালা </a></li>
                                 </ul>
                             </div>
                         </div>
@@ -395,9 +440,9 @@
                 <li><a href="/book/writter-list/"><i class="fa fa-user"></i> লেখক</a></li>
                 <li><a href="/book/categories/"><i class="fa fa-map-o"></i> বিষয়</a></li>
                 <li><a href="/book/pulisher-list/"><i class="fa fa-bookmark"></i> প্রকাশনী</a></li>
-                <li><a href="/comming-soon/"><i class="fa fa-paw"></i> লাইফ স্টাইল</a></li>
-                <li><a href="/comming-soon/"><i class="fa fa-headphones"></i> ইলেক্ট্রনিক্স</a></li>
-                <li><a href="/comming-soon/"><i class="fa fa-pied-piper"></i> গ্রোসারি </a></li>
+                <li><a href="#"><i class="fa fa-paw"></i> লাইফ স্টাইল</a></li>
+                <li><a href="#"><i class="fa fa-headphones"></i> ইলেক্ট্রনিক্স</a></li>
+                <li><a href="#"><i class="fa fa-pied-piper"></i> গ্রোসারি </a></li>
                 <li><a href="/about-us/" ><i class="fa fa-address-book"></i> আমাদের সম্পর্কে</a></li>
                 <li><a href="/contact-us/" ><i class="fa fa-phone"></i> যোগাযোগ</a></li>
                 <li><a href="#"> <i class="fa fa-book"></i> ব্লগ</a></li>
@@ -448,6 +493,9 @@
 <script src="{% static 'publisher_app/js/sweetalert2.js' %}"></script>
 <script src="{% static 'publisher_app/js/rating.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min.js"></script>
+<script src="https://scripts.sandbox.bka.sh/versions/1.1.0-beta/checkout/bKash-checkout-sandbox.js"></script>
+  
+<script defer="defer" src="{% static 'publisher_app/js/scripts.min.js' %}"></script>
 
 <script>
     $(".fixed_card_tem_display").click(function(){

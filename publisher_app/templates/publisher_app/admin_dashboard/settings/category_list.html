@@ -15,6 +15,7 @@
                             <tr>
                             <th>SL</th>
                             <th>Category Name Bangla</th> 
+                            <th>Master Category</th> 
                             <th>IS Homepage</th>
                             <th>IS Mainmenu</th>
                             <th style="width:60px">Action</th>
@@ -24,7 +25,9 @@
                             {% for cat in dash_cat_list %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td><a href="/dashboard/books/{{ cat.pk }}/category-wise-book-list/">{{ cat.cat_name_bangla }}</a></td> 
+                                <!-- <td><a href="/dashboard/books/{{ cat.pk }}/category-wise-book-list/">{{ cat.cat_name_bangla }}</a></td>  -->
+                                <td>{{ cat.cat_name_bangla }}</td> 
+                                <td>{{ cat.master_category.cat_name_bangla }}</td> 
                                 <td>
                                     {% if cat.Is_homepage %}
                                         <p style="margin: 0;color:green;">Show Homepage</p>

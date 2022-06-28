@@ -1,0 +1,114 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %} Customer Login {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+<style>
+    .loginSubmitSection{
+        padding: 22px 75px;
+        box-shadow: 0px 0px 3px #505050;
+        background: white;
+        border-radius: 5px;
+    }
+    .CustomerInfoAreabox{
+        padding: 22px;
+        box-shadow: 0px 0px 3px #505050;
+        background: white;
+        border-radius: 5px;
+    }
+ 
+
+</style>
+<section class="login_page">
+    <div class="container">
+        <div class="row"> 
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4" id="publisher_app_customer_login"> 
+                <div class="loginSubmitSection"> 
+                    <div class="login_logo">
+                        <center> 
+                            <h2>Confirm OTP</h2> 
+                            <p>Use your One Time Password (OTP) for your login request. Valid for 1 minute.</p>
+                        </center>
+                    </div>  
+                    <div class="form-group"> 
+                        <p id="OtpNotMatch" style="color: red; font-weight:bold;">OTP not match, Please try again.</p>
+                        <label>OTP Number</label>
+                        <input type="number" id="confirm_otp" class="form-control" placeholder="6 Digit OTP Number"> 
+                    </div>
+                  
+                    <div class="form-group"> 
+                        <button type="submit" class="btn btn-info" id="ConfirmOTPNumber" style="width: 150px;" >Confirm OTP</button>
+                    </div> 
+                </div> 
+            </div>
+            <form method="POST"> {% csrf_token %}
+                <div class="col-sm-12 CustomerInfoAreabox" id="publisher_app_customer_login"> 
+                    <h4>Thanks! Your OTP number is validated.</h4>
+                     
+                    <div class="form-group"> 
+                        <label>Your Name</label>
+                        <input type="text" name="customer_name" class="form-control" required> 
+                    </div>
+                    <div class="form-group"> 
+                        <label>Email (Optional)</label>
+                        <input type="email" name="customer_email" class="form-control"> 
+                    </div>
+                    <div class="form-group"> 
+                        <label>Address</label>
+                        <textarea name="customer_address" class="form-control" rows="2"></textarea>
+                    </div> 
+                    <div class="form-group"> 
+                        <button type="submit" class="btn btn-success" style="width: 150px;" >Save</button>
+                    </div>  
+                </div>   
+            </form>
+        </div>
+    </div>
+
+</section>
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script> 
+    $(".CustomerInfoAreabox").hide()
+    $("#OtpNotMatch").hide()
+    $("#ConfirmOTPNumber").click(function(){
+        var confirm_otp = $("#confirm_otp").val(); 
+        if (confirm_otp == ""){
+            alert("Please Insert Your OPT!");
+            return false
+        }
+        $.ajax({
+            url: "/confirm-otp/",
+            type:'GET',
+            data : {
+                confirm_otp : confirm_otp, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data == "OTP Set Successful")
+                {  
+                    window.location.href = "/my-account/";
+                }
+                else if(data == "New Customer")
+                { 
+                    $(".CustomerInfoAreabox").show()
+                    $("#publisher_app_customer_login").hide()
+                }
+                else if(data == "OTP not match")
+                { 
+                    $("#OtpNotMatch").show()
+                    return false
+                }
+                else{ 
+                    $("#publisher_app_customer_login").show()
+                }
+            },
+            error: function(data){
+                alert(data);
+            },
+        })
+    })
+</script>
+ 
+{% endblock %}

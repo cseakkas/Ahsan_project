@@ -1,4 +1,6 @@
+from unicodedata import category
 from django.shortcuts import render, redirect
+#from grpc import Status
 from . import models
 from publisher_app.utils import render_to_pdf
 from django.http import HttpResponse
@@ -520,6 +522,15 @@ def dashboard_sales_history(request):
     else:
         return render(request, 'publisher_app/admin_dashboard/sales/sales_history.html')
     
+#----------------- dashboard CustomerList  ---------------------------#   
+@employeeLogin
+def dashboardCustomerList(request):  
+    customer_list = models.CustomarAccount.objects.filter(status = True).order_by('-id')
+    context = {
+        'customer_list':customer_list,  
+    }
+    return render(request, 'publisher_app/admin_dashboard/settings/customer_list.html', context)
+    
 #----------------- Blog List Code here ---------------------------#   
 @employeeLogin
 def dashboard_blog_list(request):  
@@ -610,3 +621,141 @@ def dashboard_blog_update(request, id):
     }
     return render(request, 'publisher_app/admin_dashboard/blog/update_new_blog.html', context)
 
+
+def master_category_list(request):
+    category_list = models.MastarCategorySetup.objects.filter(status = True).order_by('-id')
+ 
+    context = {
+        'category_list': category_list
+    }
+    return render(request, 'publisher_app/admin_dashboard/settings/master_category_list.html', context)
+
+
+def master_category_add(request):
+    if request.method == "POST":
+        category_bangla = request.POST.get('category_bangla')
+        category_english = request.POST.get('category_english').strip()
+        loletterr = category_english.lower()
+        menu_url = (loletterr.replace(" ", "-")) 
+
+
+        models.MastarCategorySetup.objects.create(
+            cat_name_bangla = category_bangla, cat_name_english = category_english, menu_url = menu_url,
+            Is_homepage     = True if request.POST.get('is_homepage') else False,
+            Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+            Is_book         = True if request.POST.get('is_book') else False,
+        )
+        messages.success(request, "Master Category add successful.")
+        return redirect('/master-category-list/')
+    
+    return render(request, 'publisher_app/admin_dashboard/settings/master_category_add.html')
+
+def master_category_update(request, id):
+    get_category = models.MastarCategorySetup.objects.get(id=id)
+    if request.method == "POST":
+        category_bangla = request.POST.get('category_bangla')
+        category_english = request.POST.get('category_english').strip()
+        loletterr = category_english.lower()
+        menu_url = (loletterr.replace(" ", "-"))  
+
+        models.MastarCategorySetup.objects.filter(id=id).update(
+            cat_name_bangla = category_bangla, cat_name_english = category_english, menu_url = menu_url,
+            Is_homepage     = True if request.POST.get('is_homepage') else False,
+            Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+            Is_book         = True if request.POST.get('is_book') else False,
+        )
+        messages.success(request, "Master Category add successful.")
+        return redirect('/master-category-list/')
+    
+    context = {
+        'get_category': get_category,
+    }
+    return render(request, 'publisher_app/admin_dashboard/settings/master_category_edit.html', context)
+
+
+def master_subcategory_list(request): 
+    sub_category_list = models.MastarSubCategory.objects.filter(status = True).order_by('-id')
+ 
+    context = { 
+        'sub_category_list': sub_category_list,
+    }
+    return render(request, 'publisher_app/admin_dashboard/settings/master_subcategory_list.html', context)
+     
+def master_subcategory_add(request): 
+    if request.method == "GET":
+        category_list = models.BookCategory.objects.filter(status = True) 
+        master_category_list = models.MastarCategorySetup.objects.filter(status = True) 
+        
+        context = {
+            'category_list': category_list,
+            'master_category_list': master_category_list
+        }
+        return render(request, 'publisher_app/admin_dashboard/settings/master_subcategory_add.html', context) 
+        
+    else: 
+        master_category_id = int(request.POST.get('master_category_id'))
+        regular_category_id = int(request.POST.get('regular_category_id'))
+        sub_category_bangla = request.POST.get('sub_category_bangla')
+        sub_category_english = request.POST.get('sub_category_english').strip()  
+        loletterr = sub_category_english.lower()
+        menu_url = (loletterr.replace(" ", "-")) 
+
+        models.MastarSubCategory.objects.create(
+            master_category_id = master_category_id, regular_category_id = regular_category_id,
+            sub_category_bangla = sub_category_bangla,
+            sub_category_english = sub_category_english, menu_url = menu_url,
+            Is_homepage     = True if request.POST.get('is_homepage') else False,
+            Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+        )
+        
+        messages.success(request, "Sub Category add successful.")
+        return redirect('/master-subcategory-list/')
+     
+def master_subcategory_update(request, id): 
+    get_data = models.MastarSubCategory.objects.get(id = id)
+    category_list = models.BookCategory.objects.filter(status = True) 
+    master_category_list = models.MastarCategorySetup.objects.filter(status = True) 
+  
+    if request.method == "POST":
+        master_category_id = int(request.POST.get('master_category_id'))
+        regular_category_id = int(request.POST.get('regular_category_id'))
+        sub_category_bangla = request.POST.get('sub_category_bangla')
+        sub_category_english = request.POST.get('sub_category_english').strip()  
+        loletterr = sub_category_english.lower()
+        menu_url = (loletterr.replace(" ", "-")) 
+
+        models.MastarSubCategory.objects.filter(id=id).update(
+            master_category_id = master_category_id, regular_category_id = regular_category_id,
+            sub_category_bangla = sub_category_bangla,
+            sub_category_english = sub_category_english, menu_url = menu_url,
+            Is_homepage     = True if request.POST.get('is_homepage') else False,
+            Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+        )
+        
+        messages.success(request, "Sub Category add successful.")
+        return redirect('/master-subcategory-list/')
+
+    context = {
+        'get_data': get_data,
+        'category_list': category_list,
+        'master_category_list': master_category_list
+    }
+    return render(request, 'publisher_app/admin_dashboard/settings/master_subcategory_edit.html', context) 
+
+
+
+
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect
+def payment_success(request):
+
+    return render(request, 'publisher_app/aamarpay/success.html') 
+def payment_cancel(request):
+
+    return 
+
+def payment_failed(request):
+
+    return 

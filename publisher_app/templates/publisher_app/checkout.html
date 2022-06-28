@@ -5,6 +5,8 @@
 {% load static %}
 {% block content %}
 <link href="{% static 'publisher_app/admin_dashboard/css/select2.css' %}" rel="stylesheet"> 
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="crossorigin="anonymous"></script>
+<script src="https://scripts.sandbox.bka.sh/versions/1.1.0-beta/checkout/bKash-checkout-sandbox.js"></script>
 <style>
     .select2-container { 
         width: 100% !important; 
@@ -252,7 +254,7 @@
                         </div>
                      
                         <div class="form-group"> 
-                            <input type="submit" name="submit"  value="Confirm Order" class="btn btn-success" /> 
+                            <input type="submit" name="submit"  value="Confirm Order" class="btn btn-success" />  
                         </div>
                     </div>
 				</div>
@@ -451,5 +453,6 @@ $("#loginBtnHere").click(function(){
     });
 })
 </script>
+ 
 
 {% endblock %}

@@ -67,18 +67,39 @@ class SliderInfo(models.Model):
 
     def __str__(self):
         return self.slider_name
-
-class BookCategory(models.Model):
+ 
+class MastarCategorySetup(models.Model):  
     cat_name_bangla  = models.CharField(max_length=150)
     cat_name_english = models.CharField(max_length=150, blank=True)
     detail        = models.TextField(blank=True)
     Is_homepage   = models.BooleanField(default=False)
     Is_mainmenu   = models.BooleanField(default=False)
+    Is_book       = models.BooleanField(default=False)
     Is_top_category   = models.BooleanField(default=False)
     menu_url      = models.CharField(max_length=450,blank = True)
     category_cover = models.ImageField(upload_to='images/category_cover', blank = True)
     ordering       = models.IntegerField(default = 1000)
     status        = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.cat_name_bangla)
+
+    class Meta:
+        db_table = 'master_category' 
+
+
+class BookCategory(models.Model):
+    master_category     = models.ForeignKey(MastarCategorySetup, on_delete=models.DO_NOTHING, null=True, blank=True) 
+    cat_name_bangla     = models.CharField(max_length=150)
+    cat_name_english    = models.CharField(max_length=150, blank=True)
+    detail              = models.TextField(blank=True)
+    Is_homepage         = models.BooleanField(default=False)
+    Is_mainmenu         = models.BooleanField(default=False)
+    Is_top_category     = models.BooleanField(default=False)
+    menu_url            = models.CharField(max_length=450,blank = True)
+    category_cover      = models.ImageField(upload_to='images/category_cover', blank = True)
+    ordering            = models.IntegerField(default = 1000)
+    status              = models.BooleanField(default=True)
 
     def __str__(self):
         return self.cat_name_bangla
@@ -140,28 +161,22 @@ class Publisher(models.Model):
         db_table = 'book_publisher_list'
         verbose_name = 'Book Publisher'
         verbose_name_plural = 'Publisher Entry'
- 
-class MastarCategorySetup(models.Model):   
-    category_name       = models.CharField(max_length=60, blank=True, null=True)
-    category_image      = models.CharField(max_length=255, blank=True, null=True)
-    created             = models.DateTimeField(auto_now_add=True)  
-    category_ordering   = models.IntegerField(default=0) 
-    status              = models.BooleanField(default=True)
 
-    def __str__(self):
-        return str(self.category_name)
-
-    class Meta:
-        db_table = 'master_category' 
 
 class MastarSubCategory(models.Model):  
-    category_name       = models.ForeignKey(MastarCategorySetup, on_delete=models.DO_NOTHING, null=True, blank=True) 
-    sub_category        = models.CharField(max_length=60, blank=True, null=True)
-    created             = models.DateTimeField(auto_now_add=True)   
-    status              = models.BooleanField(default=True)
+    master_category      = models.ForeignKey(MastarCategorySetup, on_delete=models.DO_NOTHING, null=True, blank=True) 
+    regular_category     = models.ForeignKey(BookCategory, on_delete=models.DO_NOTHING, null=True, blank=True) 
+    sub_category_bangla  = models.CharField(max_length=60, blank=True, null=True)
+    sub_category_english = models.CharField(max_length=60, blank=True, null=True)
+    created              = models.DateTimeField(auto_now_add=True)  
+    menu_url             = models.CharField(max_length=450,blank = True) 
+    Is_homepage          = models.BooleanField(default=False)
+    Is_mainmenu          = models.BooleanField(default=False) 
+    ordering             = models.IntegerField(default = 1000)
+    status               = models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.sub_category)
+        return str(self.sub_category_bangla)
 
     class Meta:
         db_table = 'master_sub_category' 
@@ -266,6 +281,19 @@ class CategoryWiseBook(models.Model):
         db_table = 'category_wise_book'
         verbose_name = 'Category Wise Book'
         verbose_name_plural = 'Category Wise Books'
+ 
+class SubCategoryWiseBook(models.Model):
+    book_name        = models.ForeignKey(BookList, on_delete=models.DO_NOTHING, null=True ) 
+    subcategory_name = models.ForeignKey(MastarSubCategory, on_delete=models.DO_NOTHING, blank = True, null=True)
+    status           = models.BooleanField(default=True)
+
+    def __int__(self):
+        return self.subcategory_name
+
+    class Meta:
+        db_table = 'sub_category_wise_book'
+        verbose_name = 'Sub Category Wise Book'
+        verbose_name_plural = 'Sub Category Wise Books'
 
 class WritterWiseBook(models.Model):
     book_name        = models.ForeignKey(BookList, on_delete=models.DO_NOTHING, null=True)
@@ -503,6 +531,7 @@ class CustomarAccount(models.Model):
     email         = models.CharField(max_length=170, blank=True, null = True)
     user_name     = models.CharField(max_length=100, blank=True)
     password      = models.CharField(max_length=100)
+    login_otp     = models.IntegerField(blank=True, null = True)
     reg_date      = models.DateTimeField(auto_now_add=True)
     address       = models.TextField(blank=True)
     profile_images  = models.ImageField(upload_to='images/customer_images', blank = True)  

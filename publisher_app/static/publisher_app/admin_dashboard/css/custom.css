@@ -187,7 +187,30 @@ fieldset {
   
 
 
+/* Dashboard Icon menu css  */
 
+.dashboard_menu_icon{
+  padding: 5px;
+  margin-bottom: 25px;
+  box-shadow: 0px 1px 4px grey;
+  border-radius: 4px;
+  background: white;
+}
+.dashboard_menu_icon a{
+  text-decoration: none;
+  display: block;
+
+}
+.dashboard_menu_icon img{
+  width:70px;height:70px;border-radius: 50%;
+  display: block; margin:0 auto;
+}
+.dashboard_menu_icon h4{
+  color:#203040;
+  margin: 0;
+  font-size: 15px;
+  text-align: center;
+}
 
 
 

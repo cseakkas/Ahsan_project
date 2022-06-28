@@ -69,6 +69,14 @@ class UserAccessControlAdmin(admin.ModelAdmin):
 class CourierServiceAdmin(admin.ModelAdmin):
     list_display  = ['courier_name', 'ordering', 'status']
     search_fields = ['courier_name', 'ordering',]
+
+# class MastarCategorySetupAdmin(admin.ModelAdmin):
+#     list_display  = ['category_name', 'category_ordering', 'created', 'status']
+#     search_fields = ['category_name', 'category_ordering',]
+     
+# class MastarSubCategoryAdmin(admin.ModelAdmin):
+#     list_display  = ['sub_category', 'category_name', 'created', 'status']
+#     search_fields = ['sub_category', 'category_name',]
      
     
 admin.site.register(models.PublisherProfile, PublisherProfileAdmin)
@@ -83,6 +91,6 @@ admin.site.register(models.PostOfficeInfo, PostOfficeInfoAdmin)
 admin.site.register(models.UserRegistration, UserRegistrationAdmin) 
 admin.site.register(models.MenuList, MenuListAdmin) 
 admin.site.register(models.UserAccessControl, UserAccessControlAdmin) 
-admin.site.register(models.MastarCategorySetup,) 
-admin.site.register(models.MastarSubCategory,) 
+# admin.site.register(models.MastarCategorySetup, MastarCategorySetupAdmin) 
+# admin.site.register(models.MastarSubCategory, MastarSubCategoryAdmin) 
 admin.site.register(models.CourierService, CourierServiceAdmin) 

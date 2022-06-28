@@ -1,7 +1,7 @@
 *{margin: 0;padding: 0;}
 body{ 
-    font-family: 'Hind Siliguri'; 
-    font-size: 17px;
+    font-family: 'Hind Siliguri' !important; 
+    font-size: 17px !important;
     background: #ffffff85;
 }
  
@@ -100,7 +100,31 @@ header{  }
   height: 98px;
 }
 
+.allMenushowUnderDropdown{
+  background-color:#049999;
+  color:white;
+}
+.allMenushowUnderDropdown a{
+  text-decoration: none;color:white;
+  padding:5px;
+  text-align:center;
+  display: block;
+}
 
+.bookMeneInformation li{
+  width:100%;
+  display: block;
+}
+.bookMeneInformation li a{ 
+  display: block;
+  padding:5px 10px;
+}
+.bookMeneInformation li a i{ 
+  margin-right:5px;
+}
+.bookMeneInformation li a:hover{
+  background-color: #e3e3e3;
+}
 
 .search_form_field{
   position: relative;
@@ -118,7 +142,7 @@ header{  }
   position: absolute;
   background: #FBAC18;
   right: 0;
-  margin-top: -38px;
+  margin-top: -37px;
   margin-right: 15px;
   color: #fbfbfb;
   padding: 6px 19px;
@@ -3412,16 +3436,22 @@ api_login {
 
 .discount_area{
   position: absolute;
-  background: #fb8318;
-  color:white;width: 34px;height:34px;
+  background: url(../images/discount.png);
+  color: white;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   text-align: center;
   font-size: 13px;
+  background-size: cover;
+  left: -28px;
+  top: -17px;
 }
 .discount_area span{
-  padding-top: 7px;
+  padding-top: 14px;
   position: absolute;
-  left: 6px;
+  left: 13px;
+  font-size: 19px;
 }
 
 .carditem_summary tr th{padding:2px}

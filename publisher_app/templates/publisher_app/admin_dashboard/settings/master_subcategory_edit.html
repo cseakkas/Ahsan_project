@@ -1,0 +1,122 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Master Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %} 
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Sub Category Add <span><a href="/master-subcategory-list/">Sub Category List</a></span></h4>
+                    <div class="card-body"> 
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %} 
+                    <form method="POST"> {% csrf_token %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 280px;">Master Category </th>
+                                <td>
+                                    <select name="master_category_id" class="form-control" id="category_name" required>
+                                        <option value="">----Category Select---- </option>
+                                        {% for data in master_category_list %}
+                                            {% if data.id == get_data.master_category_id %}
+                                                <option value="{{ data.pk }}" selected>{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                            {% else %}
+                                                <option value="{{ data.pk }}">{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width: 280px;">Regular Category </th>
+                                <td>
+                                    <select name="regular_category_id" class="form-control" id="category_name" required>
+                                        <option value="">----Category Select---- </option>
+                                        {% for data in category_list %}
+                                            {% if data.id == get_data.regular_category_id %}
+                                                <option value="{{ data.pk }}" selected>{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                            {% else %}
+                                                <option value="{{ data.pk }}">{{ data.cat_name_bangla }} - {{ data.cat_name_english }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width: 230px;"> Sub Category Name (Bangla)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="sub_category_bangla" value="{{ get_data.sub_category_bangla }}" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Sub Category Name (English)</th>
+                                <td>
+                                    <input type="text" class="form-control" name="sub_category_english" value="{{ get_data.sub_category_english }}" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th> Is Homepage</th>
+                                <td>
+                                    <input type="checkbox" name="is_homepage" {% if get_data.Is_homepage == 1 %} checked {% endif %} style="width:20px;height:20px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Is Mainmenu</th>
+                                <td>
+                                    <input type="checkbox" name="is_mainmenu" {% if get_data.Is_mainmenu == 1 %} checked {% endif %} style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input type="submit" class="btn btn-info" name="submit">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>  
+    <script src="{% static 'publisher_app/admin_dashboard/js/select2.js' %}"></script>
+    <script>
+        $("#setMasterCategory").click(function(){
+            $('#mastercategoryset .td_class_name :checkbox').each(function(i){ 
+                if(this.checked == true){   
+                    $.ajax({
+                        url: "/master-category-add/", 
+                        type:'GET',
+                        data: {
+                            category_id : this.id, 
+                            categoryName : $("#categoryName_"+this.id).val(), 
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+                        success: function (data) {  
+                            if(data == "success"){
+                                window.location.reload()
+                            } 
+                        },
+                        error: function(data){
+                            alert(data);
+                        }
+                    });
+                } 
+            })
+        })
+
+        $("#category_name").select2({
+        placeholder: "Select Category",
+        allowClear: true
+    }); 
+        
+    </script>
+
+{% endblock %}

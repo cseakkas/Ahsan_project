@@ -30,10 +30,7 @@ from urllib.parse import urlparse
 import requests
 import json
 import datetime 
-from num2words import num2words
-
-# This is test 
-# This is test Project by akkas.
+from num2words import num2words 
 
 def check_user_permission(request, menu_url):
     chk_privilege    = models.UserAccessControl.objects.filter(user_id = int(request.session.get("user_id")), menu_id__menu_url = menu_url, menu_id__status = True, status = True).first()
@@ -46,7 +43,7 @@ def index_page(request):
     if "abcd" not in request.session:
         request.session["abcd"] = str(mysession)
  
-    slider_list = models.SliderInfo.objects.filter(status = True).order_by('slider_order') 
+    slider_list = models.SliderInfo.objects.filter(status = True).order_by('slider_order')  
     today_date = date.today()  
     one_month_ago = today_date - datetime.timedelta(days=130) 
     
@@ -61,7 +58,7 @@ def index_page(request):
         SELECT bk.id, bk.book_name_bangla, bk.book_name_english, bk.sale_price, wl.book_name_id as wl_id, bk.book_price, bk.discount, bc.cat_name_bangla, cwb.category_name_id, bc.menu_url, bw.writter_name_bangla FROM book_list bk 
         LEFT JOIN category_wise_book cwb ON bk.id = cwb.book_name_id LEFT JOIN add_to_wishlist wl ON wl.book_name_id = bk.id
         LEFT JOIN book_category_list bc ON cwb.category_name_id = bc.id LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
-        LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id WHERE bk.status = 1 and bc.Is_homepage = 1 and bc.id <> 7 GROUP by wwb.book_name_id ORDER BY bc.ordering asc, bc.cat_name_bangla ASC, bk.id desc 
+        LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id WHERE bk.status = 1 and bc.Is_homepage = 1 GROUP by wwb.book_name_id ORDER BY bc.ordering asc, bc.cat_name_bangla ASC, bk.id desc 
     ''')
     writer_book = models.BookList.objects.raw('''
         SELECT bw.id, bw.writter_name_bangla, COUNT(bw.id) as total_book, bw.menu_url,bw.writter_images FROM `book_list` bk 
@@ -105,6 +102,7 @@ def index_page(request):
     context = {
         'new_pub_book_list':new_pub_book_list,
         'slider_list':slider_list,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         'book_list':book_list,  
         'wish_list':wish_list,  
         'cart_item' : cart_item, 
@@ -116,7 +114,45 @@ def index_page(request):
         'prev_images' : models.PreviewImages.objects.raw("SELECT * FROM book_list bk INNER JOIN preview_images pi ON bk.id = pi.book_name_id GROUP BY bk.id"),
     } 
     return render(request, 'publisher_app/index.html', context)
- 
+
+def contact_page(request):
+
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }
+
+    return render(request, 'publisher_app/contact_us.html', context)
+
+def about_us(request):
+
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }
+
+    return render(request, 'publisher_app/about_page.html', context)
+
+def complain_page(request):
+
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    } 
+    return render(request, 'publisher_app/complain_page.html', context)
+
+def refund_policy(request):
+
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    } 
+    return render(request, 'publisher_app/refund_policy.html', context)
+
 
 def addToWishList(request):
     mysession = random.random()
@@ -182,6 +218,7 @@ def AdvanceBookSearch(request):
             'search_text':search_text,
             'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
             'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/index.html', context)
 
@@ -277,6 +314,7 @@ def book_details(request, id, slug):
         'total_book_price' : total_package_price[0].total_book_price, 
         'total_sale_price' : total_package_price[0].total_sale_price,  
         'total_save_price' : total_package_price[0].total_save_price,  
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request,'publisher_app/view_details.html', context)
 
@@ -326,6 +364,7 @@ def add_to_cart_page(request):
     else:
         context = {
             'count' : count,
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request,'publisher_app/empty_cart.html', context)
         
@@ -337,6 +376,7 @@ def add_to_cart_page(request):
         'count': count,
         'wishlist_count': models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'save_amount' : save_amount,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
     }
     return render(request,'publisher_app/open_cart.html', context)
 
@@ -414,20 +454,37 @@ def delete_to_cart(request):
 
 def loadPublisherWiseBook(request):
     if request.is_ajax():
-        author_list = int(request.GET.get('auth_id'))
-        print("author_list:", author_list)
-         
-        # book_list_by_pub_id = models.BookList.objects.filter(publisher_id = publisher_id)
-         
-        # results = []  
-        # for val in book_list_by_pub_id:
-        #     print("val.book_name_english :", val.book_name_english)
-        #     place_json = {}  
-        #     place_json['book_name_bangla'] = val.book_name_english 
+        author_list = request.GET.getlist('auth_id') 
+        auth_id = ""
+        for data in author_list:
+            auth_id += data
  
-        #     results.append(place_json) 
-        data = "success"
-        return JsonResponse(data, safe=False)
+        # for auth_id in author_list: 
+        get_auth_id = auth_id[:-2]
+        filtering_book_list = models.BookList.objects.raw('''
+            SELECT bw.id, bk.id as book_id, bk.slug as book_link, bk.book_name_bangla, bk.book_name_english, bk.cover_type, bk.sale_price, bk.book_price, bk.discount, bw.writter_name_bangla, bc.cat_name_bangla, cwb.category_name_id, bc.menu_url, bw.writter_name_bangla FROM book_list bk 
+            LEFT JOIN category_wise_book cwb ON bk.id = cwb.book_name_id
+            LEFT JOIN book_category_list bc ON cwb.category_name_id = bc.id LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
+            LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id WHERE bk.status = 1 and bc.Is_homepage = 1 and  bw.id in ('''+get_auth_id+''') GROUP by wwb.book_name_id ORDER BY bk.id 
+        ''')
+        print(filtering_book_list.query)
+         
+        results = [] 
+        place_json = {} 
+        for val in filtering_book_list: 
+            place_json = {}  
+            place_json['book_id'] = val.book_id 
+            place_json['book_link'] = val.book_link 
+            place_json['book_name_bangla'] = val.book_name_bangla 
+            place_json['book_name_english'] = val.book_name_english 
+            place_json['discount'] = val.discount 
+            place_json['sale_price'] = val.sale_price 
+            place_json['book_price'] = val.book_price 
+            place_json['cover_type'] = val.cover_type 
+            place_json['writter_name_bangla'] = val.writter_name_bangla 
+ 
+            results.append(place_json)  
+        return JsonResponse(results, safe=False)
 
 
  
@@ -457,6 +514,13 @@ def user_logout(request):
 
     return redirect('/customer/login/')
  
+ 
+
+from aamarpay.aamarpay import aamarPay
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect
 def checkout_order(request):   
     year = str(timezone.now().year) 
     sm_year = year[-2:]  
@@ -521,6 +585,20 @@ def checkout_order(request):
             payment_number = payment_number_n
             pay_amount = pay_amount_n
 
+    #------------------------ For Aamarpay Payment geteway ---------------------#
+        paid_amount = 10
+        successUrl = "http://127.0.0.1:8000/payment-success/"
+        cancelUrl = "http://127.0.0.1:8000/payment-cancel/"
+        failUrl = "http://127.0.0.1:8000/payment-failed/"
+        transactionID = "234H32T3"
+        
+        pay = aamarPay(isSandbox=True, successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), transactionID = str(transactionID), transactionAmount = 3 )
+        paymentpath = pay.payment()
+
+        return redirect(paymentpath)
+
+        #------------------------ For Aamarpay Payment geteway ---------------------#
+
         # today           = datetime.now()
         request.session['redirect_session'] = None 
         if not request.session.get('userid'):
@@ -528,7 +606,7 @@ def checkout_order(request):
             if not chk_customer: 
                 customer_id = models.CustomarAccount.objects.create(
                     customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
-                    password = customer_mobile, is_guest = 1
+                    password = customer_mobile, is_guest = 1, customer_level = "Member"
                 ) 
                 if customer_id:
                     request.session['userid'] = customer_id.id
@@ -606,6 +684,7 @@ def checkout_order(request):
         'sutotalamount' : sutotalamount,
         'shipping_charge' : shipping_charge,
         'grand_total' : grand_total,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/checkout.html', context)
 
@@ -680,7 +759,7 @@ def checkout_order_now(request, id, qty):
             if not chk_customer: 
                 customer_id = models.CustomarAccount.objects.create(
                     customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
-                    password = customer_mobile, is_guest = 1
+                    password = customer_mobile, is_guest = 1, customer_level = "Member"
                 ) 
                 if customer_id:
                     request.session['userid'] = customer_id.id
@@ -751,6 +830,7 @@ def checkout_order_now(request, id, qty):
             'sutotalamount' : sutotalamount,
             'shipping_charge' : shipping_charge,
             'grand_total' : grand_total,
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }  
         return render(request, 'publisher_app/order_now.html', context)
      
@@ -765,6 +845,7 @@ def customer_order_success(request):
         'order_number':order_number,
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request,'publisher_app/order_success.html', context)
 
@@ -787,6 +868,7 @@ def all_book_category_list(request):
     context = {
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
 
     return render(request,'publisher_app/all_book_category_list.html', context)
@@ -800,6 +882,7 @@ def all_book_writter_list(request):
     context = {
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
 
     return render(request,'publisher_app/all_book_writter_list.html', context)
@@ -813,6 +896,7 @@ def all_book_publisher_list(request):
     context = {
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
 
     return render(request,'publisher_app/all_book_publisher_list.html', context)
@@ -906,6 +990,7 @@ def ahsan_blog(request):
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'blog_list':blog_list,
         'category_list':category_list, 
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/blog.html', context)
 	
@@ -925,6 +1010,7 @@ def ahsan_blog_details(request, id, blog_url):
             'get_blog':get_blog, 
             'category_list':category_list,  
             'comments_list':comments_list,  
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/blog_details.html', context)
 
@@ -957,6 +1043,7 @@ def ahsan_blog_details(request, id, blog_url):
             'get_blog':get_blog, 
             'category_list':category_list, 
             'comments_list':comments_list, 
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/blog_details.html', context)
 
@@ -985,6 +1072,7 @@ def CategoryWiseBlogList(request, category_id, menu_url):
         'blog_list':blog_list,
         'category_name':category_name,
         'category_list':category_list,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/blog/category_wise_blog_lsit.html', context)
 
@@ -1112,6 +1200,7 @@ def category_book_list(request, id, menu_url):
         "current_page_no": page_number,  
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/category_book_list.html', context)
 
@@ -1178,6 +1267,7 @@ def category_wise_new_publication(request, id):
         "current_page_no": page_number,  
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/new_publication_book_list.html', context)
  
@@ -1240,6 +1330,7 @@ def category_wise_best_saller_book_list(request, id):
         "current_page_no": page_number,  
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/category_wise_best_saller_book_list.html', context)
  
@@ -1300,6 +1391,7 @@ def category_wise_last_week_best_writter_book(request, id):
         "current_page_no": page_number,  
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/last_week_best_writter_book.html', context)
  
@@ -1343,8 +1435,10 @@ def publisher_wise_page(request, id, menu_url ):
         'pub_book_list': pub_book_list,
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/publisher.html', context)
+
 
 def customer_login(request): 
     mysession = random.random()
@@ -1354,31 +1448,132 @@ def customer_login(request):
     cart_item = models.AddToCart.objects.filter(session_key = request.session.get("abcd"))
     total_price =  cart_item.aggregate(Sum('qt_price'))['qt_price__sum']
 
+    request.session['customer_mobile_no'] = None
+
     if request.is_ajax():
-        your_mobile = request.GET.get('your_mobile')
-        password = request.GET.get('password')
-       
-        data = models.CustomarAccount.objects.filter( mobile = your_mobile, password = password, is_guest = 1, status = True)
-        if data:
-            request.session['userid'] = data[0].id
-            request.session['usermobile'] = data[0].mobile
-            request.session['customername'] = data[0].customer_name
-            request.session['user_type'] = "valid_user" 
-            request.session['is_guest'] = "not_guest"
-            request.session['customer_photo'] = str(data[0].profile_images)  
-               
-            data = "Login Successful"
-            return JsonResponse(data, safe=False)
-        else: 
-            login_error = 'Login Failed!'
-            return JsonResponse(login_error, safe=False)
+        your_mobile = request.GET.get('your_mobile') 
+        panel_username = "ahsan"
+        panel_password = "ahsan@522"
+        sendder_id = "8809612441424" 
+        new_otp = random.randint(100000, 999999) 
+        request.session['customer_mobile_no'] = your_mobile
+
+        otp_msg = "Use "+str(new_otp)+" as ONE TIME KEY for your login request. Valid for 1 minute. \n  - www.ahsan.com.bd"
+        smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+otp_msg+"&to=88"+str(your_mobile)
+        sent_otp = requests.post(smsurl) 
+        get_customer = models.CustomarAccount.objects.filter( mobile = your_mobile, status = True)
+        if get_customer:
+            get_customer.update(login_otp = new_otp)
+        else:
+            models.CustomarAccount.objects.create(mobile = your_mobile, password = your_mobile, login_otp = new_otp )
+
+        data = "Sent OTP"
+        return JsonResponse(data, safe=False) 
     else:
         context = {
             'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
             'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
             'total_price' : total_price, 
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/customer_login.html', context)
+ 
+ 
+def confirm_otp(request): 
+    mysession = random.random()
+    if "abcd" not in request.session:
+        request.session["abcd"] = str(mysession)
+ 
+    cart_item = models.AddToCart.objects.filter(session_key = request.session.get("abcd"))
+    total_price =  cart_item.aggregate(Sum('qt_price'))['qt_price__sum']
+
+    customer_mobile = request.session['customer_mobile_no'] 
+    if request.is_ajax():
+        confirm_otp_no = request.GET.get('confirm_otp') 
+
+        get_customer = models.CustomarAccount.objects.filter( mobile = customer_mobile, login_otp = confirm_otp_no, status = True)
+
+        if get_customer and get_customer[0].customer_name:
+            request.session['userid'] = get_customer[0].id
+            request.session['usermobile'] = get_customer[0].mobile
+            request.session['customername'] = get_customer[0].customer_name
+            request.session['user_type'] = "valid_user" 
+            request.session['is_guest'] = "not_guest"
+            request.session['customer_photo'] = str(get_customer[0].profile_images) if get_customer[0].profile_images else ""
+            
+            data = "OTP Set Successful"
+            return JsonResponse(data, safe=False)
+        elif get_customer and get_customer[0].customer_name == "":
+
+            data = "New Customer"
+            return JsonResponse(data, safe=False)
+        else:  
+            data = 'OTP not match'
+            return JsonResponse(data, safe=False)
+    
+    if request.method == "POST":
+        customer_name = request.POST.get('customer_name')
+        customer_email = request.POST.get('customer_email')
+        customer_address = request.POST.get('customer_address')
+        customer_mobile = request.session['customer_mobile_no'] 
+ 
+        get_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True) 
+        if get_customer: 
+            get_customer.update( customer_name = customer_name, email = customer_email, address = customer_address)
+            request.session['userid'] = get_customer[0].id
+            request.session['usermobile'] = get_customer[0].mobile
+            request.session['customername'] = get_customer[0].customer_name
+            request.session['user_type'] = "valid_user" 
+            request.session['is_guest'] = "not_guest"
+            request.session['customer_photo'] = str(get_customer[0].profile_images) if get_customer[0].profile_images else ""
+            return redirect('/my-account/')
+        else:
+            pass
+
+    context = {
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'total_price' : total_price, 
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }
+    return render(request, 'publisher_app/confirm_otp.html', context)
+
+
+
+
+# def customer_login(request): 
+#     mysession = random.random()
+#     if "abcd" not in request.session:
+#         request.session["abcd"] = str(mysession)
+ 
+#     cart_item = models.AddToCart.objects.filter(session_key = request.session.get("abcd"))
+#     total_price =  cart_item.aggregate(Sum('qt_price'))['qt_price__sum']
+
+#     if request.is_ajax():
+#         your_mobile = request.GET.get('your_mobile')
+#         password = request.GET.get('password')
+       
+#         data = models.CustomarAccount.objects.filter( mobile = your_mobile, password = password, is_guest = 1, status = True)
+#         if data:
+#             request.session['userid'] = data[0].id
+#             request.session['usermobile'] = data[0].mobile
+#             request.session['customername'] = data[0].customer_name
+#             request.session['user_type'] = "valid_user" 
+#             request.session['is_guest'] = "not_guest"
+#             request.session['customer_photo'] = str(data[0].profile_images)  
+               
+#             data = "Login Successful"
+#             return JsonResponse(data, safe=False)
+#         else: 
+#             login_error = 'Login Failed!'
+#             return JsonResponse(login_error, safe=False)
+#     else:
+#         context = {
+#             'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+#             'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+#             'total_price' : total_price, 
+#         }
+#         return render(request, 'publisher_app/customer_login.html', context)
  
 
 ############### Customer Registration #################
@@ -1394,7 +1589,7 @@ def customer_registration(request):
         if not chk_cust:  
             data = models.CustomarAccount.objects.create(
                 customer_name = user_full_name, mobile = mobile_number, 
-                email = userEmail, password = confirm_password, is_guest = 1
+                email = userEmail, password = confirm_password, is_guest = 1, customer_level = "Member"
             )
             if data:  
                 request.session['userid'] = data.id
@@ -1478,10 +1673,7 @@ def client_review_message(request):
             )
             data = "Exsit"
             return JsonResponse(data, safe=False) 
-
-
  
-
 def wishList_cart_item(request):  
     mysession = random.random()
     if "abcd" not in request.session:
@@ -1518,6 +1710,7 @@ def wishList_cart_item(request):
         'wishlist_item': wishlist_item,
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(), 
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/wishlist_item.html', context)
 
@@ -1541,27 +1734,7 @@ def wishList_cart_item(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
@@ -1572,8 +1745,14 @@ def wishList_cart_item(request):
 def admin_dashboard(request):  
     chk_permission   = check_user_permission(request,'/admin-dashboard')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action:
+        order_status_list = models.SalesOrder.objects.raw("SELECT id, order_status, COUNT(order_number) as total_order FROM `sales_order` group by order_status")
+        month_wise_sale = models.SalesOrder.objects.raw("SELECT id, MONTHNAME(order_date) as month_name, sum(total_amount) as total_amount FROM `sales_order` GROUP BY MONTHNAME(order_date) order by order_date asc")
 
-        return render(request, 'publisher_app/admin_dashboard/index.html')
+        context = {
+            'order_status_list': order_status_list,
+            'month_wise_sale': month_wise_sale,
+        }
+        return render(request, 'publisher_app/admin_dashboard/index.html', context)
 
     else:
         return redirect('/accessDeny')
@@ -1617,6 +1796,7 @@ def book_category_add(request):
     chk_permission   = check_user_permission(request,'/book-category-entry/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
         if request.method =="POST":
+            master_cat_id  = request.POST['master_category_id']
             menu_url4  = request.POST['category_name_english']
             loletterr = menu_url4.lower()
             usehipen = (loletterr.replace(" ", "-"))
@@ -1624,14 +1804,17 @@ def book_category_add(request):
             models.BookCategory.objects.create(
                 cat_name_bangla  = request.POST['category_name_bangla'],
                 cat_name_english = request.POST['category_name_english'],
-                menu_url = menu_url,
-                Is_homepage     = True if request.POST.get('is_homepage') else False,
-                Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+                menu_url = menu_url, master_category_id = master_cat_id,
+                Is_homepage     = True if request.POST.get('is_homepage') else False, 
+                Is_top_category     = True if request.POST.get('is_topmenu') else False, 
             )
             messages.success(request, "Category Entry Success.")
             return redirect("/book-category-list/")
         else:
-            return render(request, 'publisher_app/admin_dashboard/settings/category_entry.html') 
+            context = {
+                'master_cat_list': models.MastarCategorySetup.objects.filter(status = True)
+            }
+            return render(request, 'publisher_app/admin_dashboard/settings/category_entry.html', context) 
     else:
         return redirect('/accessDeny')
 
@@ -1697,24 +1880,27 @@ def book_category_update(request, id):
     chk_permission   = check_user_permission(request,'/book-category-entry/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
         get_category = models.BookCategory.objects.get(id = id)
+        master_cat_list = models.MastarCategorySetup.objects.filter(status = True)
         if request.method =="POST":
             menu_url4  = request.POST['category_name_english']
             loletterr = menu_url4.lower()
             usehipen = (loletterr.replace(" ", "-"))
             menu_url = usehipen
             models.BookCategory.objects.filter(id=id).update(
-                cat_name_bangla  = request.POST['category_name_bangla'],
-                cat_name_english = request.POST['category_name_english'],
-                detail = request.POST['category_details'],
-                menu_url = menu_url, 
-                Is_homepage     = True if request.POST.get('is_homepage') else False,
-                Is_mainmenu     = True if request.POST.get('is_mainmenu') else False,
+                master_category_id  = int(request.POST['master_category_id']),
+                cat_name_bangla     = request.POST['category_name_bangla'],
+                cat_name_english    = request.POST['category_name_english'],
+                detail              = request.POST['category_details'],
+                menu_url            = menu_url, 
+                Is_homepage         = True if request.POST.get('is_homepage') else False, 
+                Is_top_category     = True if request.POST.get('is_topmenu') else False, 
             )
             messages.success(request, "Category Update Successful")
             return redirect("/book-category-list/")
     
         context = {
             'get_category':get_category,
+            'master_cat_list':master_cat_list,
         }
         return render(request, 'publisher_app/admin_dashboard/settings/edit_category.html', context)
     else:
@@ -1943,44 +2129,42 @@ def add_new_book(request):
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
 
         book_list  = models.BookList.objects.raw("SELECT bk.id, bk.book_price, bk.sale_price, bk.discount, bk.book_name_bangla, bwr.writter_name_bangla, pub.publisher_name_bangla FROM book_list bk left JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bwr ON wwb.writter_name_id = bwr.id LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id")
-        cate_list  = models.BookCategory.objects.filter(status = True)
+        cate_list  = models.BookCategory.objects.filter(status = True, master_category_id = 1)
+        subcate_list  = models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True)
         writter_list  = models.BookWritter.objects.filter(status = True)
         publisher  = models.Publisher.objects.filter(status = True)
         
         if request.method == "POST":
-            book_idendity    = random.randint(1000, 1499149999)
-            
-            publisher_name = request.POST.get('publisher_name')
-            book_name_bangla = request.POST.get('book_name_bangla')
-            book_name_english = request.POST.get('book_name_english')
-            book_origin = request.POST.get('book_origin')
-            lowletter = book_name_english.lower()
-            usehipen = (lowletter.replace(" ", "-"))
-            book_name_wo_space = (lowletter.replace(" ", ""))
-            book_url = usehipen
-
-            book_language = request.POST.get('book_language')
-            edition = request.POST.get('book_edition') 
-            isbn_code = request.POST.get('isbn_code')
-            cover_type = request.POST['cover_type'] 
-            stock_info = request.POST['stock_info']
-            quantity = 0
-            number_of_page = request.POST.get('number_of_page')
-            country = request.POST.get('country')
-            book_price = request.POST.get('book_price')
-            discount_offer = request.POST.get('discount_offer')
-            purchase_discount = request.POST.get('purchase_discount')
-            unit_price = request.POST.get('unit_price')
-            sale_price = request.POST.get('sale_price')
-            book_weight = request.POST.get('book_weight')
-            book_details = request.POST.get('book_details')
- 
+            book_idendity           = random.randint(1000, 1499149999) 
+            publisher_name          = request.POST.get('publisher_name')
+            book_name_bangla        = request.POST.get('book_name_bangla')
+            book_name_english       = request.POST.get('book_name_english')
+            book_origin             = request.POST.get('book_origin')
+            lowletter               = book_name_english.lower()
+            usehipen                = (lowletter.replace(" ", "-"))
+            book_name_wo_space      = (lowletter.replace(" ", ""))
+            book_url                = usehipen 
+            book_language           = request.POST.get('book_language')
+            edition                 = request.POST.get('book_edition') 
+            isbn_code               = request.POST.get('isbn_code')
+            cover_type              = request.POST['cover_type'] 
+            stock_info              = request.POST['stock_info'] 
+            number_of_page          = request.POST.get('number_of_page')
+            country                 = request.POST.get('country')
+            book_price              = request.POST.get('book_price')
+            discount_offer          = request.POST.get('discount_offer')
+            purchase_discount       = request.POST.get('purchase_discount')
+            unit_price              = request.POST.get('unit_price')
+            sale_price              = request.POST.get('sale_price')
+            book_weight             = request.POST.get('book_weight')
+            book_details            = request.POST.get('book_details')  
             video_link_book_details = request.POST.get('video_link_book_details') 
-            book_id_list = request.POST.getlist('book_name')  
-            category_list = request.POST.getlist('category_name') 
-            writter_lst = request.POST.getlist('writter_name') 
-            translator_list = request.POST.getlist('book_translator') 
-            editor_list = request.POST.getlist('editor_name') 
+            book_id_list            = request.POST.getlist('book_name')  
+            category_list           = request.POST.getlist('category_name') 
+            sub_cat_list            = request.POST.getlist('subcategory_name') 
+            writter_lst             = request.POST.getlist('writter_name') 
+            translator_list         = request.POST.getlist('book_translator') 
+            editor_list             = request.POST.getlist('editor_name') 
  
   
             if bool(request.FILES.get('book_image', False)) == True:
@@ -2008,7 +2192,7 @@ def add_new_book(request):
                      
             book_name_id = models.BookList.objects.create(
                 publisher_id = publisher_name, is_pre_image = is_pre_image, slug = book_url,
-                book_name_bangla = book_name_bangla, book_name_english = book_name_english, origin = book_origin, stock_info = stock_info, quantity = quantity,
+                book_name_bangla = book_name_bangla, book_name_english = book_name_english, origin = book_origin, stock_info = stock_info, quantity = 0,
                 book_idendity = book_idendity, video_link = video_link_book_details,  purchase_discount = purchase_discount, unit_price = unit_price,
                 country = country, number_of_page = number_of_page, cover_type = cover_type, ISBN = isbn_code, book_price = book_price, discount = discount_offer, 
                 sale_price = sale_price, language = book_language, edition = edition, book_image = document_path, detail = book_details, weight = book_weight,
@@ -2027,6 +2211,9 @@ def add_new_book(request):
             for cat in category_list: 
                 models.CategoryWiseBook.objects.create(book_name_id = book_name_id, category_name_id = int(cat))
             
+            for subcat in sub_cat_list: 
+                models.SubCategoryWiseBook.objects.create(book_name_id = book_name_id, subcategory_name_id = int(subcat))
+            
             for wri in writter_lst: 
                 models.WritterWiseBook.objects.create(book_name_id = book_name_id, writter_name_id = int(wri))
             
@@ -2044,6 +2231,7 @@ def add_new_book(request):
             'writter_list':writter_list,
             'publisher':publisher,
             'book_list':book_list,
+            'subcate_list':subcate_list,
         }
         return render(request, 'publisher_app/admin_dashboard/products/add_new_book.html', context) 
 
@@ -2148,8 +2336,12 @@ def dashboard_update_book_item(request, id):
 
         get_book = models.BookList.objects.get(id = id) 
         preview_file = models.PreviewPdfFile.objects.filter(book_name_id = id).first()
-        cate_list  = models.BookCategory.objects.filter(status = True)
+        cate_list  = models.BookCategory.objects.filter(status = True, master_category_id = 1)
+        subcate_list  = models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True)
+
         book_wise_cate    = models.CategoryWiseBook.objects.filter(book_name_id = id)
+        book_wise_subcate    = models.SubCategoryWiseBook.objects.filter(book_name_id = id)
+         
         
         book_list  = models.BookList.objects.raw("SELECT bk.id, bk.book_price, bk.sale_price, bk.discount, bk.book_name_bangla, bwr.writter_name_bangla, pub.publisher_name_bangla FROM `book_list` bk left JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bwr ON wwb.writter_name_id = bwr.id LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id")
         package_book_list  = models.BookPackageDetails.objects.raw("SELECT * FROM `book_package_list` WHERE booklist_master_id = %s",[id])
@@ -2189,6 +2381,7 @@ def dashboard_update_book_item(request, id):
             video_link_book_details = request.POST.get('video_link_book_details')
 
             category_list = request.POST.getlist('categoryName') 
+            sub_cat_list = request.POST.getlist('subcategory_name') 
             writter_id = request.POST.getlist('writter_name')  
             translator_id = request.POST.getlist('translator_name')  
             editor_name = request.POST.getlist('editor_name')  
@@ -2257,14 +2450,18 @@ def dashboard_update_book_item(request, id):
             models.CategoryWiseBook.objects.filter(book_name_id =  id).delete()
             for cat in category_list:   
                 models.CategoryWiseBook.objects.create(book_name_id = get_book.id, category_name_id = int(cat),)
+
+            models.SubCategoryWiseBook.objects.filter(book_name_id =  id).delete()
+            for subcat in sub_cat_list:   
+                models.SubCategoryWiseBook.objects.create(book_name_id = get_book.id, subcategory_name_id = int(subcat))
                 
             models.TranslatorWiseBook.objects.filter(book_name_id = id).delete()
             for ts in translator_id:   
-                models.TranslatorWiseBook.objects.create(book_name_id = get_book.id, translator_name_id = int(ts),)     
+                models.TranslatorWiseBook.objects.create(book_name_id = get_book.id, translator_name_id = int(ts))     
             
             models.EditorWiseBook.objects.filter(book_name_id =  id).delete()
             for ed in editor_name:   
-                models.EditorWiseBook.objects.create(book_name_id = get_book.id, editor_name_id = int(ed),)
+                models.EditorWiseBook.objects.create(book_name_id = get_book.id, editor_name_id = int(ed))
    
             return redirect('/products/book-list/')
         
@@ -2274,12 +2471,14 @@ def dashboard_update_book_item(request, id):
             'writter_list':writter_list,
             'publisher':publisher,
             'book_wise_cate':book_wise_cate,
+            'book_wise_subcate':book_wise_subcate,
             'book_wise_writ':book_wise_writ,
             'book_wise_trans':book_wise_trans,
             'book_wise_editor':book_wise_editor,
             'book_list':book_list,
             'package_book_list':package_book_list,
             'preview_file':preview_file,
+            'subcate_list':subcate_list,
         }
         return render(request, 'publisher_app/admin_dashboard/products/update_book_list.html', context)
 

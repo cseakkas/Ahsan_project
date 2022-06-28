@@ -1,0 +1,68 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Master Category || Dadhboard  {% endblock %}
+{% load static %}
+{% block content %} 
+
+<style>
+    .dataTable-dropdown label{text-transform: capitalize !important;font-weight: normal !important;}
+</style>
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar">Master Category List <span><a href="/master-category-add/">Master Category Add</a></span></h4>
+                    <div class="card-body"> 
+                        {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %} 
+                        
+                        <table class="table table-striped" id="datatablesSimple" >
+                            <thead>
+                                <tr style="background: #15a09d;color:white">
+                                    <th>SL</th>
+                                    <th>Category Name Bangla</th> 
+                                    <th>IS Homepage</th>
+                                    <th>IS Mainmenu</th>
+                                    <th style="width:60px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in category_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ cat.cat_name_bangla }}</td> 
+                                    <td>
+                                        {% if cat.Is_homepage %}
+                                            <p style="margin: 0;color:green;">Show Homepage</p>
+                                        {% else %}
+                                            <p style="margin: 0;color:#333;">Hide Homepage</p>
+                                        {% endif %}
+                                        
+                                    </td>
+                                    <td>
+                                        {% if cat.Is_mainmenu %}
+                                            <p style="margin: 0;color:green;">Show Mainmenu</p>
+                                        {% else %}
+                                            <p style="margin: 0;color:#333;">Hide Mainmenu</p>
+                                        {% endif %}
+                                    </td>
+                                    <td style="width:60px">
+                                        <a style="font-size:13px;padding:3px 10px;" href="/master-category/{{ cat.pk }}/edit/" class="btn btn-warning">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+ 
+
+{% endblock %}
