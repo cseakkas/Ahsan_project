@@ -19,14 +19,48 @@
                         </div> 
                     </div>
                 </div>   
-            </div>  
+            </div>
+            
+            <style>
+                .all_category_items{
+                    position: relative;
+                }
+                .subCategory_menu{
+                    width:308px;
+                    background: #ffffff;
+                    margin-top: -20px;
+                    display:none;
+                    position: absolute;
+                    z-index: 999999;
+                    border:1px solid gray; 
+                }
+                .subCategory_menu a{
+                    display: block;
+                    padding:6px;
+                    color:black;
+                    cursor: pointer;
+                    border-bottom: 1px solid #ccc;;
+                }
+                .subCategory_menu a:hover{
+                    background: rgb(246, 117, 17);color:white;
+                }
+                #category_items:hover .subCategory_menu{
+                    display: block;
+                }
+               
+            </style>
             <div class="row">
-                {% for category in category_load|book_category %}
+                {% for category in regular_cat_list %}
                 <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
                     <div class="all_category_items">
                         <a href="/book/category/{{ category.pk}}/{{ category.menu_url}}/">
                             <h5> {{ category.cat_name_bangla}} </h5>
                         </a>
+                    </div>
+                    <div class="subCategory_menu">
+                        {% for data in category.mastarsubcategory_set.all %}
+                            <a href="">{{ data.sub_category_bangla }}</a>
+                        {% endfor %}
                     </div>
                 </div>
                 {% endfor %}
@@ -37,6 +71,12 @@
   
 <script src="{% static 'publisher_app/js/jquery.js' %}"></script>   
 <script>
+    // $(document).ready(function(){
+    //     $('#category_items').hover(function(){
+    //         alert("Ok");
+    //     });
+    // });
+
     $("#writter_search_box").keyup(function(){
         if($("#writter_search_box").val().length > 2)
             {

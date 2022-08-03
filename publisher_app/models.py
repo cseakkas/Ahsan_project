@@ -122,7 +122,7 @@ class BookWritter(models.Model):
     address         = models.TextField( blank = True)
     personal_details = RichTextField(blank = True)
     writter_images   = models.CharField(max_length=450,blank = True)
-    is_wirter        = models.BooleanField(default=1)
+    is_writer        = models.BooleanField(default=1)
     is_translator    = models.BooleanField(default=0)
     is_editor        = models.BooleanField(default=0) 
     status           = models.BooleanField(default=1)
@@ -548,7 +548,24 @@ class CustomarAccount(models.Model):
 
     class Meta:
         db_table = 'customer_list'
+    
 
+class GatewayePayment(models.Model):  
+    customer        = models.ForeignKey(CustomarAccount, on_delete=models.DO_NOTHING, blank = True, null=True) 
+    bank_id         = models.CharField(max_length=100,blank = True, null=True)    
+    payment_type    = models.CharField(max_length=100,blank = True, null=True)    
+    amount          = models.IntegerField(default=0)   
+    transaction_id  = models.CharField(max_length=100,blank = True, null=True)
+    created         = models.DateTimeField(auto_now_add=True, null=True)
+    status          = models.BooleanField(default=1)
+
+    def __str__(self):
+        return self.customer
+
+    class Meta:
+        db_table = 'gatewaye_payment_list'
+
+ 
 class BookPackageDetails(models.Model): 
     package_name = models.CharField(max_length=30)
     booklist_master_id  = models.IntegerField(blank=True, null = True)
@@ -597,6 +614,7 @@ class SalesOrder(models.Model):
         ('2', 'Bkash'),
         ('3', 'Rocket'),
         ('4', 'Nagad'),
+        ('5', 'AamarPay'),
     )
     payment_method  = models.CharField(max_length=1, choices=payment_type_choose, default=1) 
     delivery_method = models.ForeignKey(CourierService, on_delete=models.DO_NOTHING, blank = True, null=True)
@@ -665,11 +683,12 @@ class SalesOrderPaymentDetails(models.Model):
         ('2', 'Bkash'),
         ('3', 'Rocket'),
         ('4', 'Nagad'),
+        ('5', 'AamarPay'),
     )
     payment_method  = models.CharField(max_length=1, choices=payment_type_choose, default=1)
     payment_status_choose= (
         ('1', 'Partial'),
-        ('2', 'Pull'),
+        ('2', 'Full'),
         ('3', 'Due'),
         ('4', 'Free'),
     )
@@ -678,7 +697,7 @@ class SalesOrderPaymentDetails(models.Model):
     payment_amount      = models.IntegerField(default=0)
     txt_number          = models.CharField(max_length=50,blank=True,null=True)
     create_date     = models.DateTimeField(auto_now_add = True)
-    update_date     = models.DateTimeField(auto_now_add = False)
+    update_date     = models.DateTimeField(auto_now_add = True)
     status          = models.BooleanField(default=True)
     
     def __str__(self):

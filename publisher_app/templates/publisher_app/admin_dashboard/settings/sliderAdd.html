@@ -1,0 +1,56 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Upozilla List|| Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Add New Slider<span><a href="/settings/sliderList/">Slider List</a></span> </h4>
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 230px;">Slider Title</th>
+                                    <td>
+                                        <input type="text" class="form-control" name="slider_title">
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <th>Ordering</th>
+                                    <td>
+                                        <input type="number" class="form-control" name="ordering">
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <th>Slider Image</th>
+                                    <td>
+                                        <input type="file" name="slider_images">
+                                    </td>
+                                </tr>
+                                 
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input type="submit" class="btn btn-info" name="submit" value="Add Slider">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div>
+
+{% endblock %}

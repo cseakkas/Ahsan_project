@@ -3,12 +3,40 @@
 {% load data_load %}
 {% load static %}
 {% block content %}
+
+<style>
+    .paymentSuccessful{
+        width:60%;
+        margin: 50px auto;
+        box-shadow: 0px 1px 4px gray;
+        padding:50px;
+        border-radius: 5px;
+    }
+    .paymentSuccessful img{
+        width:250px;
+        height:250px;
+        margin:10px auto;
+        display: block;
+    }
+    .paymentSuccessful h2{
+        text-align: center;
+        color:rgb(10, 96, 92)
+    }
+    .paymentSuccessful p{
+        text-align: center;
+        font-size: 20px;
+    }
+</style>
   
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <h2>Payment Successfully</h2>
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quibusdam natus ipsum nisi, quae delectus, excepturi ab, earum voluptate nesciunt eos est iste. Optio magnam nesciunt quia iste exercitationem, rerum dolorum ex officia maxime, deleniti labore quibusdam? Numquam ut voluptas ipsam tempore in repudiandae a veniam reprehenderit sed illum distinctio sequi ex quae saepe, officiis error. Autem consequatur a doloremque laborum, nam officia quod sequi architecto tempora, reiciendis eligendi illo quam vel ex veniam odio quidem. Nobis, consectetur est similique vel ad asperiores ea et repellat, eaque doloribus ut ab dignissimos, id quibusdam deleniti temporibus maiores. Nostrum numquam assumenda aliquam nisi?</p>
+            <div class="paymentSuccessful">
+                <img src="/static/publisher_app/images/payment_seccess.jpg" alt="">
+                <h2>Your payment was successful</h2>
+                <p>Thank you for your payment. <br> We will be in contact with more details shortly.</p>
+                <p><a href="/" class="btn btn-success">Go to homepage</a></p>
+            </div>
         </div>
     </div>
 </div>

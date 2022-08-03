@@ -1,0 +1,111 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %}  Sub Category List {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section>
+    <div class="sort_statistic_items" style="background: white">
+        <div class="container">  
+            <div class="row"> 
+                <div class="col-sm-12">  
+                    <div class="all_writter_category_publisher_search_box">  
+                        <h4 class="favorite_writter_title"><strong>{{sub_cat_list.0.regular_category.cat_name_bangla}}</strong> এর সকল সাব-ক্যাটাগরি সমুহ </h4>  
+                        <!-- <div class="all_search_box">
+                            <input name="search_txt" type="text" id="writter_search_box" placeholder="Search your favorite Author " class="form-control search_form_field awc_search" style="border: 1px solid #ffffff;">
+                            <ul id="search_writter_list">
+                                        
+                            </ul>
+                        </div>  -->
+                    </div>
+                </div>   
+            </div>
+            
+            <style>
+                .all_category_items{
+                    position: relative;
+                }
+                .subCategory_menu{
+                    width:308px;
+                    background: #ffffff;
+                    margin-top: -20px;
+                    display:none;
+                    position: absolute;
+                    z-index: 999999;
+                    border:1px solid gray; 
+                }
+                .subCategory_menu a{
+                    display: block;
+                    padding:6px;
+                    color:black;
+                    cursor: pointer;
+                    border-bottom: 1px solid #ccc;;
+                }
+                .subCategory_menu a:hover{
+                    background: rgb(246, 117, 17);color:white;
+                }
+                #category_items:hover .subCategory_menu{
+                    display: block;
+                }
+               
+            </style>
+            <div class="row">
+                {% for sub in sub_cat_list %}
+                <div class="col-lg-3 col-md-4 col-xs-6" id="category_items">
+                    <div class="all_category_items">
+                        <a href="#">
+                            <h5> {{ sub.sub_category_bangla}} </h5>
+                        </a>
+                    </div> 
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+  
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>   
+<script>
+    // $(document).ready(function(){
+    //     $('#category_items').hover(function(){
+    //         alert("Ok");
+    //     });
+    // });
+
+    $("#writter_search_box").keyup(function(){
+        if($("#writter_search_box").val().length > 2)
+            {
+                var action_url = "/category-search/";
+                $.ajax({
+                    url: action_url,
+                    type:'GET',
+                    dataType:"json",
+                    data : {
+                        'src_data': $("#writter_search_box").val()
+                    },
+                    success: function(data){ 
+                        $("#search_writter_list").html("");
+                        $.each(data, function(rowIndex, r) { 
+                            var category_id = data[rowIndex].id;
+                            var menu_url = data[rowIndex].menu_url;
+                            var cat_name_bangla = data[rowIndex].cat_name_bangla;
+                            var cat_name_english = data[rowIndex].cat_name_english;  
+                            $('#search_writter_list').append(
+                                '<li><a href="/book/category/'+category_id+'/'+menu_url+'"><div class="search_writter_name"> <p style="margin-left:10px">'+data[rowIndex].cat_name_bangla+'</p> </div> </a></li>'
+                                );
+
+                        });
+                    },
+                    error: function(data){     
+                    }
+                });
+            }
+        else{
+            $("#search_writter_list").html("");
+        }
+    });
+</script>
+
+
+{% endblock %}
+

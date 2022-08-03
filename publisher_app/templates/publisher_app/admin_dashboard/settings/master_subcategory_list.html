@@ -53,8 +53,9 @@
                                         <p style="margin: 0;color:#333;">Hide Mainmenu</p>
                                     {% endif %}
                                 </td>
-                                <td style="width:60px">
+                                <td style="width:130px">
                                     <a style="font-size:13px;padding:3px 10px;" href="/master-subcategory/{{ cat.id }}/edit/" class="btn btn-warning">Edit</a>
+                                    <a style="font-size:13px;padding:3px 10px;" onclick="return confirm('Are you sure delete sub category?')"  href="/master-subcategory/{{ cat.id }}/delete/" class="btn btn-danger">Delete</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -65,5 +66,5 @@
         </div>
     </div>
 </div> 
-  
+ 
 {% endblock %}

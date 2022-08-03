@@ -7065,7 +7065,7 @@ body.compensate-for-scrollbar {
      font-size: 15px;
 }
 .brk-header-list li {
-    width: 23%;
+    width: 29%;
     float: left;
     margin-right: 2%;
 }
@@ -8668,11 +8668,7 @@ button:active,
 button:focus {
     outline: 0;
 }
-img {
-    max-width: 100%;
-    height: auto;
-}
- 
+  
 input[type="search"] {
     box-sizing: border-box !important;
 }
@@ -11058,56 +11054,7 @@ q:before {
     font-weight: 700;
     color: var(--brand-primary);
 }
-@media (max-width: 767px) {
-    table {
-        box-shadow: none;
-    }
-}
-table tbody,
-table thead {
-    font-size: 1rem;
-    line-height: 18px;
-}
-table thead {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.06), inset 0 -3px #fafafa;
-    position: relative;
-    z-index: 9;
-    font-weight: 700;
-}
-@media (max-width: 767px) {
-    table thead {
-        display: none;
-    }
-}
  
-@media (max-width: 767px) {
-    table tbody {
-        font-size: 0.875rem;
-        line-height: 16px;
-    }
-}
-table tbody tr {
-    border-bottom: 1px solid #eaeaea;
-}
-@media (max-width: 767px) {
-    table tbody tr {
-        display: block;
-        margin-bottom: 15px;
-        border: 0;
-        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-    }
-}
-table td {
-    padding-top: 28px;
-    padding-bottom: 28px;
-    transition: all 0.3s ease-in-out;
-}
-@media (max-width: 767px) {
-    table td,
-    table th {
-        text-align: right;
-    }
-}
 .h1,
 .h2,
 .h3,

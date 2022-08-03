@@ -1,5 +1,8 @@
+from email import message
 from urllib import response
-from django.shortcuts import redirect, render 
+from django.shortcuts import redirect, render
+from numpy import place
+#from grpc import Status 
 from . import models
 from publisher_app.utils import render_to_pdf
 from django.http import HttpResponse
@@ -11,7 +14,7 @@ from PIL import Image
 from django.conf import settings
 from django.http import JsonResponse
 from django.contrib.auth.models import User, auth
-from django.contrib import messages
+from django.contrib import messages 
 import random
 from random import randint
 from django.db.models import Sum,Max,Min,Count,Q,F
@@ -102,7 +105,7 @@ def index_page(request):
     context = {
         'new_pub_book_list':new_pub_book_list,
         'slider_list':slider_list,
-        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('regular_category','id'),
         'book_list':book_list,  
         'wish_list':wish_list,  
         'cart_item' : cart_item, 
@@ -428,11 +431,16 @@ def ajaxQuantityUpDown(request):
             data = "plus"    
             return JsonResponse(data, safe=False)
         else:
-            models.AddToCart.objects.filter(book_name_id = customer_book_id, session_key = session_key).update(
-                quantity = F('quantity')-1
-            ) 
-            data = "minus"    
-            return JsonResponse(data, safe=False)
+            chk_qty = models.AddToCart.objects.filter(book_name_id = customer_book_id, session_key = session_key).first()
+            if chk_qty and chk_qty.quantity > 1 :
+                models.AddToCart.objects.filter(book_name_id = customer_book_id, session_key = session_key).update(
+                    quantity = F('quantity')-1
+                ) 
+                data = "minus"    
+                return JsonResponse(data, safe=False)
+            else:
+                data = "minus"    
+                return JsonResponse(data, safe=False)
 
 def deleteCartItemByAjax(request):
     if request.is_ajax():
@@ -537,8 +545,8 @@ def checkout_order(request):
     sutotalamount = int(subtotal_amount[0].subtotal)
       
     shipping_charge = 50
-    if sutotalamount > 1499:
-        shipping_charge = 0
+    # if sutotalamount > 2000:
+    #     shipping_charge = 0
 
     grand_total = sutotalamount + shipping_charge
  
@@ -548,8 +556,9 @@ def checkout_order(request):
         if get_id:
             last_id = get_id.id
             last_prefix = int(last_id)+1  
-            if len(str(last_prefix))<2:
+            if len(str(last_prefix)) < 2:
                 last_prefix = '0'+str(last_prefix) 
+                
         else:
             last_prefix = '01'
 
@@ -562,7 +571,7 @@ def checkout_order(request):
  
         customer_email  = request.POST.get('customer_email')
         password  = request.POST.get('password')
-        total_amount    = sutotalamount 
+        total_amount    = grand_total 
         payment_method  = request.POST.get('payment_type')
         payment_number_b  = request.POST.get('accounts_number_b')
         pay_amount_b      = request.POST.get('pay_amount_b')
@@ -570,8 +579,10 @@ def checkout_order(request):
         pay_amount_r      = request.POST.get('pay_amount_r')
         payment_number_n  = request.POST.get('accounts_number_n')
         pay_amount_n      = request.POST.get('pay_amount_n')
-        shipping_address = request.POST.get('delivery_address')
-        upozilla_id = request.POST.get('upozilla_name')
+        shipping_address  = request.POST.get('delivery_address')
+        upozilla_id       = request.POST.get('upozilla_name')
+        aamarpay_payment       = request.POST.get('is_aamarpay_payment')
+ 
          
         payment_number = ""
         pay_amount = ""
@@ -585,94 +596,196 @@ def checkout_order(request):
             payment_number = payment_number_n
             pay_amount = pay_amount_n
 
-    #------------------------ For Aamarpay Payment geteway ---------------------#
-        paid_amount = 10
-        successUrl = "http://127.0.0.1:8000/payment-success/"
-        cancelUrl = "http://127.0.0.1:8000/payment-cancel/"
-        failUrl = "http://127.0.0.1:8000/payment-failed/"
-        transactionID = "234H32T3"
-        
-        pay = aamarPay(isSandbox=True, successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), transactionID = str(transactionID), transactionAmount = 3 )
-        paymentpath = pay.payment()
-
-        return redirect(paymentpath)
-
+    #------------------------ For Aamarpay Payment geteway ---------------------# 
         #------------------------ For Aamarpay Payment geteway ---------------------#
 
         # today           = datetime.now()
         request.session['redirect_session'] = None 
-        if not request.session.get('userid'):
-            chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
-            if not chk_customer: 
-                customer_id = models.CustomarAccount.objects.create(
-                    customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
-                    password = customer_mobile, is_guest = 1, customer_level = "Member"
-                ) 
-                if customer_id:
-                    request.session['userid'] = customer_id.id
-                    request.session['usermobile'] = customer_id.mobile
-                    request.session['customername'] = customer_id.customer_name 
-  
-                models.SalesOrder.objects.create(
-                    order_number = order_number, customer_name_id = customer_id.id, 
-                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
-                    shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
-                    upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
-                    total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                    service_charge = 0, payment_method = payment_method,payment_status = 1, order_status = 1, session_key = session_key
-                ) 
-                for i in checkout_item:    
-                    models.SalesDetails.objects.create(
-                        order_number = order_number, book_name_id = int(i.book_name_id), sale_price = i.qt_price,
-                        book_quantity = i.quantity, session_key = session_key 
+
+        
+        successUrl = "https://ahsan.com.bd/payment-success/"
+        cancelUrl = "https://ahsan.com.bd/payment-cancel/"
+        failUrl = "https://ahsan.com.bd/payment-failed/"
+        transactionID = randint(100001, 999999999) 
+        storeID = "ahsan" 
+        signature_key  = "74870a2fd40b4d9926a5849f64fa2fca"
+        
+        description = 'This is Aamarpay Payment'
+         
+        if aamarpay_payment == "5": 
+            payment_method = 5  
+
+            if not request.session.get('userid'):
+                chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
+                if not chk_customer: 
+                    customer_id = models.CustomarAccount.objects.create(
+                        customer_name = del_per_name, mobile = customer_mobile, email = customer_email, password = customer_mobile, is_guest = 1, customer_level = "Member"
                     ) 
-                    models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-                 
-            else:  
+                    if customer_id:
+                        request.session['userid'] = customer_id.id
+                        request.session['usermobile'] = customer_id.mobile
+                        request.session['customername'] = customer_id.customer_name 
+ 
+                    pay = aamarPay(
+                        isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                        transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = del_per_name,
+                        customerMobile = customer_mobile, customerEmail = customer_email, description = description,
+                    )
+                    paymentpath = pay.payment() 
+                    if paymentpath: 
+                        models.SalesOrder.objects.create(
+                            order_number = order_number, customer_name_id = customer_id.id, 
+                            delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
+                            shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
+                            upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
+                            total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                        ) 
+                        for i in checkout_item:    
+                            models.SalesDetails.objects.create(
+                                order_number = order_number, book_name_id = int(i.book_name_id), sale_price = i.qt_price,
+                                book_quantity = i.quantity, session_key = session_key 
+                            ) 
+                            models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                    
+                    models.GatewayePayment.objects.create(customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
+
+                    # return redirect(paymentpath)
+                else:  
+                    pay = aamarPay(
+                        isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                        transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = chk_customer.customer_name,
+                        customerMobile = chk_customer.mobile, customerEmail = chk_customer.email, description = description,
+                    )
+                    paymentpath = pay.payment() 
+                    if paymentpath:
+                        models.SalesOrder.objects.create(
+                            order_number = order_number, customer_name_id = chk_customer.id, 
+                            delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
+                            optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
+                            total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  order_date = datetime.datetime.now(),
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                        ) 
+                        for i in checkout_item:   
+                            models.SalesDetails.objects.create(
+                                order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
+                            ) 
+                            models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                        
+                        if chk_customer:
+                            request.session['userid'] = chk_customer.id
+                            request.session['usermobile'] = chk_customer.mobile
+                            request.session['customername'] = chk_customer.customer_name 
+                
+                    models.GatewayePayment.objects.create( customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
+                return redirect(paymentpath)
+
+            else: 
+                exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
+                if exit_customer:
+                    request.session['userid'] = exit_customer.id
+                    request.session['usermobile'] = exit_customer.mobile
+                    request.session['customername'] = exit_customer.customer_name  
+
+                pay = aamarPay(
+                    isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                    transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = exit_customer.customer_name,
+                    customerMobile = exit_customer.mobile, customerEmail = exit_customer.email, description = description,
+                )
+                paymentpath = pay.payment() 
+                if paymentpath:
+
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
+                        upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
+                        optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
+                        shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                    )  
+
+                    for i in checkout_item: 
+                        models.SalesDetails.objects.create(
+                            order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
+                        ) 
+                        models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                
+                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
+                return redirect(paymentpath)
+  
+        else:                              ####----------- Other Payment options ------------- ####### 
+            if not request.session.get('userid'):
+                chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
+                if not chk_customer: 
+                    customer_id = models.CustomarAccount.objects.create(
+                        customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
+                        password = customer_mobile, is_guest = 1, customer_level = "Member"
+                    ) 
+                    if customer_id:
+                        request.session['userid'] = customer_id.id
+                        request.session['usermobile'] = customer_id.mobile
+                        request.session['customername'] = customer_id.customer_name 
+
+                    
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = customer_id.id, 
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
+                        shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
+                        upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
+                        total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
+                        service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
+                    ) 
+                    for i in checkout_item:    
+                        models.SalesDetails.objects.create(
+                            order_number = order_number, book_name_id = int(i.book_name_id), sale_price = i.qt_price,
+                            book_quantity = i.quantity, session_key = session_key 
+                        ) 
+                        models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                    
+                else:  
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = chk_customer.id, 
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
+                        optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
+                        total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge, order_date = datetime.datetime.now(), 
+                        service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
+                    ) 
+                    for i in checkout_item:   
+                        models.SalesDetails.objects.create(
+                            order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
+                        ) 
+                        models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                    
+                    if chk_customer:
+                        request.session['userid'] = chk_customer.id
+                        request.session['usermobile'] = chk_customer.mobile
+                        request.session['customername'] = chk_customer.customer_name 
+
+            else: 
+                exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
+                if exit_customer:
+                    request.session['userid'] = exit_customer.id
+                    request.session['usermobile'] = exit_customer.mobile
+                    request.session['customername'] = exit_customer.customer_name  
+
                 models.SalesOrder.objects.create(
-                    order_number = order_number, customer_name_id = chk_customer.id, 
-                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
-                    optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
-                    total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  
-                    service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
-                ) 
-                for i in checkout_item:   
+                    order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
+                    upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
+                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
+                    optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
+                    shipping_charge = shipping_charge, service_charge = 0, payment_method = aamarpay_payment, payment_status = 1, order_status = 1, session_key = session_key
+                )  
+
+                for i in checkout_item: 
                     models.SalesDetails.objects.create(
                         order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
                     ) 
                     models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-                
-                if chk_customer:
-                    request.session['userid'] = chk_customer.id
-                    request.session['usermobile'] = chk_customer.mobile
-                    request.session['customername'] = chk_customer.customer_name 
- 
-        else: 
-            exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
-            if exit_customer:
-                request.session['userid'] = exit_customer.id
-                request.session['usermobile'] = exit_customer.mobile
-                request.session['customername'] = exit_customer.customer_name  
-
-            models.SalesOrder.objects.create(
-                order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
-                upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
-                delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
-                optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
-            )  
-            for i in checkout_item: 
-                models.SalesDetails.objects.create(
-                    order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
-                ) 
-                models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-        request.session['redirect_session'] = order_number
-        return redirect('/myorder/order-list/', order_number = order_number)   
-        # context = {
-        #     'order_number':order_number,
-        #     'customer_info':customer_info, 
-        # }  
-        # return render(request, 'publisher_app/customer_panel/my_account.html', context)
+            
+            context = {
+                'order_number':order_number,
+                'customer_info':customer_info, 
+            }   
+            return render(request, 'publisher_app/order_success.html', context)
 
     context = {
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
@@ -706,8 +819,8 @@ def checkout_order_now(request, id, qty):
         sutotalamount = int(or_book_quantity) * int(or_book_price)
       
     shipping_charge = 50
-    if sutotalamount > 1499:
-        shipping_charge = 0
+    # if sutotalamount > 1499:
+    #     shipping_charge = 0
 
     grand_total = sutotalamount + shipping_charge
    
@@ -739,6 +852,7 @@ def checkout_order_now(request, id, qty):
         pay_amount_n      = request.POST.get('pay_amount_n')
         shipping_address = request.POST.get('delivery_address')
         upozilla_id = request.POST.get('upozilla_name')
+        aamarpay_payment       = request.POST.get('is_aamarpay_payment')
          
         payment_number = ""
         pay_amount = ""
@@ -754,86 +868,200 @@ def checkout_order_now(request, id, qty):
 
         # today           = datetime.now()
         request.session['redirect_session'] = None 
-        if not request.session.get('userid'):
-            chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
-            if not chk_customer: 
-                customer_id = models.CustomarAccount.objects.create(
-                    customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
-                    password = customer_mobile, is_guest = 1, customer_level = "Member"
-                ) 
-                if customer_id:
-                    request.session['userid'] = customer_id.id
-                    request.session['usermobile'] = customer_id.mobile
-                    request.session['customername'] = customer_id.customer_name 
-  
-                sales_order_id = models.SalesOrder.objects.create(
-                    order_number = order_number, customer_name_id = customer_id.id, 
-                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
-                    shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
-                    upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
-                    total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                    service_charge = 0, payment_method = payment_method,payment_status = 1, order_status = 1, session_key = session_key
-                )     
+        successUrl = "https://ahsan.com.bd/payment-success/"
+        cancelUrl = "https://ahsan.com.bd/payment-cancel/"
+        failUrl = "https://ahsan.com.bd/payment-failed/"
+        transactionID = randint(100001, 999999999) 
+        storeID = "ahsan" 
+        signature_key  = "74870a2fd40b4d9926a5849f64fa2fca"
+        
+        description = 'This is Aamarpay Payment'
+
+        if aamarpay_payment == "5": 
+            payment_method = 5  
+            if not request.session.get('userid'): 
+                chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
+                if not chk_customer: 
+                    customer_id = models.CustomarAccount.objects.create(
+                        customer_name = del_per_name, mobile = customer_mobile, email = customer_email, password = customer_mobile, is_guest = 1, customer_level = "Member"
+                    ) 
+                    if customer_id:
+                        request.session['userid'] = customer_id.id
+                        request.session['usermobile'] = customer_id.mobile
+                        request.session['customername'] = customer_id.customer_name 
+
+                    pay = aamarPay(
+                        isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                        transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = del_per_name,
+                        customerMobile = customer_mobile, customerEmail = customer_email, description = description,
+                    )
+                    paymentpath = pay.payment() 
+                    if paymentpath: 
+                        models.SalesOrder.objects.create(
+                            order_number = order_number, customer_name_id = customer_id.id, 
+                            delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
+                            shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
+                            upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
+                            total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                        )     
+                        models.SalesDetails.objects.create(
+                            order_number = order_number, book_name_id = int(customer_id.id), sale_price = checkout_item.sale_price,
+                            book_quantity = or_book_quantity, session_key = session_key 
+                        )
+                        models.SalesOrderPaymentDetails.objects.create( order_number = order_number, payment_method = payment_method, payment_status = 2 ) 
+                    models.GatewayePayment.objects.create(customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
+
+                else:  
+                    pay = aamarPay(
+                        isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                        transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = chk_customer.customer_name,
+                        customerMobile = chk_customer.mobile, customerEmail = chk_customer.email, description = description,
+                    )
+                    paymentpath = pay.payment() 
+                    if paymentpath:
+                        models.SalesOrder.objects.create(
+                            order_number = order_number, customer_name_id = chk_customer.id, 
+                            delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
+                            optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
+                            total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                        )    
+                        models.SalesDetails.objects.create(
+                            order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
+                            book_quantity = or_book_quantity, session_key = session_key 
+                        )  
+                        models.SalesOrderPaymentDetails.objects.create(
+                            order_number = order_number, payment_method = payment_method, payment_status = 2
+                        ) 
+                        if chk_customer:
+                            request.session['userid'] = chk_customer.id
+                            request.session['usermobile'] = chk_customer.mobile
+                            request.session['customername'] = chk_customer.customer_name 
+                    models.GatewayePayment.objects.create( customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
+                return redirect(paymentpath)
+    
+            else: 
+                exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
+                if exit_customer:
+                    request.session['userid'] = exit_customer.id
+                    request.session['usermobile'] = exit_customer.mobile
+                    request.session['customername'] = exit_customer.customer_name  
+
+                pay = aamarPay(
+                    isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
+                    transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = exit_customer.customer_name,
+                    customerMobile = exit_customer.mobile, customerEmail = exit_customer.email, description = description,
+                )
+                paymentpath = pay.payment() 
+                if paymentpath:
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
+                        upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
+                        optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
+                        shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                    )  
+                    models.SalesDetails.objects.create(
+                        order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
+                        book_quantity = or_book_quantity, session_key = session_key 
+                    )
+                    models.SalesOrderPaymentDetails.objects.create(
+                        order_number = order_number, payment_method = payment_method, payment_status = 2
+                    ) 
+                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
+                return redirect(paymentpath)
+             
+        else:                              ####----------- Other Payment options ------------- ####### 
+            if not request.session.get('userid'):
+                chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
+                if not chk_customer: 
+                    customer_id = models.CustomarAccount.objects.create(
+                        customer_name = del_per_name, mobile = customer_mobile, email = customer_email,
+                        password = customer_mobile, is_guest = 1, customer_level = "Member"
+                    ) 
+                    if customer_id:
+                        request.session['userid'] = customer_id.id
+                        request.session['usermobile'] = customer_id.mobile
+                        request.session['customername'] = customer_id.customer_name 
+    
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = customer_id.id, 
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
+                        shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
+                        upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
+                        total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
+                        service_charge = 0, payment_method = payment_method,payment_status = 1, order_status = 1, session_key = session_key
+                    )     
+                    models.SalesDetails.objects.create(
+                        order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
+                        book_quantity = or_book_quantity, session_key = session_key 
+                    )
+                    models.SalesOrderPaymentDetails.objects.create(
+                        order_number = order_number, payment_method = payment_method, payment_status = 3, 
+                    )  
+                else:  
+                    models.SalesOrder.objects.create(
+                        order_number = order_number, customer_name_id = chk_customer.id, 
+                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
+                        optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
+                        total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  
+                        service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
+                    )    
+                    models.SalesDetails.objects.create(
+                        order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
+                        book_quantity = or_book_quantity, session_key = session_key 
+                    ) 
+                    models.SalesOrderPaymentDetails.objects.create(
+                        order_number = order_number, payment_method = payment_method, payment_status = 3, 
+                    )
+                   
+                    if chk_customer:
+                        request.session['userid'] = chk_customer.id
+                        request.session['usermobile'] = chk_customer.mobile
+                        request.session['customername'] = chk_customer.customer_name 
+ 
+            else: 
+                exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
+                if exit_customer:
+                    request.session['userid'] = exit_customer.id
+                    request.session['usermobile'] = exit_customer.mobile
+                    request.session['customername'] = exit_customer.customer_name  
+
+                models.SalesOrder.objects.create(
+                    order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
+                    upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
+                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
+                    optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
+                    shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
+                )  
                 models.SalesDetails.objects.create(
                     order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
                     book_quantity = or_book_quantity, session_key = session_key 
                 )
                 models.SalesOrderPaymentDetails.objects.create(
-                    sales_order_id = sales_order_id, order_number = order_number, payment_method = payment_method,
-                    account_number = payment_number, payment_amount = pay_amount
+                    order_number = order_number, payment_method = payment_method, payment_status = 3, 
                 ) 
-            else:  
-                models.SalesOrder.objects.create(
-                    order_number = order_number, customer_name_id = chk_customer.id, 
-                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
-                    optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
-                    total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  
-                    service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
-                )    
-                models.SalesDetails.objects.create(
-                    order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
-                    book_quantity = or_book_quantity, session_key = session_key 
-                )  
-                if chk_customer:
-                    request.session['userid'] = chk_customer.id
-                    request.session['usermobile'] = chk_customer.mobile
-                    request.session['customername'] = chk_customer.customer_name 
- 
-        else: 
-            exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
-            if exit_customer:
-                request.session['userid'] = exit_customer.id
-                request.session['usermobile'] = exit_customer.mobile
-                request.session['customername'] = exit_customer.customer_name  
-
-            models.SalesOrder.objects.create(
-                order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
-                upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
-                delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
-                optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 1, order_status = 1, session_key = session_key
-            )  
-            models.SalesDetails.objects.create(
-                order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
-                book_quantity = or_book_quantity, session_key = session_key 
-            )
-        request.session['redirect_session'] = order_number
-        return redirect('/myorder/order-list/', order_number = order_number)    
-    
-    else:
+                
         context = {
-            'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(),
-            'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
-            'district' : district, 
-            'checkout_item' : checkout_item,
-            'customer_info' : customer_info,
-            'sutotalamount' : sutotalamount,
-            'shipping_charge' : shipping_charge,
-            'grand_total' : grand_total,
-            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
-        }  
-        return render(request, 'publisher_app/order_now.html', context)
+            'order_number':order_number,
+            'customer_info':customer_info, 
+        }   
+        return render(request, 'publisher_app/order_success.html', context)
      
+    context = {
+        'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'district' : district, 
+        'checkout_item' : checkout_item,
+        'customer_info' : customer_info,
+        'sutotalamount' : sutotalamount,
+        'shipping_charge' : shipping_charge,
+        'grand_total' : grand_total,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }  
+    return render(request, 'publisher_app/order_now.html', context)
+    
 
 def customer_order_success(request):
     mysession = random.random()
@@ -859,19 +1087,61 @@ def bind_upozilla_wise_postoffice(request):
     }
     return render(request, 'publisher_app/bind_post_office.html', context)
 
+def category_wise_subcategory(request):
+    category_id   = int(request.POST.get('category_id', None))
+    subcat_list = models.MastarSubCategory.objects.filter(master_category_id = 1, regular_category_id = category_id, status = True)
+
+    results = []
+    for sub in subcat_list:
+        place_json = {} 
+        place_json['subcat_id'] = sub.id
+        place_json['subcat_bangla'] = sub.sub_category_bangla
+        place_json['subcat_english'] = sub.sub_category_english
+         
+        results.append(place_json) 
+    return JsonResponse(results, safe=False)
+
+
+        # print(sub.id, " Sub category name : ", sub.sub_category_english)
+    
+    # pass
+    # upozilla_wise_post = models.PostOfficeInfo.objects.filter(upozilla_name_id = upozilla_name)
+    
+    # context = {
+    #     'upozilla_wise_post': upozilla_wise_post,
+    # }
+    # return render(request, 'publisher_app/category_wise_subcategory.html')
+
 
 def all_book_category_list(request):
     mysession = random.random()
     if "abcd" not in request.session:
         request.session["abcd"] = str(mysession)
 
+    regular_cat_list = models.BookCategory.objects.filter(status=True).order_by('ordering')
     context = {
+        'regular_cat_list':regular_cat_list,
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
 
     return render(request,'publisher_app/all_book_category_list.html', context)
+
+def category_wise_all_subcategory(request, category_id):
+    mysession = random.random()
+    if "abcd" not in request.session:
+        request.session["abcd"] = str(mysession)
+
+    sub_cat_list = models.MastarSubCategory.objects.filter(regular_category_id = category_id, status=True).order_by('id')
+    context = {
+        'sub_cat_list':sub_cat_list,
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }
+
+    return render(request,'publisher_app/all_sub_category.html', context)
 
 
 def all_book_writter_list(request):
@@ -1116,6 +1386,8 @@ def author_pages(request, id, menu_url):
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'total_price' : total_price,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+
         # 'recent_book_list' : recent_book_list, 
     }
     return render(request, 'publisher_app/authors.html', context)
@@ -1203,6 +1475,73 @@ def category_book_list(request, id, menu_url):
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/category_book_list.html', context)
+
+
+######## Sub Category wise book list ####################
+def subcategoryWiseBookList(request, id, menu_url): 
+    mysession = random.random()
+    if "abcd" not in request.session:
+        request.session["abcd"] = str(mysession)
+ 
+    subcat_info = models.MastarSubCategory.objects.get(id = id) 
+    today_date = datetime.date.today() 
+    one_month_ago = today_date - datetime.timedelta(days=230)  
+  
+    # Best sales book list 
+    subcate_book_list = models.BookList.objects.raw('''
+        SELECT *, wl.book_name_id as wl_id FROM book_list INNER JOIN sub_category_wise_book scwb ON book_list.id = scwb.book_name_id 
+        LEFT JOIN add_to_wishlist wl ON wl.book_name_id = book_list.id
+        INNER JOIN master_sub_category bc ON scwb.subcategory_name_id=bc.id  INNER JOIN writter_wise_book wwb ON book_list.id  = wwb.book_name_id
+        INNER JOIN book_writter_list au ON wwb.writter_name_id = au.id WHERE book_list.status = 1 and scwb.subcategory_name_id = %s
+        and book_list.total_sale >= 0 GROUP by wwb.book_name_id order by book_list.total_sale desc limit 12 ''', [id]) 
+     
+     
+    wish_list = models.AddToWishlist.objects.filter(session_key = request.session.get("abcd"))
+    if request.is_ajax():
+        book_name_id = request.GET.get('book_id')
+        cart_items_list = models.AddToCart.objects.filter( book_name_id = book_name_id,session_key = request.session.get("abcd")).first()
+        if not cart_items_list:
+            models.AddToCart.objects.create(
+                book_name_id = request.GET.get('book_id'), qt_price = request.GET.get('sale_price'),
+                book_price = request.GET.get('book_price'), discount = request.GET.get('discount'),
+                session_key = request.session.get("abcd")
+            )
+            data = "success"
+            return JsonResponse(data, safe=False) 
+        else:
+            data = "Book Already Exsit"
+            return JsonResponse(data, safe=False) 
+
+
+    page_number = request.GET.get('page')
+    if request.method == "POST":
+        btnvalue = request.POST.get('btnPage')
+        page_number = btnvalue
+    index_count = 0
+    if page_number and int(page_number) > 1:
+        index_count = 16 * (int(page_number)-1)
+
+    paginator = Paginator(subcate_book_list, 16)
+    pagination = paginator.get_page(page_number)
+    if page_number is None:
+        page_number = 1
+        
+    subcate_book =  subcate_book_list[index_count:16 * int(page_number)] 
+  
+    context = {
+        'subcat_info': subcat_info, 
+        'wish_list': wish_list,   
+        'subcate_book': subcate_book,  
+        "index_count": index_count,
+        "page_number": pagination, 
+        "current_page_no": page_number,  
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    }
+    return render(request, 'publisher_app/subcategory_wise_book_list.html', context)
+
+
 
 # category_wise_new_publication 
 def category_wise_new_publication(request, id):
@@ -1439,6 +1778,141 @@ def publisher_wise_page(request, id, menu_url ):
     }
     return render(request, 'publisher_app/publisher.html', context)
 
+def get_load_publisher_list(request):
+    id_list = json.loads(request.POST.get('publisher_id'))
+    
+    book_list = []
+    for i in id_list:
+         
+        pub_book_list = models.BookList.objects.filter(publisher_id = int(i))
+        book_list.append(pub_book_list)
+    
+    for data in book_list:
+        print(data.count())
+    # pub_book_list = models.BookList.objects.raw('''
+    #     SELECT *, wl.book_name_id as wl_id FROM book_list INNER JOIN category_wise_book cwb ON book_list.id = cwb.book_name_id 
+    #     LEFT JOIN add_to_wishlist wl ON wl.book_name_id = book_list.id
+    #     INNER JOIN book_category_list bc ON cwb.category_name_id=bc.id  INNER JOIN writter_wise_book wwb ON book_list.id  = wwb.book_name_id
+    #     INNER JOIN book_writter_list au ON wwb.writter_name_id = au.id WHERE book_list.status = 1 and book_list.publisher_id = %s GROUP by wwb.book_name_id order by book_list.id desc ''', [publisher_info.id]
+    # )
+    data = "success"
+    return JsonResponse(data, safe=False) 
+
+
+
+def customer_login2(request): 
+    mysession = random.random()
+    if "abcd" not in request.session:
+        request.session["abcd"] = str(mysession)
+ 
+    cart_item = models.AddToCart.objects.filter(session_key = request.session["abcd"])
+    total_price =  cart_item.aggregate(Sum('qt_price'))['qt_price__sum']
+
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+         
+       
+        data = models.CustomarAccount.objects.filter((Q(mobile = username) | Q(email = username)), password = password, status = True)
+        if data:
+            request.session['userid'] = data[0].id
+            request.session['usermobile'] = data[0].mobile
+            request.session['customername'] = data[0].customer_name
+            request.session['user_type'] = "valid_user" 
+            request.session['is_guest'] = "not_guest"
+            request.session['customer_photo'] = str(data[0].profile_images)  
+
+            # messages.success(request, "Category Entry Success.")    
+            
+            return redirect('/my-account/')
+        else: 
+            messages.error(request, 'Login Failed! Please try again')
+            return redirect('/customer/login/')
+    else:
+        context = {
+            'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(),
+            'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+            'total_price' : total_price, 
+            'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+        }
+        return render(request, 'publisher_app/customer_login2.html', context)
+
+def customer_forgot_password(request):
+    request.session['customer_mobile'] = None
+    if request.method=="POST":
+        mobile_no = request.POST.get('mobile_no')
+        
+        chk_mobile = models.CustomarAccount.objects.filter((Q(mobile = mobile_no) | Q(optional_mobile = mobile_no)), status = 1)
+        if chk_mobile:
+            new_otp = random.randint(100000, 999999)
+            panel_username = "ahsan"
+            panel_password = "ahsan@522"
+            sendder_id = "8809612441424" 
+            new_otp = random.randint(100000, 999999)  
+
+            otp_msg = "Use "+str(new_otp)+" as ONE TIME KEY for your login request. Valid for 1 minute. \n  - www.ahsan.com.bd"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+otp_msg+"&to=88"+str(mobile_no)
+            sent_otp = requests.post(smsurl) 
+            request.session['customer_mobile'] = str(mobile_no)
+
+            chk_mobile.update(login_otp = new_otp) 
+            return redirect('/customer/reset-password/')
+        else:
+            context = {
+                'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(), 
+                'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+                'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+            }
+            messages.warning(request, "Mobile number not match! Please try again.")
+            return render(request, 'publisher_app/customer_forgot_password.html', context)
+
+    else: 
+        context = {
+            'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(), 
+            'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+            'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+        }
+        return render(request, 'publisher_app/customer_forgot_password.html', context) 
+
+def customer_reset_password(request): 
+    if request.method == "POST": 
+        otp_number = request.POST.get('otp_number')
+        new_password = request.POST.get('new_password')
+        customer_mobile = request.session.get('customer_mobile') 
+
+        chk_otp = models.CustomarAccount.objects.filter((Q(mobile=customer_mobile) | Q(optional_mobile=customer_mobile)), status = 1).first()
+        
+        if chk_otp: 
+            if int(chk_otp.login_otp) == int(otp_number):  
+                models.CustomarAccount.objects.filter((Q(mobile=customer_mobile) | Q(optional_mobile=customer_mobile)), status = 1).update(password = new_password)
+                messages.success(request, "Password change successful.")
+                return redirect('/customer/login/')
+            else:
+                context = {
+                    'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(), 
+                    'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+                    'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+                }
+                messages.warning(request, "OTP dose not match!")
+                return render(request, 'publisher_app/customer_reset_password.html', context)
+        else:
+            context = {
+                'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(), 
+                'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+                'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+            }
+            messages.warning(request, "Invalid OTP or Mobile no")
+            return render(request, 'publisher_app/customer_reset_password.html', context)
+    
+    context = {
+        'count' : models.AddToCart.objects.filter(session_key = request.session["abcd"]).count(), 
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True).order_by('master_category', 'regular_category'),
+    }
+    return render(request, 'publisher_app/customer_reset_password.html', context)
+
+
+
 
 def customer_login(request): 
     mysession = random.random()
@@ -1586,6 +2060,7 @@ def customer_registration(request):
         confirm_password = request.GET.get('confirm_password')
 
         chk_cust = models.CustomarAccount.objects.filter(mobile = mobile_number).first()
+
         if not chk_cust:  
             data = models.CustomarAccount.objects.create(
                 customer_name = user_full_name, mobile = mobile_number, 
@@ -1599,21 +2074,21 @@ def customer_registration(request):
                 data = "Registration Successful"
                 return JsonResponse(data, safe=False)
         else:  
-            data = models.CustomarAccount.objects.filter(
-                mobile = chk_cust.mobile, password = chk_cust.password, is_guest = 1
-            ).first()
+            data = models.CustomarAccount.objects.filter(mobile = chk_cust.mobile).first()
             if data:  
-                request.session['userid'] = data.id
-                request.session['usermobile'] = data.mobile
-                request.session['customername'] = data.customer_name
-                request.session['user_type'] = "valid_user" 
-                data = "Registration Successful"
-                return JsonResponse(data, safe=False) 
+                result = "Already customer exist!"
+                # request.session['userid'] = data.id
+                # request.session['usermobile'] = data.mobile
+                # request.session['customername'] = data.customer_name
+                # request.session['user_type'] = "valid_user" 
+                # data = "Registration Successful"
+                return JsonResponse(result, safe=False) 
              
              
     context = {
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(), 
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/new_registration.html', context)
  
@@ -1679,8 +2154,7 @@ def wishList_cart_item(request):
     if "abcd" not in request.session:
         request.session["abcd"] = str(mysession)
 
-    session_key = request.session.get("abcd")
-    print(session_key)
+    session_key = request.session.get("abcd") 
     wishlist_item = models.AddToWishlist.objects.raw("""
         SELECT bk.id, bk.book_name_bangla, bk.slug, bk.book_image, bk.book_price, bk.sale_price, IF(bk.cover_type = 1, 'পেপারব্যাক', 'হার্ডকভার') as cover_type,
         bp.publisher_name_bangla, bw.writter_name_bangla, bk.discount FROM add_to_wishlist wl 
@@ -1767,13 +2241,13 @@ def admin_login(request):
             request.session['user_name'] = data.full_name
             return redirect('/admin-dashboard')
         else:
-            return redirect('/adminlogin') 
+            return redirect('/adminlogin/') 
      
     return render(request, 'publisher_app/admin_dashboard/login.html')
 
 def admin_logout(request):  
     request.session['user_id'] = False
-    return redirect('/adminlogin')
+    return redirect('/adminlogin/')
  
 
 
@@ -1925,12 +2399,10 @@ def book_author_add(request):
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
         if request.method=="POST":
             prod = models.BookWritter()
-            menu_url4 = request.POST['author_name_english']
+            menu_url4 = request.POST['author_name_english'].strip()
             loletterr = menu_url4.lower()
-            usehipen = (loletterr.replace(" ", "-"))
-            menu_url = usehipen
-            
-            #  = "" 
+            menu_url = (loletterr.replace(" ", "-")) 
+             
             document_path = "" 
             if bool(request.FILES.get('author_photo', False)) == True:
                 file = request.FILES['author_photo']   
@@ -1942,12 +2414,18 @@ def book_author_add(request):
                     document_path = str("writter/")+str(document_path).split("/")[-1]  
      
             models.BookWritter.objects.create(
-                writter_name_bangla = request.POST['author_name_bangla'], writter_name_english = request.POST['author_name_english'],
-                menu_url = menu_url, email = request.POST['author_email'], mobile = request.POST['author_mobile'], qualification = request.POST['qualification'], 
-                personal_details = request.POST['personal_details'], address = request.POST['author_address'], writter_images = document_path,
+                writter_name_bangla = request.POST['author_name_bangla'], 
+                writter_name_english = request.POST['author_name_english'],
+                menu_url = menu_url, email = request.POST['author_email'], mobile = request.POST['author_mobile'], 
+                qualification = request.POST['qualification'], 
+                personal_details = request.POST['personal_details'], address = request.POST['author_address'], 
+                writter_images = document_path,
+                is_writer = True if request.POST.get('is_writer') else False,
+                is_translator = True if request.POST.get('is_translator') else False,
+                is_editor = True if request.POST.get('is_editor') else False,
             )
  
-            messages.success(request, "Book Writter Entry Save Successful.")
+            messages.success(request, "Author Entry Successful.")
             return redirect('/book-author-list/')
         else:        
             return render(request, 'publisher_app/admin_dashboard/settings/author_entry.html')
@@ -1961,10 +2439,9 @@ def book_author_update(request, id):
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
         get_auth = models.BookWritter.objects.get(id = id)
         if request.method=="POST":
-            menu_url4 = request.POST['author_name_english']
+            menu_url4 = request.POST['author_name_english'].strip()
             loletterr = menu_url4.lower()
-            usehipen = (loletterr.replace(" ", "-"))
-            menu_url = usehipen 
+            menu_url = (loletterr.replace(" ", "-")) 
 
             writter_images = str(get_auth.writter_images) if get_auth.writter_images else ""
             if bool(request.FILES.get('writter_images', False)) == True: 
@@ -1982,15 +2459,31 @@ def book_author_update(request, id):
             models.BookWritter.objects.filter(id=id).update(
                 writter_name_bangla = request.POST['author_name_bangla'], writter_name_english = request.POST['author_name_english'],
                 menu_url = menu_url, email = request.POST['author_email'], mobile = request.POST['author_mobile'], qualification = request.POST['qualification'], 
-                personal_details = request.POST['personal_details'], address = request.POST['author_address'], writter_images = writter_images,
+                personal_details = request.POST['personal_details'], address = request.POST['author_address'], 
+                writter_images = writter_images, 
+                is_writer = True if request.POST.get('is_writer') else False,
+                is_translator = True if request.POST.get('is_translator') else False,
+                is_editor = True if request.POST.get('is_editor') else False,
             )
-            messages.success(request, "Book Writter Update Successful.")
+            messages.success(request, "Author Update Successful.")
             return redirect('/book-author-list/')
 
         context = {
             'get_auth':get_auth,
         }
         return render(request, 'publisher_app/admin_dashboard/settings/author_edit.html', context) 
+    else:
+        return redirect('/accessDeny')
+
+
+@employeeLogin
+def book_author_delete(request, id):  
+    chk_permission   = check_user_permission(request,'/book-category-list/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+        models.BookWritter.objects.filter(id = id).delete() 
+        messages.success(request, "Author Delete Successful.")
+        return redirect('/book-author-list/')
+
     else:
         return redirect('/accessDeny')
 
@@ -2131,7 +2624,9 @@ def add_new_book(request):
         book_list  = models.BookList.objects.raw("SELECT bk.id, bk.book_price, bk.sale_price, bk.discount, bk.book_name_bangla, bwr.writter_name_bangla, pub.publisher_name_bangla FROM book_list bk left JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bwr ON wwb.writter_name_id = bwr.id LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id")
         cate_list  = models.BookCategory.objects.filter(status = True, master_category_id = 1)
         subcate_list  = models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True)
-        writter_list  = models.BookWritter.objects.filter(status = True)
+        writter_list  = models.BookWritter.objects.filter(status = True, is_writer = 1)
+        editorlist  = models.BookWritter.objects.filter(status = True, is_editor = 1)
+        translatorlist  = models.BookWritter.objects.filter(status = True, is_translator = 1)
         publisher  = models.Publisher.objects.filter(status = True)
         
         if request.method == "POST":
@@ -2227,11 +2722,13 @@ def add_new_book(request):
             return redirect("/products/book-list/")
 
         context = {
-            'cate_list':cate_list,
-            'writter_list':writter_list,
-            'publisher':publisher,
-            'book_list':book_list,
-            'subcate_list':subcate_list,
+            'cate_list': cate_list,
+            'writter_list': writter_list,
+            'publisher': publisher,
+            'book_list': book_list,
+            'subcate_list': subcate_list,
+            'editorlist': editorlist,
+            'translatorlist': translatorlist,
         }
         return render(request, 'publisher_app/admin_dashboard/products/add_new_book.html', context) 
 
@@ -2255,12 +2752,27 @@ def bookWisePreviewImageClear(request):
 def book_list(request):  
     chk_permission   = check_user_permission(request,'/products/book-list/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+        category_list       = models.BookCategory.objects.filter(status=True)
+        sub_category_list   = models.MastarSubCategory.objects.filter(status=True)
+        publisher_list      = models.Publisher.objects.filter(status=True)
         if request.method == "GET":
+            # book_list_total = models.BookList.objects.raw('''
+            #     SELECT * FROM book_list bk LEFT JOIN category_wise_book bwc ON bk.id = bwc.book_name_id LEFT JOIN book_category_list bc ON bwc.category_name_id = bc.id 
+            #     LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bw ON wwb.writter_name_id = bw.id
+            #     LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id GROUP BY bwc.book_name_id ORDER BY bk.id desc
+            # ''')
             book_list_total = models.BookList.objects.raw('''
-                SELECT * FROM book_list bk LEFT JOIN category_wise_book bwc ON bk.id = bwc.book_name_id LEFT JOIN book_category_list bc ON bwc.category_name_id = bc.id 
-                LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bw ON wwb.writter_name_id = bw.id
-                LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id GROUP BY bwc.book_name_id ORDER BY bk.id desc
-            ''')
+                SELECT bk.id, bk.book_name_bangla, bk.origin, bk.book_image, bk.book_price, bk.sale_price, bk.stock_info, 
+                pub.publisher_name_bangla, bcl.cat_name_bangla, msc.sub_category_bangla, bwl.writter_name_bangla 
+                FROM `book_list` bk LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id
+                LEFT JOIN sub_category_wise_book scwb ON scwb.book_name_id = bk.id
+                LEFT JOIN master_sub_category msc on scwb.subcategory_name_id = msc.id
+                LEFT JOIN book_category_list bcl ON msc.regular_category_id = bcl.id
+                LEFT JOIN writter_wise_book wwb ON wwb.book_name_id = bk.id
+                LEFT JOIN book_writter_list bwl ON bwl.id = wwb.writter_name_id
+                WHERE bk.status = 1 and bcl.status = 1 and msc.status = 1 ORDER BY bcl.id asc '''
+            )
+             
             page_number = request.GET.get('page')
             if request.method == "POST":
                 btnvalue = request.POST.get('btnPage')
@@ -2282,21 +2794,51 @@ def book_list(request):
                 "index_count": index_count,
                 "page_number": pagination, 
                 "current_page_no": page_number,  
+                "category_list": category_list,  
+                "sub_category_list": sub_category_list,  
+                "publisher_list": publisher_list,  
             }
             return render(request, 'publisher_app/admin_dashboard/products/book_list.html', context)
         
         else:   
-            book_txt = request.POST.get("book_content_search").strip() 
-            src_data_txt = str("%")+book_txt+str("%")
+            category_id = request.POST.get("category_name") 
+            subcategory_id = request.POST.get("subcategory_name") 
+            publisher_id = request.POST.get("publisher_name")  
+
+            print("publisher_id :", publisher_id)
+
+            arr = []
+            query_str = ""
+            book_list_total = ""
+
+            if category_id:
+                category_id = int(category_id)
+                arr.append(category_id)
+                query_str += " and bcl.id = %s" 
+
+            if subcategory_id:
+                subcategory_id = int(subcategory_id)
+                arr.append(subcategory_id)
+                query_str += " and msc.id = %s"
+
+            if publisher_id:
+                publisher_id = int(publisher_id)
+                arr.append(publisher_id)
+                query_str += " and bk.publisher_id = %s"
            
-            book_list_total = models.BookList.objects.raw('''
-                SELECT * FROM book_list bk LEFT JOIN category_wise_book bwc ON bk.id = bwc.book_name_id 
-                LEFT JOIN book_category_list bc ON bwc.category_name_id = bc.id LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
-                LEFT JOIN book_writter_list bw ON wwb.writter_name_id = bw.id LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id
-                where(bk.id LIKE %s OR bk.origin LIKE %s OR bk.book_price LIKE %s OR bk.sale_price LIKE %s OR bk.book_name_bangla LIKE %s OR bk.book_name_english LIKE %s OR bc.cat_name_bangla LIKE %s 
-                OR bw.writter_name_bangla LIKE %s OR bw.writter_name_english LIKE %s OR pub.publisher_name_bangla LIKE %s 
-                OR pub.publisher_name_english LIKE %s) GROUP BY bwc.book_name_id ORDER BY bk.id desc
-            ''', [src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt, src_data_txt])
+            book_list_total = models.BookList.objects.raw(''' 
+                SELECT bk.id, bk.book_name_bangla, bk.origin, bk.book_image, bk.book_price, bk.sale_price, 
+                bk.stock_info, pub.publisher_name_bangla, bcl.cat_name_bangla, msc.sub_category_bangla, 
+                bwl.writter_name_bangla FROM `book_list` bk LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id
+                LEFT JOIN sub_category_wise_book scwb ON scwb.book_name_id = bk.id
+                LEFT JOIN master_sub_category msc on scwb.subcategory_name_id = msc.id
+                LEFT JOIN book_category_list bcl ON msc.regular_category_id = bcl.id
+                LEFT JOIN writter_wise_book wwb ON wwb.book_name_id = bk.id
+                LEFT JOIN book_writter_list bwl ON bwl.id = wwb.writter_name_id
+                WHERE bk.status = 1 and bcl.status = 1 and bwl.status = 1 '''+str(query_str)+''' ORDER BY bcl.id asc ''', arr
+            ) 
+
+            print("book_list_total : ", book_list_total.query)
               
             to_entry = models.BookList.objects.raw("SELECT id, COUNT(id) as total_entry FROM `book_list`") 
             
@@ -2318,10 +2860,15 @@ def book_list(request):
             context = { 
                 'book_list':book_list, 
                 'total_book':len(book_list_total),
-                "index_count": index_count,
-                'book_txt':book_txt,
+                "index_count": index_count, 
                 "page_number": pagination, 
-                "current_page_no": page_number,     
+                "current_page_no": page_number,  
+                "category_list": category_list,  
+                "sub_category_list": sub_category_list,  
+                "publisher_list": publisher_list,    
+                "category_id": category_id,    
+                "publisher_id": publisher_id,    
+                "subcategory_id": subcategory_id,    
             }
             return render(request, 'publisher_app/admin_dashboard/products/book_list.html', context)
 
@@ -2627,6 +3174,82 @@ def dashboard_post_office_list(request):
             'post_office_list': post_office_list,
         }
         return render(request, 'publisher_app/admin_dashboard/settings/post_office_list.html', context)
+    else:
+        return redirect('/accessDeny')
+    
+@employeeLogin
+def sliderList(request):
+    chk_permission   = check_user_permission(request,'/settings/sliderList/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+
+        slider_list = models.SliderInfo.objects.all().order_by('slider_order')
+        context = {
+            'slider_list': slider_list,
+        }
+        return render(request, 'publisher_app/admin_dashboard/settings/sliderList.html', context)
+    else:
+        return redirect('/accessDeny')
+
+@employeeLogin
+def sliderAdd(request):
+    chk_permission   = check_user_permission(request,'/settings/sliderList/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+        if request.method == "POST":
+            slider_title = request.POST.get('slider_title')
+            ordering = request.POST.get('ordering') 
+
+            slider_images = "" 
+            if bool(request.FILES.get('slider_images', False)) == True:
+                file = request.FILES['slider_images']   
+                if not os.path.exists('publisher_app/static/publisher_app/media/images/slider/'):
+                    os.mkdir('publisher_app/static/publisher_app/media/images/slider/')
+
+                slider_path = default_storage.save("slider/"+file.name, ContentFile(file.read()))
+                if slider_path:
+                    slider_images = str("slider/")+str(slider_path).split("/")[-1] 
+
+            
+            models.SliderInfo.objects.create(
+                slider_name = slider_title, slider_order = ordering, slider_images = slider_images
+            ) 
+            messages.success(request, "New slider add successful")
+            return redirect('/settings/sliderList/')
+
+        return render(request, 'publisher_app/admin_dashboard/settings/sliderAdd.html')
+    else:
+        return redirect('/accessDeny')
+
+@employeeLogin
+def sliderEdit(request, id):
+    chk_permission   = check_user_permission(request,'/settings/sliderList/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+        get_data = models.SliderInfo.objects.get(id = id)
+        
+        if request.method == "POST":
+            slider_title = request.POST.get('slider_title')
+            ordering = request.POST.get('ordering') 
+            slider_status = True if request.POST.get('slider_status') else False
+
+            slider_images = str(get_data.slider_images) if get_data.slider_images else "" 
+            if bool(request.FILES.get('slider_images', False)) == True:
+                file = request.FILES['slider_images']   
+                if not os.path.exists('publisher_app/static/publisher_app/media/images/slider/'):
+                    os.mkdir('publisher_app/static/publisher_app/media/images/slider/')
+
+                slider_path = default_storage.save("slider/"+file.name, ContentFile(file.read()))
+                if slider_path:
+                    slider_images = str("slider/")+str(slider_path).split("/")[-1] 
+ 
+            models.SliderInfo.objects.filter(id=id).update(
+                slider_name = slider_title, slider_order = ordering, slider_images = slider_images, 
+                status = slider_status, upload_date = datetime.datetime.now()
+            ) 
+            messages.success(request, "Slider update successful")
+            return redirect('/settings/sliderList/')
+        context = {
+            'get_data':get_data,
+        }
+        return render(request, 'publisher_app/admin_dashboard/settings/sliderEdit.html', context)
     else:
         return redirect('/accessDeny')
 

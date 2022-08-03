@@ -5,6 +5,8 @@
 }
 #mobile_version_package_details{display: none;}
 @media only screen and (max-width:250px){
+    
+    .main-container{display:none}
     #desktop_version_package_details{display: none;}
     #mobile_version_package_details{display: block;}
     #mobile_version_package_details h4 {font-size: 16px;font-weight: bold;}
@@ -314,7 +316,7 @@
 /* For 351px to 500px Screen Device  */
 
 @media screen and (min-width:251px) and (max-width:350px){
-    
+    .main-container{display:none}
     #desktop_version_package_details{display: none;}
     #mobile_version_package_details{display: block;}
     #mobile_version_package_details h4 {font-size: 16px;font-weight: bold;}
@@ -345,6 +347,7 @@
         border-radius: 0.25rem;
         height: 30px;
     }
+    .fixed_card_tem_display{display:none}
     #ClickHereForLoginForm input{
         width:100%;
         margin-bottom:10px;
@@ -536,7 +539,7 @@
         margin-top: -30px;
         margin-right: 16px;
         color: #fbfbfb;
-        padding: 4px 10px;
+        padding: 2px 10px;
         border: none;
         border-radius: 0 4px 4px 0;
     }
@@ -564,7 +567,13 @@
         box-shadow: 0px 2px 5px #757575;
     }
     #SowForMobileMenu form {
-        width:85%;float:right;
+        width:100%;float:right;
+    }
+    
+    .track_order_and_user a img {
+        width: 20px;
+        margin-right: 1px;
+        height: 20px;
     }
     .responsive_menu_items1212{
         z-index: 999999;
@@ -857,6 +866,8 @@
 /* For 351px to 500px Screen Device  */
 
 @media screen and (min-width:351px) and (max-width:500px){ 
+    
+    .main-container{display:none}
     #desktop_version_package_details{display: none;}
     #mobile_version_package_details{display: block;}
     #mobile_version_package_details h4 {font-size: 16px;font-weight: bold;}
@@ -1995,6 +2006,7 @@
 
  
 @media screen and (min-width:501px) and (max-width:767px){
+    .main-container{display:none}
     #desktop_version_package_details{display: none;}
     #mobile_version_package_details{display: block;}
     #mobile_version_package_details h4 {font-size: 16px;font-weight: bold;}

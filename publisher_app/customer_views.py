@@ -64,6 +64,7 @@ def my_account(request):
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'total_price' : total_price,
         'customer' : customer,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/customer_panel/my_account.html', context)
 
@@ -82,6 +83,7 @@ def my_cart_items(request):
         'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'cart_item': cart_item,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/customer_panel/my_cart_items.html', context)
 
@@ -91,9 +93,17 @@ def my_wishlist_items(request):
 
     customer_id = request.session.get('userid')
     session_key = request.session.get("abcd")  
+    wishlist_item = models.AddToWishlist.objects.raw("""
+        SELECT bk.id, bk.book_name_bangla, bk.slug, bk.book_image, bk.book_price, bk.sale_price, IF(bk.cover_type = 1, 'পেপারব্যাক', 'হার্ডকভার') as cover_type,
+        bp.publisher_name_bangla, bw.writter_name_bangla, bk.discount FROM add_to_wishlist wl 
+        INNER JOIN book_list bk ON wl.book_name_id = bk.id INNER JOIN book_publisher_list bp ON bk.publisher_id = bp.id
+        INNER JOIN writter_wise_book wwb ON wwb.book_name_id = bk.id INNER JOIN book_writter_list bw ON bw.id = wwb.writter_name_id
+        where wl.session_key = %s and bk.status = 1 order by wl.id desc""", [session_key])
     context = {
+        'wishlist_item':wishlist_item,
         'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
          
     }
     return render(request, 'publisher_app/customer_panel/my_wishlist_items.html', context)
@@ -151,6 +161,7 @@ def my_order_list(request):
             "index_count": index_count,
             "page_number": pagination, 
             "current_page_no": page_number,  
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/customer_panel/my_order_list.html', context) 
 
@@ -190,6 +201,7 @@ def my_order_list(request):
             "current_page_no": page_number,
             'count' : models.AddToCart.objects.filter(session_key = request.session.get('abcd')).count(),
             'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+            'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
         }
         return render(request, 'publisher_app/customer_panel/my_order_list.html', context)
 
@@ -233,6 +245,7 @@ def my_order_view(request, order_number):
         'due_amount':due_amount,
         'discount_amount':discount_amount,
         'grand_total':grand_total,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/customer_panel/mycart_item_view.html', context)
 
@@ -279,6 +292,7 @@ def customer_profile_update(request, id):
         'count' : models.AddToCart.objects.filter(session_key = request.session.get('abcd')).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'get_pro_id' : get_pro_id,
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     }
     return render(request, 'publisher_app/customer_panel/update_customer_account.html', context)
  

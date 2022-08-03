@@ -56,6 +56,24 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th>Is Writer</th>
+                                <td>
+                                    <input type="checkbox" {%  if get_auth.is_writer %} checked {% endif %} name="is_writer" style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th>Is Translator</th>
+                                <td>
+                                    <input type="checkbox" {% if get_auth.is_translator %} checked {% endif %}  name="is_translator" style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
+                                <th>Is Editor</th>
+                                <td>
+                                    <input type="checkbox" {%  if get_auth.is_editor %} checked {% endif %}  name="is_editor" style="width:20px;height:20px;">
+                                </td>
+                            </tr> 
+                            <tr>
                                 <th>Author Photo</th>
                                 <td>
                                     <input type="file" name="writter_images">

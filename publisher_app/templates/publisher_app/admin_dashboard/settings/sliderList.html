@@ -1,0 +1,55 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %} 
+{% block title %} Upozilla List|| Dashboard  {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid page_container"> 
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="card shadow mb-4">
+                <h4 class="page_header_bar"> Slider List <span><a href="/settings/sliderAdd/">Slider Add</a></span> </h4>
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th style="width:5%">SL</th>
+                                <th style="width:50%">Slider Title</th>
+                                <th style="width:25%">Image</th>
+                                <th style="width:10%">Order</th>
+                                <th style="width:10%">Status</th> 
+                                <th style="width:10%">Action</th> 
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for data in slider_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td> 
+                                    <td>{{ data.slider_name }}</td>
+                                    <td>
+                                        <img src="/static/publisher_app/media/{{ data.slider_images}}" alt="" style="width:200px;height:60px">
+                                    </td>
+                                    <td>{{ data.slider_order }}</td>
+                                    <td>{% if data.status %} Active {% else %} Inactive {% endif %}</td> 
+                                    <td>
+                                        <a href="/settings/{{ data.pk }}/sliderEdit/" class="btn btn-warning">Edit</a>
+                                    </td>
+                                </tr> 
+                            {% endfor %}        
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div> 
+</div>
+
+{% endblock %}

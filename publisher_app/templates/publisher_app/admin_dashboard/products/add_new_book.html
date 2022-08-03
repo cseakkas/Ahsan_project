@@ -105,11 +105,11 @@
                                             <tr>
                                                 <td>
                                                     <label>Book Sub Category </label>
-                                                    <select class="form-control" id="subcategory_name" required>
-                                                        <option value="0"><strong>Select Sub Category</strong></option> 
+                                                    <select class="form-control CategoryWiseSubcategoyLoad" id="subcategory_name" required>
+                                                        <!-- <option value="0"><strong>Select Sub Category</strong></option> 
                                                         {% for cat in subcate_list %}
                                                             <option value="{{ cat.pk }}">{{ cat.sub_category_bangla }}</option>
-                                                        {% endfor %}
+                                                        {% endfor %} -->
                                                     </select>
                                                 </td>
                                                 <td style="width:70px;"> <br>
@@ -146,7 +146,7 @@
                                                     <label>Select Translator <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewWriter">Add New</span></label>
                                                     <select class="form-control" id="book_translator">
                                                         <option value="0"><strong>Select Translator</strong></option>
-                                                        {% for wri in writter_list %}
+                                                        {% for wri in translatorlist %}
                                                         <option value="{{ wri.pk }}">{{ wri.writter_name_bangla }}
                                                         </option>
                                                         {% endfor %}
@@ -166,7 +166,7 @@
                                                     <label>Select Editor <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewWriter">Add New</span></label>
                                                     <select class="form-control" name="book_editor" id="book_editor">
                                                         <option value="0">Select Editor</option>
-                                                        {% for wri in writter_list %}
+                                                        {% for wri in editorlist %}
                                                         <option value="{{ wri.pk }}">{{ wri.writter_name_bangla }}
                                                         </option>
                                                         {% endfor %}
@@ -819,6 +819,35 @@
     });
 </script>
 
+<script>
+    $("#category_name").change(function(){
+        var category_id = $("#category_name").val();
+        $.ajax({
+            url: "/category-wise-subcategory/",
+            type:'POST',
+            data : {
+                category_id : category_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(results){ 
+                $(".CategoryWiseSubcategoyLoad").html("")
+                for(i = 0; i < results.length; i++){
+                    var subcat_id = results[i]['subcat_id'];
+                    var category_bangla = results[i]['subcat_bangla'];
+                    var subcat_english = results[i]['subcat_english'];
+                    appendItemOption = `
+                        <option value="`+subcat_id+`">`+category_bangla+`</option>
+                    `
+                    $(".CategoryWiseSubcategoyLoad").append(appendItemOption);
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+
+    });
+</script>
   
 
 {% endblock %}

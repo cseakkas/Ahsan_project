@@ -18,6 +18,7 @@ urlpatterns = [
     path('checkout-order-now/<int:id>/<str:qty>/', views.checkout_order_now),
     path('order-success/', views.customer_order_success), 
     path('bind-upozilla-wise-post-office/', views.bind_upozilla_wise_postoffice), 
+    path('category-wise-subcategory/', views.category_wise_subcategory), 
     path('book/categories/', views.all_book_category_list),
     path('book/writter-list/', views.all_book_writter_list),
     path('book/pulisher-list/', views.all_book_publisher_list),
@@ -25,13 +26,17 @@ urlpatterns = [
     path('writter-search/', views.bind_writter_search), 
     path('category-search/', views.bind_category_search), 
     path('publisher-search/', views.bind_publisher_search),
-    path('book/author/<int:id>/<str:menu_url>/',views.author_pages), 
+    path('book/author/<int:id>/<str:menu_url>/',views.author_pages),  
     path('book/category/<int:id>/<str:menu_url>/', views.category_book_list), 
+    path('book/subcategory/<int:id>/<str:menu_url>/', views.subcategoryWiseBookList), 
     path('book/newPpublishedBook/<int:id>/', views.category_wise_new_publication), 
     path('book/bestSallerBook/<int:id>/', views.category_wise_best_saller_book_list), 
     path('book/LastWeekBestWritter/<int:id>/', views.category_wise_last_week_best_writter_book), 
     path('book/publisher/<int:id>/<str:menu_url>/', views.publisher_wise_page),
-    path('customer/login/', views.customer_login),
+    path('customer/login/off/', views.customer_login),
+    path('customer/login/', views.customer_login2),
+    path('customer/forgot-password/', views.customer_forgot_password),
+    path('customer/reset-password/', views.customer_reset_password),
     path('customer/registration/', views.customer_registration),
     path('logout/', views.user_logout),  
     path('login_for_review/', views.login_for_review), 
@@ -42,9 +47,11 @@ urlpatterns = [
     path('bookSearch/', views.AdvanceBookSearch, name="AdvanceBookSearch"), 
     path('addToWishList/', views.addToWishList, name="addToWishList"), 
     path('wishlist-item/', views.wishList_cart_item, name="wishList_cart_item"), 
+    path('category/<int:category_id>/all-subcategory/', views.category_wise_all_subcategory, name="category_wise_all_subcategory"), 
      
     path('ajaxQuantityUpDown/', views.ajaxQuantityUpDown, name="ajaxQuantityUpDown"), 
     path('confirm-otp/', views.confirm_otp, name="confirm_otp"),   
+    path('get-load-publisher-list/', views.get_load_publisher_list, name="get_load_publisher_list"),   
 
 
     # Bkash API Payment 
@@ -63,7 +70,7 @@ urlpatterns = [
 
     #####################  Dashboard Url ##############################
     path('admin-dashboard', views.admin_dashboard, name="admin_dashboard"),
-    path('adminlogin', views.admin_login, name="admin_login"),
+    path('adminlogin/', views.admin_login, name="admin_login"),
     path('adminlogout', views.admin_logout, name="admin_logout"),
     path('accessDeny', views.accessDeny, name="accessDeny"),
     
@@ -81,6 +88,7 @@ urlpatterns = [
     path('book-author-entry/', views.book_author_add, name="book_author_add"),
     path('NewBookWriterEntry/', views.NewBookWriterEntry, name="NewBookWriterEntry"),
     path('book-author-update/<int:id>/', views.book_author_update, name="book_author_update"),
+    path('book-author-delete/<int:id>/', views.book_author_delete, name="book_author_update"),
     path('book-author-list/', views.book_author_list, name="book_author_list"),
     # path('book-category-list/', views.book_category_list, name="book_category_list"),
 
@@ -99,6 +107,9 @@ urlpatterns = [
     path('bind-district-upozilla/', views.dashboard_bind_district_wise_upozilla), 
     path('settings/menu-add/', views.menu_add, name="menu_add"), 
     path('settings/menu-list/', views.menu_list, name="menu_list"), 
+    path('settings/sliderAdd/', views.sliderAdd, name="sliderAdd"), 
+    path('settings/sliderList/', views.sliderList, name="sliderList"), 
+    path('settings/<int:id>/sliderEdit/', views.sliderEdit, name="sliderEdit"), 
     
 
     ########  Product Urls ###########
@@ -134,6 +145,7 @@ urlpatterns = [
     # Sales Reports 
     path('dashboard/sales/sales-history/', order_views.dashboard_sales_history), 
     path('dashboard/customerList/', order_views.dashboardCustomerList), 
+    path('dashboard/ExportSalesList/', order_views.ExportSalesList), 
     
     #blog POSt List
     path('ahsan-blog/', views.ahsan_blog),
@@ -152,8 +164,12 @@ urlpatterns = [
     path('master-subcategory-list/', order_views.master_subcategory_list),
     path('master-subcategory-add/', order_views.master_subcategory_add), 
     path('master-subcategory/<int:id>/edit/', order_views.master_subcategory_update), 
+    path('master-subcategory/<int:id>/delete/', order_views.master_subcategory_delete), 
     path('payment-success/', order_views.payment_success), 
     path('payment-cancel/', order_views.payment_cancel), 
     path('payment-failed/', order_views.payment_failed), 
+    path('importSubcategory/', order_views.importSubcategory), 
+    path('importcategorywisebook/', order_views.importcategorywisebook), 
+    path('importsubcategorywisebook/', order_views.importsubcategorywisebook), 
     
 ]

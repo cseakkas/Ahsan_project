@@ -162,27 +162,28 @@
                     </div>
                      
                     <div class="top_publisher_book">
-                        <h5>Book Types  <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> </h5>
+                        <h5>Book Types   <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books"> 
                             {% for publi in publisher_load|book_publisher %}
-                                <p> <label> <input type="checkbox" onclick="getPublisherId('{{publi.pk}}')"> {{ publi.publisher_name_bangla }} </label></p>
+                                <p> <label> <input type="checkbox" onclick="filter_publisher('{{publi.id}}')" > <a href="/book/publisher/{{ publi.pk }}/{{publi.menu_url}}"> {{ publi.publisher_name_bangla }} </a></label></p>
                             {% endfor %}
                         </div> 
                     </div>
                     <div class="top_publisher_book">
-                        <h5>Authors <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> </h5>
+                        <h5>Authors  <!--  <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i>--> </h5>
                         <div class="display_top_books"> 
                             {% for writer in writter_load|book_writter %}
-                                <p> <label> <input type="checkbox" > {{ writer.writter_name_bangla }}</label></p>
-                            {% endfor %} 
+                                <p> <label> <input type="checkbox"  onclick="filter_writter('{{writer.id}}')" ><a href="/book/author/{{ writer.pk }}/{{writer.menu_url}}"> {{ writer.writter_name_bangla }}</a></label></p>
+                            {% endfor %}
+                             
                         </div> 
                     </div>
                     <div class="top_publisher_book">
-                        <h5>Categories <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> </h5>
+                        <h5>Categories  <!--  <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books">
                             <p> <label> <input type="checkbox" > Meena book House </label></p>
                             {% for category in category_load|book_category %}
-                                <p> <label> <input type="checkbox" > {{ category.cat_name_bangla }}</label></p>
+                                <p> <label> <input type="checkbox" ><a href="/book/category/{{ category.pk }}/{{category.menu_url}}">  {{ category.cat_name_bangla }} </a> </label></p>
                             {% endfor %}
                         </div> 
                     </div> 

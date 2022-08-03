@@ -35,6 +35,8 @@ import datetime
 import time 
 import random
 
+import io, os, xlsxwriter
+
 @employeeLogin
 def dashboard_bind_district_wise_upozilla(request): 
     district_name   = int(request.GET.get('district_name', None))  
@@ -496,6 +498,7 @@ def dashboard_update_order(request):
 # Sales Reports  
 @employeeLogin
 def dashboard_sales_history(request):   
+    request.session['sales_list'] = None
     if request.method =="POST":
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
@@ -512,15 +515,116 @@ def dashboard_sales_history(request):
         if to_date:
             arr.append(to_date+str(' 23:59:59'))
             query_str += " and order_date <= %s"
+
+        if order_status:
+            arr.append(order_status)
+            query_str += " and order_status = %s"
          
         sales_list = models.SalesOrder.objects.raw("SELECT * FROM sales_order where status = 1 "+query_str+" order by order_number desc", arr)
          
+        
+        if from_date and to_date:
+            from_date2 = str("'")+from_date+str(" 00:00:00")+str("'")
+            to_date2   = str("'")+to_date+str(" 23:59:59")+str("'")
+            print("to_date2 :", to_date2)
+            request.session['sales_list'] = str(sales_list.query).replace("order_date >= "+from_date+" 00:00:00 and order_date <= "+to_date+" 23:59:59", "order_date >= "+from_date2+" and order_date <= "+to_date2) 
+
+        elif from_date and not to_date:
+            from_date2 = str("'")+from_date+str(" 00:00:00")+str("'")
+            request.session['sales_list'] = str(sales_list.query).replace("order_date >= "+from_date+" 00:00:00", "order_date >= "+from_date2)
+        elif to_date and not from_date:
+            to_date2 = str("'")+to_date+str(" 23:59:59")+str("'")
+            request.session['sales_list'] = str(sales_list.query).replace("order_date <= "+to_date+" 23:59:59", "order_date <= "+to_date2)
+
+        elif order_status:  
+            request.session['sales_list'] = str(sales_list.query) 
+
+        else: 
+            request.session['sales_list'] = str(sales_list.query) 
+
+        print("request session: ", request.session['sales_list']) 
+
+        total_summary = 0
+        for amount in  sales_list: 
+            total_summary += amount.total_amount
+        
         context = {
             'sales_list': sales_list,
+            'total_summary': total_summary,
+            'from_date': from_date,
+            'to_date': to_date,
         }  
         return render(request, 'publisher_app/admin_dashboard/sales/sales_history.html', context)
     else:
         return render(request, 'publisher_app/admin_dashboard/sales/sales_history.html')
+
+ 
+from django.http import  Http404
+def download_excel_sheet(file_name):
+    file_path = os.path.join(settings.MEDIA_ROOT+'/excel_templates/', file_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404  
+
+
+def ExportSalesList(request):  
+    sales_order_list = models.SalesOrder.objects.raw(request.session["sales_list"]) 
+    print(len(sales_order_list))    
+    if sales_order_list: 
+        if not os.path.exists(settings.MEDIA_ROOT+'/excel_templates/'):
+            os.mkdir(settings.MEDIA_ROOT+'/excel_templates/')
+
+        file_name = "sales_order_list.xlsx"
+        file_path = os.path.join(settings.MEDIA_ROOT+'/excel_templates/',file_name)
+        if os.path.isfile(settings.MEDIA_ROOT+'/excel_templates/'+file_name):
+            os.remove(settings.MEDIA_ROOT+'/excel_templates/'+file_name)
+
+        if not os.path.exists(file_path):
+            workbook  = xlsxwriter.Workbook(settings.MEDIA_ROOT+'/excel_templates/'+file_name)
+            worksheet = workbook.add_worksheet()
+
+            worksheet.write('A1','Order Date') 
+            worksheet.write('B1','Order Number') 
+            worksheet.write('C1','Customer Name') 
+            worksheet.write('D1','Mobile')    
+            worksheet.write('E1','Payment Method')    
+            worksheet.write('F1','Payment Status')    
+            worksheet.write('G1','Order Status')    
+            worksheet.write('H1','Total Amount')    
+
+            worksheet.set_column('A:A', 15)
+            worksheet.set_column('B:B', 15) 
+            worksheet.set_column('C:C', 25) 
+            worksheet.set_column('D:D', 15)  
+            worksheet.set_column('E:E', 15)  
+            worksheet.set_column('F:F', 15)  
+            worksheet.set_column('G:G', 15)  
+            worksheet.set_column('H:H', 15)  
+                
+            count = 2 
+            for i in sales_order_list:   
+                worksheet.write('A'+str(count), str(i.order_date))
+                worksheet.write('B'+str(count), str(i.order_number))
+                worksheet.write('C'+str(count), str(i.customer_name.customer_name)) 
+                worksheet.write('D'+str(count), str(i.customer_name.mobile)) 
+                worksheet.write('E'+str(count), str(i.get_payment_method_display())) 
+                worksheet.write('F'+str(count), str(i.get_payment_status_display())) 
+                worksheet.write('G'+str(count), str(i.get_order_status_display())) 
+                worksheet.write('H'+str(count), str(i.total_amount))
+                count +=1
+         
+            workbook.close()
+            return download_excel_sheet(file_name)
+    else:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+
+
+
+
     
 #----------------- dashboard CustomerList  ---------------------------#   
 @employeeLogin
@@ -742,16 +846,27 @@ def master_subcategory_update(request, id):
     }
     return render(request, 'publisher_app/admin_dashboard/settings/master_subcategory_edit.html', context) 
 
+def master_subcategory_delete(request, id):
+    models.MastarSubCategory.objects.filter(id=id).delete()
+    messages.success(request, "Sub Category delete successful.")
+    return redirect('/master-subcategory-list/')
 
 
+from django.views.decorators.csrf import csrf_exempt
 
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
-
-@csrf_protect
+@csrf_exempt
 def payment_success(request):
 
-    return render(request, 'publisher_app/aamarpay/success.html') 
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+
+    }
+
+
+    return render(request, 'publisher_app/aamarpay/success.html', context) 
+
 def payment_cancel(request):
 
     return 
@@ -759,3 +874,83 @@ def payment_cancel(request):
 def payment_failed(request):
 
     return 
+
+
+
+import pandas as pd
+
+def importSubcategory(request):
+    if request.method == "POST":
+        xl = pd.read_excel(request.FILES["import_file"], "Sheet1") 
+        headers = list(xl.head(0))
+        update_count, new_count = 1, 0 
+        for i in range(1,len(xl)): 
+            master_cate_id  = xl["Master id"][i]
+            regular_cate_id = str(xl["Regular Category id"][i])
+            sub_category_name = str(xl["Sub category"][i]) 
+            loletterr = sub_category_name.lower()
+            menu_url = (loletterr.replace(" ", "-"))  
+ 
+            models.MastarSubCategory.objects.create(
+                master_category_id = int(master_cate_id),
+                regular_category_id = int(regular_cate_id),
+                sub_category_bangla = sub_category_name,
+                sub_category_english = sub_category_name,
+                menu_url = menu_url, 
+            ) 
+            update_count += 1
+        messages.success(request, "Sub Category Import successful.")
+        return redirect('/master-subcategory-list/')
+ 
+    else:
+        pass
+
+
+def importcategorywisebook(request):
+    if request.method == "POST":
+        xl = pd.read_excel(request.FILES["import_file"], "Sheet1")  
+        update_count = 1
+ 
+        for i in range(1,len(xl)): 
+            book_id  = xl["Book Id"][i]
+            cate_id = str(xl["Category Id"][i]) 
+ 
+            models.CategoryWiseBook.objects.create(
+                book_name_id = int(book_id),
+                category_name_id = int(cate_id), 
+            ) 
+            update_count += 1
+        messages.success(request, "Category Wise book Import successful.")
+        return redirect('/master-subcategory-list/')
+ 
+    else:
+        pass
+
+def importsubcategorywisebook(request):
+    if request.method == "POST":
+        xl = pd.read_excel(request.FILES["import_file"], "Sheet1")  
+        update_count = 1
+ 
+        for i in range(1,len(xl)): 
+            book_id  = xl["Book ID"][i]
+            cate_name = str(xl["Regular"][i]) 
+            subcat_name = str(xl["Sub category"][i])  
+
+            get_sub_cate = models.MastarSubCategory.objects.filter(regular_category__cat_name_bangla = cate_name, sub_category_bangla = subcat_name).first()
+            
+            models.SubCategoryWiseBook.objects.create(
+                book_name_id = int(book_id),
+                subcategory_name_id = int(get_sub_cate.id), 
+            ) 
+            update_count += 1
+        messages.success(request, "Sub Category Wise book Import successful.")
+        return redirect('/master-subcategory-list/')
+ 
+    else:
+        pass
+
+
+		
+
+
+    

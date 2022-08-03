@@ -178,4 +178,13 @@ def load_hold_order(request):
 
 
 
+@register.filter(name='subcategory_load')
+def category_wise_subcategory(request):
+    cat_list = models.BookCategory.objects.filter(status = True, Is_top_category = True).order_by('id')
+ 
+    if cat_list: 
+        return cat_list
+
+
+
 

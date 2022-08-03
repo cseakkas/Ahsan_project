@@ -170,7 +170,7 @@
                         <div class="row" id="bkash_payment_field">
                             
                             <div class="col-sm-12 form-group">
-                               <p style="font-size:13px;margin:0px;">অর্ডারের মূল্য বিকাশের মাধ্যমে পাঠিয়ে নিচের ফর্মটি পূরন করুন। এই মূহুর্ত যদি বেলেন্স না থাকে তাহলে আপনি পরবর্তীতে পেমেন্ট করে আমাদের পেইজে মেসেজ অথবা ফোনে জানিয়ে দিবেন । তবে এখন অর্ডার সম্পূর্ণ করার জন্য বিকাশ নাম্বারের পরিবর্তে <strong>01614344469</strong> এবং পে অ্যামাউন্ট এর পরিবর্তে <strong>WILLPAYLATER</strong> লিখুন। <br> <strong>Bkash Merchant Number : 01614344469</strong> </p>
+                               <p style="font-size:13px;margin:0px;">অর্ডারের মূল্য বিকাশের মাধ্যমে পাঠিয়ে নিচের ফর্মটি পূরন করুন। এই মূহুর্ত যদি বেলেন্স না থাকে তাহলে আপনি পরবর্তীতে পেমেন্ট করে আমাদের পেইজে মেসেজ অথবা ফোনে জানিয়ে দিবেন । তবে এখন অর্ডার সম্পূর্ণ করার জন্য বিকাশ নাম্বারের পরিবর্তে <strong>01737-419624</strong> এবং পে অ্যামাউন্ট এর পরিবর্তে <strong>WILLPAYLATER</strong> লিখুন। <br> <strong>Bkash Merchant Number : 01737-419624</strong> </p>
                             </div>
 
                             <div class="col-sm-12 form-group">
@@ -183,8 +183,21 @@
                             </div> 
                         </div>
                     </div>
+
+                     <!-- Pay in Aamarpay Payment Gateway  -->
+                     <div class="form-group">
+                        <label style="background:#e2e2e2;padding:15px;width:100%;border-radius: 5px;">
+                            <input type="radio" id="aamarpay" name="payment_type" class="payment_type" value="4"> Aamarpay   <img src="/static/publisher_app/images/aamarpay_logo.png" alt="" style="width:150px;float:right; height: 30px;">
+                        </label>
+                        <div class="row" id="aamarpay_payment" style="margin-left:30px;">
+                            <input type="text" name="is_aamarpay_payment" id="isAamarpay" hidden> 
+                            <input type="submit" name="submit" value="Aamarpay Payment" class="btn btn-info" /> <img src="/static/publisher_app/images/aamarpay_logo.png" alt="" style="width:150px;float:right; height: 30px;">
+                        </div>
+                    </div>  
+
+
                     <!-- Pay in Rocket  -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label style="background:#e2e2e2;padding:15px;width:100%;border-radius: 5px;">
                             <input type="radio" id="cash_on_rocket" name="payment_type" class="payment_type" value="3"> Rocket  <img src="/static/publisher_app/images/rocket.png" alt="" style="width: 41px;float:right;height: 23px;">
                         </label>
@@ -202,10 +215,10 @@
                                 <input  type="text" class="form-control" name="pay_amount_r" id="pay_amount">
                             </div> 
                         </div>
-                    </div>
+                    </div> -->
                     
                     <!-- Pay in Nagad  -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label style="background:#e2e2e2;padding:15px;width:100%;border-radius: 5px;">
                             <input type="radio" id="cash_on_nagad" name="payment_type" class="payment_type" value="4"> Nagad  <img src="/static/publisher_app/images/nagad.png" alt="" style="width:50px;float:right;">
                         </label>
@@ -222,10 +235,10 @@
                                 <input  type="text" class="form-control" name="pay_amount_n" id="pay_amount">
                             </div> 
                         </div>
-                    </div>
+                    </div> -->
                  
                     <div class="form-group"> 
-                        <input type="submit" name="submit"  value="Confirm Order" class="btn btn-success" /> 
+                        <input type="submit" name="submit" id="confirm_order"  value="Confirm Order" class="btn btn-success" /> 
                     </div>
                 </div>
             </div>
@@ -302,26 +315,43 @@ $('#mobile_number').on('keyup', function() {
     $("#bkash_payment_field").hide();
     $("#cash_on_rocket_field").hide();
     $("#cash_on_nagad_field").hide();
+    $("#aamarpay_payment").hide();
 	
     $("#cash_on_delivery").click(function(){
         $("#bkash_payment_field").hide(300);
 		$("#cash_on_rocket_field").hide(300);
         $("#cash_on_nagad_field").hide(300);
+        $("#aamarpay_payment").hide(300); 
+		$("#confirm_order").show();
     });
     $("#cash_on_bkash").click(function(){
         $("#bkash_payment_field").show(300);
 		$("#cash_on_rocket_field").hide(300);
         $("#cash_on_nagad_field").hide(300);
+        $("#aamarpay_payment").hide(300); 
+		$("#confirm_order").show();
     });
     $("#cash_on_rocket").click(function(){
         $("#cash_on_rocket_field").show(300);
 		$("#bkash_payment_field").hide(300);
         $("#cash_on_nagad_field").hide(300);
+        $("#aamarpay_payment").hide(300); 
+		$("#confirm_order").show();
     });
     $("#cash_on_nagad").click(function(){
         $("#cash_on_nagad_field").show(300);
 		$("#bkash_payment_field").hide(300);
 		$("#cash_on_rocket_field").hide(300);
+        $("#aamarpay_payment").hide(300); 
+		$("#confirm_order").show();
+    });
+    $("#aamarpay").click(function(){
+        $("#aamarpay_payment").show(300);
+		$("#bkash_payment_field").hide(300);
+		$("#cash_on_rocket_field").hide(300);
+		$("#cash_on_nagad_field").hide(300);
+		$("#confirm_order").hide(); 
+		$("#isAamarpay").val(5);
     });
 </script>
 

@@ -149,12 +149,60 @@
                 <div class="card-body">
                     <div class="table-responsive all_book_list">  
                         <h4 style="overflow: hidden;"> Book List ({{total_book }})
-                            <span style="float: right;">
+                            <!-- <span style="float: right;">
                                 <form method="POST"> {% csrf_token %}
                                     <input type="text" name="book_content_search" class="form-control" value="{{book_txt}}" placeholder="Search..." style="width:250px;float:right;margin-bottom:10px">
                                 </form> 
-                            </span>
+                            </span> -->
                         </h4>
+                        <form method="POST"> {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <label>ক্যাটাগরি </label>
+                                    <select class="form-control" id="category_name" name="category_name" >
+                                        <option value=""><strong>Select Category</strong></option> 
+                                        {% for cat in category_list %}
+                                            {% if cat.pk == category_id %}
+                                                <option value="{{ cat.pk }}" selected>{{ cat.cat_name_bangla }}</option>
+                                            {% else %}
+                                                <option value="{{ cat.pk }}">{{ cat.cat_name_bangla }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> সাব ক্যাটাগরি </label>
+                                    <select class="form-control CategoryWiseSubcategoyLoad" name="subcategory_name" id="subcategory_name" >
+                                          
+                                        <!-- {% for sub in sub_category_list %}
+                                            {% if sub.pk == subcategory_id %}
+                                                <option value="{{ sub.pk }}" selected>{{ sub.sub_category_bangla }}</option>
+                                            {% else %}
+                                                <option value="{{ sub.pk }}">{{ sub.sub_category_bangla }}</option>
+                                            {% endif %}
+                                        {% endfor %} -->
+                                    </select>
+                                </div>
+                                
+                                <div class="col-sm-3"> 
+                                    <label>পাবলিকেশন</label>
+                                    <select class="form-control" name="publisher_name" id="publisher_name" >
+                                        <option value=""><strong> পাবলিকেশন </strong></option>
+                                        {% for pub in publisher_list %}
+                                            {% if pub.pk == publisher_id %}
+                                                <option value="{{ pub.pk }} " selected>{{ pub.publisher_name_bangla }} </option>
+                                            {% else %}
+                                                <option value="{{ pub.pk }}">{{ pub.publisher_name_bangla }} </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-1"> 
+                                    <input style="margin-top: 25px;" type="submit" class="btn btn-success" value="Search">
+                                </div>
+                            </div>
+                        </form> 
+                        <br> 
                         
                         <table class="table table-striped">
                         <!-- <table class="table table-striped" id="datatablesSimple">  -->
@@ -164,6 +212,7 @@
                                     <th>Book Name</th>
                                     <th>Origin</th>
                                     <th style="width:150px">Category</th>
+                                    <th style="width:170px">Sub Category</th>
                                     <th>Author</th>
                                     <th>Publisher</th>
                                     <th style="width:75px;text-align: center;">Stock</th> 
@@ -179,6 +228,7 @@
                                     <td>{{ book.book_name_bangla }}</td>
                                     <td>{% if book.origin %}{{ book.origin }}{% endif %}</td>
                                     <td>{{ book.cat_name_bangla }}</td>
+                                    <td>{{ book.sub_category_bangla }}</td>
                                     <td>{{ book.writter_name_bangla }}</td>
                                     <td>{{ book.publisher_name_bangla }}</td> 
                                     <td style="text-align:center">  {{ book.quantity }} </td>
@@ -200,9 +250,7 @@
                             {% endfor %}
                             </tbody> 
                         </table> 
-
-                        
-                        
+ 
                         <form method="POST"> {% csrf_token %} 
                             <input type="text" id="active_page" value="{{ current_page_no }}" hidden />
                             <input type="text" name="book_content_search" value="{{ book_txt}}" hidden />
@@ -270,4 +318,36 @@
     pagination_sales_list();
  
 </script>
+
+<script>
+    $("#category_name").change(function(){
+        var category_id = $("#category_name").val();
+        $.ajax({
+            url: "/category-wise-subcategory/",
+            type:'POST',
+            data : {
+                category_id : category_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(results){ 
+                $(".CategoryWiseSubcategoyLoad").html("");
+                 
+                for(i = 0; i < results.length; i++){
+                    var subcat_id = results[i]['subcat_id'];
+                    var category_bangla = results[i]['subcat_bangla'];
+                    var subcat_english = results[i]['subcat_english'];
+                    appendItemOption = `
+                        <option value="`+subcat_id+`">`+category_bangla+`</option>
+                    `
+                    $(".CategoryWiseSubcategoyLoad").append(appendItemOption);
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+
+    });
+</script>
+
 {% endblock %}

@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>    
+    {% load data_load %}
+    {% load static %}
+    {% for profile in shop_profile_load|shop_profile|slice:"1" %}
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Ahsan.com is the largest online bookstore in Bangladesh.
+    Buy Islamic Book, Computer Programming and Most popular Novel, Story, Children and youngers, West Bengal, Fiction, Non fiction, Medical,
+    Engineering books from the biggest selection of Bangla books at lowest price to upper price. We maintainence Cash on
+    delivery, Parsel and courier service & Happy return policy & Free shipping offer available."/> 
+
+    <meta name="keywords" content="Ahsan, Ahsan Book Shop, Ahsan Online Book Shop, The best Saller book, Bela furabar age, peradoxical sajid, Arif Ajads book, Arif Azad Book, Moroner Age o pore, Mohanobi sallallahu er 24 hours Amol, Boi mela 2021, Best books in 2021, Aymon sadik er book, Best Math Books, Best of English Books, Munjerin Shahid English Spoken Books, Ahsan Online Shop Online Ahsan, Online Ahsan, Best Online Shop, Best Ahsan, Best Online Book Shop, Online Book Marketplace, Ahsan Largest Online Shop, Best Bookshop in Bangladesh, Ahsan BD Shop, Ahsan Largest Online BD Book Store, Ahsan Book Store, Ahsan Online Bookstore, Bangladesh Best Online Book Shop, BD Online Book Shop, Bangladeshi Online Bookstore, Bangladesh Ahsan book store">
+    <meta name="author" content="John Doe"> 
+    <!-- OG image  -->
+    <meta property="og:type" content="Ahsan || Best Online Book Shop"/>
+    <meta property="og:site_name" content="Ahsan || Best Online Book Shop"/> 
+    <meta property="og:title" content="{% block og_title %}{% endblock %}"/> 
+    <meta property="og:url" content="{% block og_url %}{% endblock %}"/> 
+    <meta property="og:image" content="{% block og_img %}{% endblock %}"/>
+    <meta property="og:description" content="{% block og_description %}{% endblock %}"/>
+    <title>{% block title %} Ahsan || Best Online Book Shop in Bangladesh {% endblock %} </title>
+  
+    <link rel="shortcut icon" href="/static/publisher_app/media/{{ profile.favicon_logo }}" />
+    <link rel="stylesheet" href="{% static 'publisher_app/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/e-product.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/sweetalert2.css' %}">
+    <link rel="stylesheet" href="{% static 'publisher_app/css/responsive_popup.css' %}">
+    <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Hind Siliguri' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'publisher_app/css/jquery-ui.css' %}"> 
+    <link rel="stylesheet" href="{% static 'publisher_app/css/pagination.css' %}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/css/ion.rangeSlider.min.css"/> 
+  
+	<link rel="stylesheet" id="brk-direction-offsets" href="{% static 'publisher_app/css/assets/offsets.css' %}">
+	<link id="brk-css-min" rel="stylesheet" href="{% static 'publisher_app/css/assets/style.css' %}">
+
+</head>
+
+<body>
+    <!-- Load Facebook SDK for JavaScript -->
+    <div id="fb-root"></div>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+            xfbml            : true,
+            version          : 'v9.0'
+            });
+        };
+
+        (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[i];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+        fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        </script>
+
+    <!-- Your Chat Plugin code -->
+    <div class="fb-customerchat"
+        attribution="setup_tool"
+        page_id="299741934289088"
+        theme_color="#0A7CFF">
+    </div> 
+    <header  class="logo_and_search_box" id="myHeader_fixed">
+			<div class="logo_and_search_box22">
+				<div class="container">
+					<div class="row"> 
+						<div class="col-sm-3" id="logo_area_for_mobile">
+							<div class="logo_area">
+                                <a href="/" class="logo"> 
+                                    <img src="/static/publisher_app/media/{{ profile.logo }}" alt="Ahsan Logo" >
+                                </a>							
+							</div>
+						</div> 
+                        <div class="col-sm-6" style="margin-top:30px;" id="hideForMobileMenu"> 
+                            <form method="POST" action="/bookSearch/"> {% csrf_token %}
+                                <input name="search_txt" id="txt_search_box" type="text" placeholder="Search book & writter..." class="form-control search_form_field" autocomplete="off">
+                                <button type="submit" id="search_button"><i class="fa fa-search"></i></button>
+                                <ul id="search_item_menu_list">
+                                    
+                                </ul>  
+                            </form>
+                        </div>
+						<div  id="short_menu_for_mobile" class="col-sm-3 track_order_and_user" style="margin-top:30px;">
+                            <ul>
+                                <li>
+                                    <a href="/wishlist-item/" class="cart_box">
+                                        <img src="/static/publisher_app/images/love.png" alt=""><span id="wishlist_items">{{wishlist_count}}</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/my-cart/"  class="cart_box">
+                                        <img src="/static/publisher_app/images/cart-48X48.png" alt=""><span id="cart_items"> {{ count }}</span>
+                                    </a>
+                                </li>
+                                <li class="for_desktop_profile_menu">
+                                    {% if request.session.userid %}
+                                        <a id="for_desktop_profile" href="#">
+                                            {% if request.session.customer_photo %}
+                                                <img src="/static/publisher_app/media/{{ request.session.customer_photo }}" alt="Customer Profile"> 
+                                            {% else %}
+                                                <img src="/static/publisher_app/images/sign-in-48X48.png" alt=""> 
+                                            {% endif %}
+                                            {{ request.session.customername }} 
+                                        </a>
+                                        <a id="for_mobile_profile" href="#" data-trigger="#my_offcanvas2">
+                                            {% if request.session.customer_photo %}
+                                                <img src="/static/publisher_app/media/{{ request.session.customer_photo }}" alt="Customer Profile"> 
+                                            {% else %}
+                                                <img src="/static/publisher_app/images/sign-in-48X48.png" alt=""> 
+                                            {% endif %}
+ 
+                                            {{ request.session.customername|truncatewords:1 }} 
+                                        </a>
+                                    {% else %}
+                                        <a href="/customer/login/"><img src="/static/publisher_app/images/sign-in-48X48.png" alt=""> Sign In</a>
+                                    {% endif %}
+
+                                    <!-- offcanvas panel right -->
+                                    <aside class="offcanvas offcanvas-right" id="my_offcanvas2">
+                                        <nav class="list-group list-group-flush">
+                                                <header class="bg-light border-bottom">
+                                                    <button class="btn-outline-danger btn-close"> &times </button>
+                                                    <h6 class="mb-0">{{ request.session.customername }}</h6>
+                                                </header>
+                                            <ul>
+                                                <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                                                <li><a href="/myorder/order-list/"><i class="fa fa-list-ol"></i> Order</a></li>
+                                                <li><a href="/my-wishlist/" class="my_acc_menu_active"><i class="fa fa-heart"></i> Wishlist</a></li>
+                                                <li><a href=""><i class="fa fa-credit-card-alt"></i> Wallet</a></li>
+                                                <li><a href=""><i class="fa fa-bell-o"></i> Notification</a></li>
+                                                <li><a href="/logout/"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                            </ul>
+                                        </nav>
+                                    </aside>
+                                    <!-- offcanvas panel right .end -->
+                                    <ul class="profile_menu_link">
+                                        <li><a href="/my-account/"><i class="fa fa-user"></i> Profile</a></li>
+                                        <li><a href="/myorder/order-list/"><i class="fa fa-list-ol"></i> Order</a></li>
+                                        <li><a href="/my-wishlist/" class="my_acc_menu_active"><i class="fa fa-heart"></i> Wishlist</a></li>
+                                        <li><a href=""><i class="fa fa-credit-card-alt"></i> Wallet</a></li>
+                                        <li><a href=""><i class="fa fa-bell-o"></i> Notification</a></li>
+                                        <li><a href="/logout/"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                             
+                        </div>
+                       
+						<div class="col-sm-5" style="margin-bottom:6px;margin-top:5px;" id="SowForMobileMenu">
+                            
+                            <form method="POST" action="bookSearch"> {% csrf_token %}
+                                <i id="responsive_toggle_menu" class="fa fa-bars" data-trigger="#my_offcanvas1" ></i>  
+                                <input name="search_txt" id="txt_search_box2" type="text" placeholder="Search" class="form-control search_form_field" autocomplete="off">
+                                <button type="submit" id="search_button"><i class="fa fa-search"></i></button> 
+                                <ul id="search_item_menu_list2">
+                                    
+                                </ul>  
+                            </form>
+                        </div>
+                        
+					</div>
+					
+				</div>
+            </div>	
+              
+            <div class="main-wrapper">
+                <main class="main-container">
+                    <div class="brk-header-mobile">
+                        <div class="brk-header-mobile__open brk-header-mobile__open_white">
+                            <span></span>
+                        </div>
+                    </div>
+                    <header class="brk-header brk-header_style-2 brk-header_color-white brk-header_skin-2 d-lg-flex flex-column" style="background:#1399A0" data-logo-src="img/logo-dark-2.png" data-bg-mobile="img/brk-bg-mobile-menu.jpg" data-brk-library="component__header">
+                        <div class="brk-header__main-bar brk-header_border-top order-lg-2 order-1">
+                            <div class="container">
+                                <div class="row align-items-center justify-content-between pl-lg-15 pr-lg-5"> 
+                                    <div class="col-lg-auto align-self-lg-stretch"> 
+                                        <nav class="brk-nav brk-header__item">
+                                            <ul class="brk-nav__menu"> 
+                                                {% regroup website_menu by master_category as top_menu %}
+                                                {% for menu in top_menu %} 
+                                                <li class="brk-nav__children brk-nav__full-width">
+                                                    <a href="#" data-brk-library="component__tabs">
+                                                        <span>{{ menu.grouper }}</span>
+                                                    </a>
+                                                    <div class="brk-nav__mega-menu brk-nav-drop-down">
+                                                        <div class="bg-white">
+                                                            <div class="brk-tabs brk-tabs-hovers" data-index="0">  
+                                                                {% regroup menu.list by regular_category as regular_menu %}
+                                                                <ul class="brk-tabs-nav"> 
+                                                                    {% for submenu in regular_menu %}
+                                                                        {% if forloop.counter == 1 %}
+                                                                            <li class="brk-tab">
+                                                                                <i class="fa fa-tasks"></i>
+                                                                                <a href="/book/category/{{ submenu.grouper.id }}/{{ submenu.grouper.menu_url }}">{{ submenu.grouper }}</a>
+                                                                            </li>
+                                                                        {% else %}
+                                                                            <li class="brk-tab">
+                                                                                <i class="fa fa-tasks"></i>
+                                                                                <a href="/book/category/{{ submenu.grouper.id }}/{{ submenu.grouper.menu_url }}">{{ submenu.grouper }}</a>
+                                                                            </li>
+                                                                        {% endif %} 
+                                                                    {% endfor %} 
+                                                                </ul>
+                                                                <div class="brk-tabs-content">
+                                                                    {% for submenu in regular_menu %}
+                                                                        {% if forloop.counter == 1 %} 
+                                                                            <div class="brk-tab-item" style>
+                                                                                <div class="row no-gutters"> 
+                                                                                    <div class="col-lg"> 
+                                                                                        <div class="brk-header_border-right pt-lg-20 pb-lg-30 pb-10 brk-header_h-100">
+                                                                                            <ul class="brk-header-list"> 
+                                                                                                {% for data in submenu.list|slice:16 %} 
+                                                                                                    {% if data.regular_category.id == submenu.grouper.id %}
+                                                                                                        <li>
+                                                                                                            <a href="/book/subcategory/{{ data.pk }}/{{ data.menu_url }}/">
+                                                                                                                <span class="brk-header-list__icon">
+                                                                                                                    <i class="fa fa-book"></i>
+                                                                                                                </span>
+                                                                                                                {{ data.sub_category_bangla }}
+                                                                                                            </a>
+                                                                                                        </li>
+                                                                                                    {% else %}
+                                                                                                        <li>
+                                                                                                            <a href="/book/subcategory/{{ data.pk }}/{{ data.menu_url }}/">
+                                                                                                                <span class="brk-header-list__icon">
+                                                                                                                    <i class="fa fa-book"></i>
+                                                                                                                </span>
+                                                                                                                {{ data.sub_category_bangla }}
+                                                                                                            </a>
+                                                                                                        </li>
+                                                                                                    {% endif %}
+                                                                                                {% endfor %}
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                </div>
+                                                                            </div>
+                                                                        {% else %} 
+                                                                            <div class="brk-tab-item">
+                                                                                <div class="row no-gutters"> 
+                                                                                    <div class="col-lg"> 
+                                                                                        <div class="brk-header_border-right pt-lg-20 pb-lg-30 pb-10 brk-header_h-100">
+                                                                                            <ul class="brk-header-list">
+                                                                                                {% for data in submenu.list|slice:16 %}
+                                                                                                    <li>
+                                                                                                        <a href="/book/subcategory/{{ data.pk }}/{{ data.menu_url }}/">
+                                                                                                            <span class="brk-header-list__icon">
+                                                                                                                <i class="fa fa-book"></i>
+                                                                                                            </span>
+                                                                                                            {{ data.sub_category_bangla }}
+                                                                                                        </a>
+                                                                                                    </li>
+                                                                                                {% endfor %}
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endif %} 
+                                                                    {% endfor %} 
+                                                                     
+                                                                </div>  
+                                                            </div>
+                                                        </div>
+                                                        <div class="allMenushowUnderDropdown">
+                                                            <a href="/book/categories/">সবগুলো দেখুন</a>
+                                                        </div>
+                                                    </div>  
+                                                </li>
+                                                {% endfor %}  
+                                                <li class="brk-nav__children brk-nav__full-width" style="position: relative;">
+                                                    <a href="#" data-brk-library="component__tabs">
+                                                        <span> বই সম্পর্কিত তথ্য</span>
+                                                    </a>
+                                                    <div class="brk-nav__mega-menu brk-nav-drop-down"  style="width:300px;position: absolute;padding:10px 0;background-color: #fafafa;">  
+                                                        <ul class="brk-tabs-nav bookMeneInformation" >
+                                                            <li class="brk-tab">
+                                                                <a href="/book/writter-list/"><i class="fa fa-user"></i> লেখক</a>
+                                                            </li>
+                                                            <li class="brk-tab">
+                                                                <a href="/book/categories/"><i class="fa fa-book"></i> বিষয় </a>
+                                                            </li> 
+                                                            <li class="brk-tab">
+                                                                <a href="/book/pulisher-list/"><i class="fa fa-home"></i> প্রকাশনী </a>
+                                                            </li> 
+                                                        </ul>  
+                                                    </div>
+                                                </li>  
+                                                <li><a href="#"> প্যাকেজ ও অফার সমূহ </a></li>
+                                                <li><a href="#"> জায়নামাজ ও টুপি </a></li>
+                                                <li><a href="#"> অন্যান্য আইটেম </a></li> 
+                                            </ul> 
+                                        </nav>
+                                    </div> 
+                                </div>
+                                 
+                            </div>
+                        </div>
+                    </header>
+                
+                </main>
+            </div>
+    
+		</div>
+    </header>
+
+
+{% block content %}
+
+{% endblock %}
+
+    
+    <section>
+        <footer>
+            <div class="top_wedget_service_items">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12" style="padding: 0 15px;">
+                            <h2>আমাদের সেবা সমূহ </h2>
+                        </div>
+                    </div>
+                    <div class="row"> 
+                        <div class="col-sm-12" style="padding: 0 25px;">
+                            <div class="row">
+                                <div class="col-sm-3" id="margin_6px">
+                                    <div class="services_items_pull">
+                                        <div class="service_icon_box">
+                                            <img src="/static/publisher_app/images/services/service1.PNG" alt="">
+                                        </div>  
+                                    </div>
+                                </div>
+                                <div class="col-sm-3" id="margin_6px">
+                                    <div class="services_items_pull">
+                                        <div class="service_icon_box">
+                                            <img src="/static/publisher_app/images/services/service2.PNG" alt="">
+                                        </div>   
+                                    </div>
+                                </div>
+                                <div class="col-sm-3" id="margin_6px">
+                                    <div class="services_items_pull">
+                                        <div class="service_icon_box">
+                                            <img src="/static/publisher_app/images/services/service3.PNG" alt="">
+                                        </div>  
+                                    </div>
+                                </div>
+                                <div class="col-sm-3" id="margin_6px">
+                                    <div class="services_items_pull">
+                                        <div class="service_icon_box">
+                                            <img src="/static/publisher_app/images/services/service4.PNG" alt=""> 
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="top_footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-2"></div> 
+                        <div class="col-sm-8">
+                            <img src="/static/publisher_app/images/services/payments.PNG" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main_footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="address_footer">
+                                <img src="/static/publisher_app/images/services/footer_logo.PNG" alt="" >
+                                {% if profile.mobile1 %}<p><i class="fa fa-volume-control-phone"></i> {{ profile.mobile1 }}</p>{% endif %}
+                                {% if profile.mobile2 %}<p><i class="fa fa-phone"></i> {{ profile.mobile2 }}</p>{% endif %}
+                                {% if profile.email1 %}<p style="font-family: sans-serif;"><i class="fa fa-envelope-o"></i> {{ profile.email1 }}</p>{% endif %}
+                                <p><i class="fa fa-map-marker" aria-hidden="true"></i> {{ profile.address }}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-2" id="footer_menu">
+                            <div class="footer_menu">
+                                <h4>প্রয়োজনীয় লিংক </h4>
+                                <ul>
+                                    <li><a href="/book/categories/">Category</a></li>
+                                    <li><a href="/book/writter-list/">Author</a></li>
+                                    <li><a href="/book/pulisher-list/">Publisher</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-2" id="footer_menu">
+                            <div class="footer_menu">
+                                <h4>Get To Know Us</h4>
+                                <ul>
+                                    <li><a href="/contact-us/">Contact Us</a></li>
+                                    <li><a href="/about-us/">About Us</a></li>
+                                    <li><a href="/complain/">Complain</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-2" id="footer_menu">
+                            <div class="footer_menu">
+                                <h4>শর্তাবলী ও নীতিমালা</h4>
+                                <ul>  
+                                    <li><a href="#">ব্লগ</a></li>
+                                    <li><a href="/my-cart/">শপিং ব্যাগ </a></li>
+                                    <li><a href="/wishlist-item/">আপনার পছন্দের তালিকা </a></li>
+                                    <li><a href="#"> শর্তাবলী </a></li>
+                                    <li><a href="#"> প্রশ্নোত্তর </a></li>
+                                    <li><a href="/refund-policy/"> রিফান্ড নীতিমালা </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="social_menu">
+                                <h6>Stay Connected With Us</h6>
+                                <ul>
+                                   
+                                    <li><a target="_blank" href="{{ profile.facebook_link }}" title="Facebook"> <img src="/static/publisher_app/images/facebook.png"  alt=""/> </a></li>
+                                    <li><a target="_blank" href="{{ profile.instagram_link }}" title="Instagram"> <img src="/static/publisher_app/images/instagram.png"  alt=""/> </a></li>
+                                    <li><a target="_blank" href="{{ profile.linkedin_link }}" title="Linkedin"> <img src="/static/publisher_app/images/LinkedIn.png"  alt=""/> </a></li>
+                                    <li><a target="_blank" href="{{ profile.youtube_link }}" title="Youtube"> <img src="/static/publisher_app/images/youtube.png"  alt=""/> </a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <style>
+                .footer_bottom{
+                    background-color: #0c6168;
+                    overflow: hidden;
+                    padding: 10px;
+                }
+                .footer_bottom p{
+                    margin-bottom: 0;
+                    text-align: center;color: #dee9e9;
+                }
+                .footer_bottom p span{
+                    float:right;
+                }
+                .footer_bottom p span a i{margin-right:6px;}
+                .footer_bottom p span a{
+                    text-decoration: none;
+                    color: #fbffff;
+                    font-weight: bold;
+                    font-size:14px;
+                }
+            </style>
+            <div class="footer_bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p> {{profile.staring_year}} Copyrigth@ahsanpublication <span><a target="_blank" href="https://bitscol.com"><i class="fa fa-desktop" aria-hidden="true"></i> Development By BITSCOL</a></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </section>
+
+    <b class="screen-overlay"></b>
+    <!-- offcanvas panel -->
+    <aside class="offcanvas" id="my_offcanvas1">  
+        <div class="responsive_menu_items1212">  
+            <ul>
+                <li class="active_menu"><a href="/"><i class="fa fa-home"></i> হোম </a> </li>
+                <li><a href="/book/writter-list/"><i class="fa fa-user"></i> লেখক</a></li>
+                <li><a href="/book/categories/"><i class="fa fa-map-o"></i>  ক্যাটাগরি </a></li>
+                <li><a href="#"><i class="fa fa-map-o"></i>  সাব ক্যাটাগরি </a></li>
+                <li><a href="/book/pulisher-list/"><i class="fa fa-bookmark"></i> প্রকাশনী</a></li>
+                <li><a href="#"><i class="fa fa-paw"></i> লাইফ স্টাইল</a></li>
+                <li><a href="#"><i class="fa fa-headphones"></i> ইলেক্ট্রনিক্স</a></li>
+                <li><a href="#"><i class="fa fa-pied-piper"></i> গ্রোসারি </a></li>
+                <li><a href="/about-us/" ><i class="fa fa-address-book"></i> আমাদের সম্পর্কে</a></li>
+                <li><a href="/contact-us/" ><i class="fa fa-phone"></i> যোগাযোগ</a></li>
+                <!-- <li><a href="#"> <i class="fa fa-book"></i> ব্লগ</a></li> -->
+                <li><a href="/complain/"><i class="fa fa-commenting-o"></i> অভিযোগ</a></li>
+            </ul>
+        </div>
+    </aside>
+<!-- offcanvas panel .end -->
+
+
+
+
+<div class="fixed_card_tem_display"> 
+    <div class="fixed_card_item">
+        <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+    </div>
+    <div class="fixed_card_item_price"> 
+        <h6> Item : <span id="page_cart"> {{ count }}</span></h6> 
+    </div> 
+</div>
+<div class="toggleCartSideBar">
+    <div class="cart_box_popup_hader">
+        <h4>আপনার শপিং কার্ট <span class="CloseBtn"><i class="fa fa-times"></i></span>
+        <input type="hidden" value="{{ request.session.abcd }}" id="customerSessionId">
+        </h4>
+    </div>  
+    <div class="cart_box_popup_item_area">
+         
+    </div>
+    <div class="cart_box_popup_footer">
+        <div class="totalPriceCart">
+            <p>মোটঃ  <del> ৳ <span id="TotalCartAmountOldPrice"></span></del> <span id="TotalCartAmount"></span> <span> ৳</span></p>
+        </div>
+        <div class="cartboxbottombuttom">
+            <a href="/my-cart/" class="shopping_bag"> শপিং ব্যাগ </a>
+            <a href="/my-cart/" class="cartOrderDone"> অর্ডার করুন</a>
+        </div>
+    </div> 
+</div>
+
+ 
+
+<script src="{% static 'publisher_app/js/jquery.js' %}"></script>  
+<script src="{% static 'publisher_app/js/jquery-ui.js' %}"></script>
+<script src="{% static 'publisher_app/js/owl.carousel.js' %}"></script>
+<script src="{% static 'publisher_app/js/bootstrap.js' %}"></script>
+<script src="{% static 'publisher_app/js/bootstrap.bundle.js' %}"></script>
+<script src="{% static 'publisher_app/js/sweetalert2.js' %}"></script>
+<script src="{% static 'publisher_app/js/rating.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min.js"></script>
+<script src="https://scripts.sandbox.bka.sh/versions/1.1.0-beta/checkout/bKash-checkout-sandbox.js"></script>
+  
+<script defer="defer" src="{% static 'publisher_app/js/scripts.min.js' %}"></script>
+
+<script>
+    $(".fixed_card_tem_display").click(function(){
+        $(".toggleCartSideBar").show();
+        var customerSessionId = $("#customerSessionId").val(); 
+        $.ajax({
+            url: "/loadCartItemByAjax/",
+            type:'GET',
+            data : {
+                customerSessionId : customerSessionId, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(results){ 
+                $('.cart_box_popup_item_area').html(" "); 
+                
+                var TotalCartAmount = results[0].total_sale_price 
+                var TotalCartAmountOldPrice = results[0].total_book_price 
+
+                for(i=0; i<results.length; i++){
+                    var myAppendDesign = ` 
+                        <div class="cart_popup_single_item">
+                            <div class="single_item_image">
+                                <a href="/book/`+results[i].book_id+`/`+results[i].book_slug+`/">
+                                    <img src="/static/publisher_app/media/`+results[i].book_image+`" >
+                                </a>
+                            </div>
+                            <div class="single_item_name">
+                                <a href="/book/`+results[i].book_id+`/`+results[i].book_slug+`/">
+                                    <p>`+results[i].book_name_bangla+`</p>
+                                    <p>`+results[i].publisher_name+`</p>
+                                    <p><span id="SalesPrice_`+results[i].book_id+`">`+results[i].sales_price+`</span> x <span id="TotalQty_`+results[i].book_id+`">`+results[i].quantity+`</span> = <span id="TotalValue_`+results[i].book_id+`">`+results[i].total_price+`</span></p> 
+                                </a>
+                                <p>
+                                    <input type="hidden" value="`+results[i].sale_price+`" id="bookSalePrice_`+results[i].book_id+`" >
+                                    <span onclick="CardBoxincrementQuantity('`+results[i].book_id+`','minus');" class="fa fa-minus-square"></span>
+                                    <input id="refrash_qty_`+results[i].book_id+`" type="number" style="width:40px;height:20px;border-radius: 3px;text-align: center;border:1px solid rgb(168, 168, 168);font-size:13px" value="`+results[i].quantity+`" min="1" max="50" readonly>
+                                    <span onclick="CardBoxincrementQuantity('`+results[i].book_id+`','plus');" class="fa fa-plus-square"></span>     
+                                </p>
+                            </div>
+                            <div class="single_item_delete">
+                                <i onclick="deleteCartItem('`+results[i].card_id+`')" class="fa fa-times"></i> 
+                            </div>
+                        </div> 
+                    `
+                    $('.cart_box_popup_item_area').append(myAppendDesign);   
+                }
+                $("#TotalCartAmount").html(TotalCartAmount);
+                $("#TotalCartAmountOldPrice").html(TotalCartAmountOldPrice);
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+
+    })
+    $(".CloseBtn").click(function(){
+        $(".toggleCartSideBar").hide();
+    })
+
+    function deleteCartItem(cart_id){
+        $.ajax({
+            url: "/deleteCartItemByAjax/",
+            type:'GET',
+            data : {
+                cart_id : cart_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                alert(data);
+                location.reload();
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    }
+
+    // Book Quantity increment or dicrement by click button 
+    function CardBoxincrementQuantity(id, status){   
+        $.ajax({
+            url: "/ajaxQuantityUpDown/",
+            type:'GET',
+            data : {
+                book_id : id, 
+                status : status,  
+            },
+            success: function(data){ 
+                if (data=="plus"){   
+                    var cart_qty = parseInt($("#refrash_qty_"+id).val()) + 1;
+                    $("#refrash_qty_"+id).val(cart_qty);
+                    var bookSalePrice = $("#bookSalePrice_"+id).val();
+                    var TotalQty = parseInt($("#TotalQty_"+id).html()) + 1;
+                    $("#TotalQty_"+id).html(TotalQty);
+                    var TotalValue = parseInt($("#TotalValue_"+id).html()) + parseInt(bookSalePrice);
+                    $("#TotalValue_"+id).html(TotalValue); 
+                    var TotalCartAmount = parseInt($("#TotalCartAmount").html()) + parseInt(bookSalePrice);
+                    $("#TotalCartAmount").html(TotalCartAmount);
+                    var TotalCartAmountOldPrice = parseInt($("#TotalCartAmountOldPrice").html()) + parseInt(bookSalePrice);
+                    $("#TotalCartAmountOldPrice").html(TotalCartAmountOldPrice); 
+
+                }else{ 
+                    if($("#refrash_qty_"+id).val() > '1'){ 
+                        var cart_qty = parseInt($("#refrash_qty_"+id).val()) - 1;
+                        $("#refrash_qty_"+id).val(cart_qty);
+                        var bookSalePrice = $("#bookSalePrice_"+id).val();
+                        var TotalQty = parseInt($("#TotalQty_"+id).html()) - 1;
+                        $("#TotalQty_"+id).html(TotalQty);
+                        var TotalValue = parseInt($("#TotalValue_"+id).html()) - parseInt(bookSalePrice);
+                        $("#TotalValue_"+id).html(TotalValue);
+                        var TotalCartAmount = parseInt($("#TotalCartAmount").html()) - parseInt(bookSalePrice);
+                        $("#TotalCartAmount").html(TotalCartAmount);
+                        var TotalCartAmountOldPrice = parseInt($("#TotalCartAmountOldPrice").html()) - parseInt(bookSalePrice);
+                        $("#TotalCartAmountOldPrice").html(TotalCartAmountOldPrice);
+                    }
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        }); 
+    }
+
+</script>
+
+
+<script>
+    $(".js-range-slider").ionRangeSlider({
+        skin: "round",
+        step: 100,
+        type: "double", 
+        min: 100,
+        max: 1000,
+        from: 200,
+        to: 500, 
+    });
+</script>
+<script>
+  
+    $("#txt_search_box").keyup(function(){
+        if($("#txt_search_box").val().length > 2)
+            {
+                var action_url = "/book-search/";
+                $.ajax({
+                    url: action_url,
+                    type:'GET',
+                    dataType:"json",
+                    data : {
+                        'src_data': $("#txt_search_box").val()
+                    },
+                    success: function(results){ 
+                        $("#search_item_menu_list").html("");
+                        for (i = 0; i < results.length; i++){  
+                            var book_id = results[i]['book_id'];
+                            var book_url = results[i]['book_url'];
+                            var book_name_bangla = results[i]['book_name_bangla'];
+                            var book_name_english = results[i]['book_name_english'];
+                            var book_price = results[i]['book_price'];
+                            var sale_price = results[i]['sale_price'];
+                            var discount = results[i]['book_discount'];
+                            var publisher_name_bangla = results[i]['publisher_name_bangla'];
+                            var publisher_name_english = results[i]['publisher_name_english'];
+                            var writter_name_english = results[i]['writter_name_english'];
+                            var writter_name_bangla = results[i]['writter_name_bangla']; 
+                            var book_img = results[i]['book_image']; 
+                        
+                            var zirovalue = parseInt(1)
+                            var discountv = parseInt(discount)
+                            if (discount > 0){
+                                $('#search_item_menu_list').append(  
+                                    '<li><a href="/book/'+book_id+'/'+book_url+'"><div class="search_book_image"><img src="/static/publisher_app/media/'+book_img+'" /></div> <div class="search_book_name"> <p>'+book_name_bangla.substring(0, 50)+'</p> <p><span> '+writter_name_bangla+ '</span> | <span> '+publisher_name_bangla+ '</span></p> </div> <div class="search_book_price"><h5><span>Tk. '+sale_price+'</span></h5>  <h5>('+discount+' % off ) </h5> </div> </a></li>'
+                                    );
+                            }else{
+                                $('#search_item_menu_list').append(  
+                                    '<li><a href="/book/'+book_id+'/'+book_url+'"><div class="search_book_image"><img src="/static/publisher_app/media/'+book_img+'" /></div> <div class="search_book_name"> <p>'+book_name_bangla.substring(0, 50)+'</p> <p><span> '+writter_name_bangla+ '</span> | <span> '+publisher_name_bangla+ '</span></p> </div> <div class="search_book_price"><h5><span>Tk. '+sale_price+'</span></h5>  <h5>(Fixed Price) </h5> </div> </a></li>'
+                                );
+                            }
+                        }
+                    },
+                    error: function(data){     
+                    }
+                });
+            }
+        else{
+            $("#search_item_menu_list").html("");
+        }
+    });
+</script>
+
+<script>
+    $("#txt_search_box2").keyup(function(){
+        if($("#txt_search_box2").val().length > 2)
+            {
+                var action_url = "/book-search/";
+                $.ajax({
+                    url: action_url,
+                    type:'GET',
+                    dataType:"json",
+                    data : {
+                        'src_data': $("#txt_search_box2").val()
+                    },
+                    success: function(results){ 
+                        $("#search_item_menu_list2").html("");
+                        for (i = 0; i < results.length; i++){  
+                            var book_id = results[i]['book_id'];
+                            var book_url = results[i]['book_url'] ;
+                            var book_name_bangla = results[i]['book_name_bangla'];
+                            var book_name_english = results[i]['book_name_english'];
+                            var book_price = results[i]['book_price'];
+                            var sale_price = results[i]['sale_price'];
+                            var discount = results[i]['book_discount'];
+                            var publisher_name_bangla = results[i]['publisher_name_bangla'];
+                            var publisher_name_english = results[i]['publisher_name_english'];
+                            var writter_name_english = results[i]['writter_name_english'];
+                            var writter_name_bangla = results[i]['writter_name_bangla']; 
+                            var book_img = results[i]['book_image'];
+                            var zirovalue = parseInt(1)
+                            var discountv = parseInt(discount)
+                            if (discount > 0){
+                                $('#search_item_menu_list2').append(  
+                                    '<li><a href="/book/'+book_id+'/'+book_url+'"><div class="search_book_image"><img src="/static/publisher_app/media/'+book_img+'" /></div> <div class="search_book_name"> <p>'+book_name_bangla.substring(0, 50)+'</p> <p><span> '+writter_name_bangla+ '</span> | <span> '+publisher_name_bangla+ '</span></p> </div> <div class="search_book_price"><h5><span>Tk. '+sale_price+'</span></h5>  <h5>('+discount+' % off ) </h5> </div> </a></li>'
+                                );
+                            }else{
+                                $('#search_item_menu_list2').append(  
+                                    '<li><a href="/book/'+book_id+'/'+book_url+'"><div class="search_book_image"><img src="/static/publisher_app/media/'+book_img+'" /></div> <div class="search_book_name"> <p>'+book_name_bangla.substring(0, 50)+'</p> <p><span> '+writter_name_bangla+ '</span> | <span> '+publisher_name_bangla+ '</span></p> </div> <div class="search_book_price"><h5><span>Tk. '+sale_price+'</span></h5>  <h5>(Fixed Price) </h5> </div> </a></li>'
+                                );
+                            } 
+                        }
+                    },
+                    error: function(data){     
+                    }
+                });
+            }
+        else{
+            $("#search_item_menu_list2").html("");
+        }
+    });
+</script>
+
+
+<script type="text/javascript">
+    /// some script
+    
+    // jquery ready start
+    $(document).ready(function() {
+        // jQuery code
+    
+          $("[data-trigger]").on("click", function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var offcanvas_id =  $(this).attr('data-trigger');
+            $(offcanvas_id).toggleClass("show");
+            $('body').toggleClass("offcanvas-active");
+            $(".screen-overlay").toggleClass("show");
+    
+        }); 
+    
+        // Close menu when pressing ESC
+        $(document).on('keydown', function(event) {
+            if(event.keyCode === 27) {
+               $(".offcanvas").removeClass("show");
+               $("body").removeClass("overlay-active");
+            }
+        });
+    
+        $(".btn-close, .screen-overlay").click(function(e){
+            $(".screen-overlay").removeClass("show");
+            $(".offcanvas").removeClass("show");
+            $("body").removeClass("offcanvas-active");
+    
+    
+        }); 
+        
+    }); // jquery end
+    </script>
+
+<script>
+    $("#for_desktop_profile").click(function(){
+        $(".profile_menu_link").slideToggle(200)
+    })
+    $("#for_mobile_profile").click(function(){
+        $(".profile_menu_link").slideToggle(200)
+    })
+    $("#emptycart").click(function(){
+        Swal.fire({
+            title: 'Your Cart is now Empty.',
+            showCancelButton: false,
+            showConfirmButton: false,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    })
+    // $("#responsive_toggle_menu").click(function(){
+    //     $(".responsive_menu_items1212").fadeToggle(300);
+    // })
+</script>
+ 
+<script>
+$(document).ready(function() {
+    $('.book-items').owlCarousel({
+        loop: true,
+        navText:['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+        nav: true,
+        margin: 25,
+        responsiveClass: true,
+        responsive: {
+          0: {
+            items: 1,
+            nav: true,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          300: {
+            items: 2,
+            nav: true,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          400: {
+            items: 2,
+            nav: true,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          500: {
+            items: 2,
+            nav: false,
+            loop: true,
+            autoplay:true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          600: {
+            items: 3,
+            nav: false,
+            autoplay:true,
+            loop: true,
+            autoplayTimeout:5000,
+            autoplayHoverPause:true
+          },
+          800: {
+            items: 4,
+            nav: false,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          1000: {
+            items: 4,
+            loop: true,
+            margin: 25,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          1100: {
+            items: 5,
+            loop: true,
+            margin: 25,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          },
+          1200: {
+            items:5,
+            loop: true,
+            margin: 25,
+            autoplay:true,
+            autoplayTimeout:7000,
+            autoplayHoverPause:true
+          }
+        }
+      })
+    })
+</script>
+
+<script>
+    window.onscroll = function() {myFunction()};
+    var header = document.getElementById("myHeader_fixed");
+    var sticky = header.offsetTop;
+        function myFunction() {
+        if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    }
+</script>
+
+<script>
+    //made by vipul mirajkar thevipulm.appspot.com
+      var TxtType = function(el, toRotate, period) {
+        this.toRotate = toRotate;
+        this.el = el;
+        this.loopNum = 0;
+        this.period = parseInt(period, 10) || 2000;
+        this.txt = '';
+        this.tick();
+        this.isDeleting = false;
+    };
+
+    TxtType.prototype.tick = function() {
+        var i = this.loopNum % this.toRotate.length;
+        var fullTxt = this.toRotate[i];
+
+        if (this.isDeleting) {
+        this.txt = fullTxt.substring(0, this.txt.length - 1);
+        } else {
+        this.txt = fullTxt.substring(0, this.txt.length + 1);
+        }
+
+        this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
+
+        var that = this;
+        var delta = 200 - Math.random() * 100;
+
+        if (this.isDeleting) { delta /= 2; }
+
+        if (!this.isDeleting && this.txt === fullTxt) {
+        delta = this.period;
+        this.isDeleting = true;
+        } else if (this.isDeleting && this.txt === '') {
+        this.isDeleting = false;
+        this.loopNum++;
+        delta = 500;
+        }
+
+        setTimeout(function() {
+        that.tick();
+        }, delta);
+    };
+
+    window.onload = function() {
+        var elements = document.getElementsByClassName('typewrite');
+        for (var i=0; i<elements.length; i++) {
+            var toRotate = elements[i].getAttribute('data-type');
+            var period = elements[i].getAttribute('data-period');
+            if (toRotate) {
+              new TxtType(elements[i], JSON.parse(toRotate), period);
+            }
+        }
+        // INJECT CSS
+        var css = document.createElement("style");
+        css.type = "text/css";
+        css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+        document.body.appendChild(css);
+    };
+</script>
+ 
+<script> 
+    function pagination_sales_list(){
+        $(".pagination li.list:lt(5)").css({'display':'inline', 'margin-right':'0px'});
+        $(".pagination li.list").first().css({'display':'inline'});
+        $(".pagination li.active").next().css( "display", "inline" );
+        $(".pagination li.active").prev().css( "display", "inline" );
+        $('.pagination li.list').last().css({'display':'inline', 'margin-left':'40px'});
+        $(".pagination li.list").last().addClass('last-place');
+        $(window).on('load', function() {
+            var current_lenght = $(".pagination li.list").length;
+            current_lenght = current_lenght -4;
+            console.log(current_lenght);
+            var current_id = $("#active_page").val();
+            current_id = parseInt(current_id);
+            if( current_id >=5 ){
+                $(".pagination li.list").first().addClass('first-place');
+                $(".pagination li.list:lt(5)").css({'display':'none'});
+                $(".pagination li.list").first().css({'display':'inline','margin-right':'40px'});
+                $(".pagination li.active").next().css( "display", "inline" );
+                $(".pagination li.active").prev().css( "display", "inline" );
+                if(current_lenght <= current_id){
+                    $('.pagination li.list').last().css({'display':'inline', 'margin-left':'0px'});
+                    $('.pagination li.list').slice(-5).css("display", "inline");
+                }
+            }
+        }); 
+    }
+     
+    pagination_sales_list();
+</script>  
+
+{% endfor %}
+</body>
+</html>

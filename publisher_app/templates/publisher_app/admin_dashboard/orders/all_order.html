@@ -92,7 +92,11 @@
                                     </td> 
                             
                                     <td class="positionTableTd">
-                                        <a data-toggle="tooltip" title="Update" href="/dashboard-orders-details/{{ord.order_number}}/" class="btn btn-warning" style="padding: 4px 6px;font-size: 13px;"> Update </a>
+                                        {% if ord.order_status == '5' %}
+                                            <button data-toggle="tooltip" title="Update" class="btn btn-warning" style="padding: 4px 6px;font-size: 13px;" disabled> Delivery </button>
+                                        {% else %}
+                                            <a data-toggle="tooltip" title="Update" href="/dashboard-orders-details/{{ord.order_number}}/" class="btn btn-warning" style="padding: 4px 6px;font-size: 13px;"> Update </a>
+                                        {% endif %}
                                         <a data-toggle="tooltip" target="_blank" title="View" href="/dashboard/orderWiseView/{{ord.order_number}}/" class="btn btn-info" style="padding: 4px 6px;font-size: 13px;"> <i class="fa fa-eye"></i> </a>
                                         <button type="button" class="btn btn-primary PrintCustomerInvoice" data-toggle="modal"  data-id="{{ ord.order_number }}" style="padding:2px 10px"><i class="fa fa-print"></i></button>
                                     </td>

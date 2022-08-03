@@ -192,6 +192,7 @@
 <script src="{% static 'publisher_app/js/jquery.js' %}"></script> 
 <script>
     function DeleteCartItem(id){
+        if (!confirm('Are you sure delete this item?')) return false;
         var url = "/cart/delete-item/";
         $.ajax({
             url: url,

@@ -25,9 +25,10 @@
                                 <th>Author Name English</th>
                                 <th>Mobile</th>
                                 <th>Email</th>
+                                <th>Type</th>
                                 <th>Address</th>
                                 <th style="width:60px">Photo</th>
-                                <th style="width:60px">Action</th>
+                                <th style="width:120px">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -38,6 +39,17 @@
                                     <td><a href="#" style="color:#203040;text-decoration:none">{{ auth.writter_name_english }}</a></td>
                                     <td>{{ auth.mobile }}</td>
                                     <td>{{ auth.email }}</td>
+                                    <td>
+                                        
+                                        {% if  auth.is_writer == 1 and auth.is_editor == 1 and auth.is_translator == 1 %} Writer, Editor, Translator 
+                                        {% elif  auth.is_writer == 1 and auth.is_editor == 1 and auth.is_translator != 1 %} Writer, Editor 
+                                        {% elif  auth.is_writer == 1 and auth.is_editor != 1 and auth.is_translator == 1 %} Writer, Translator 
+                                        {% elif  auth.is_writer != 1 and auth.is_editor == 1 and auth.is_translator == 1 %} Editor, Translator  
+                                        {% elif auth.is_writer == 1 %} Writer 
+                                        {% elif auth.is_translator == 1 %} Translator
+                                        {% elif auth.is_editor == 1 %} Editor 
+                                        {% else %} None Type Author {% endif %}
+                                    </td>
                                     <td>{{ auth.address }}</td>
                                     <td>
                                         {% if auth.writter_images %}
@@ -46,8 +58,9 @@
                                             <img src="/static/publisher_app/images/writter.jpg" alt="" style="width:50px;height:55px;border:1px solid #ccc;">
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <a style="font-size:13px;padding:3px 10px;" href="/book-author-update/{{auth.pk}}/" class="btn btn-info">Edit</a>
+                                    <td style="width:110px">
+                                        <a style="font-size:13px;padding:3px 10px;" href="/book-author-update/{{auth.pk}}/" class="btn btn-warning">Edit</a>
+                                        <a style="font-size:13px;padding:3px 10px;"  onclick="return confirm('Are you sure to delete this Author?');" href="/book-author-delete/{{auth.pk}}/" class="btn btn-danger">Del</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
