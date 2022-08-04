@@ -1779,23 +1779,29 @@ def publisher_wise_page(request, id, menu_url ):
     return render(request, 'publisher_app/publisher.html', context)
 
 def get_load_publisher_list(request):
-    id_list = json.loads(request.POST.get('publisher_id'))
+    publisher_id_list = json.loads(request.POST.get('publisher_id'))
+    writer_id_list = json.loads(request.POST.get('writer_id'))
+    category_id_list = json.loads(request.POST.get('category_id'))
     
-    book_list = []
-    for i in id_list:
-         
-        pub_book_list = models.BookList.objects.filter(publisher_id = int(i))
-        book_list.append(pub_book_list)
+    cat_book_list = []
+    writer_book_list = []
+    pub_book_list = []
+    for i in publisher_id_list:     
+        pub_book_list = models.BookList.objects.values("publisher","book_name_english","book_name_bangla").filter(publisher_id = int(i))
+        
+    for i in writer_id_list:     
+        writer_book_list = models.CategoryWiseBook.objects.values("book_name__book_name_bangla","category_name").filter(category_name_id = int(i))
+        
+    for i in category_id_list:     
+        cat_book_list = models.WritterWiseBook.objects.values("book_name__book_name_bangla","writter_name").filter(writter_name_id = int(i))
+        
+
     
-    for data in book_list:
-        print(data.count())
-    # pub_book_list = models.BookList.objects.raw('''
-    #     SELECT *, wl.book_name_id as wl_id FROM book_list INNER JOIN category_wise_book cwb ON book_list.id = cwb.book_name_id 
-    #     LEFT JOIN add_to_wishlist wl ON wl.book_name_id = book_list.id
-    #     INNER JOIN book_category_list bc ON cwb.category_name_id=bc.id  INNER JOIN writter_wise_book wwb ON book_list.id  = wwb.book_name_id
-    #     INNER JOIN book_writter_list au ON wwb.writter_name_id = au.id WHERE book_list.status = 1 and book_list.publisher_id = %s GROUP by wwb.book_name_id order by book_list.id desc ''', [publisher_info.id]
-    # )
-    data = "success"
+    data = {
+        "pub_book_list":list(pub_book_list),
+        "cat_book_list":list(cat_book_list),
+        "writer_book_list":list(writer_book_list),
+    }
     return JsonResponse(data, safe=False) 
 
 
