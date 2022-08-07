@@ -1,0 +1,45 @@
+{% extends 'publisher_app/base.html' %} 
+{% block title %} Ahsan || Aamarpay Successfully {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<style>
+    .paymentCancel{
+        width:60%;
+        margin: 50px auto;
+        box-shadow: 0px 1px 4px gray;
+        padding:50px;
+        border-radius: 5px;
+    }
+    .paymentCancel img{
+        width:450px;
+        height:250px;
+        margin:10px auto;
+        display: block;
+    }
+    .paymentCancel h2{
+        text-align: center;
+        color:rgb(10, 96, 92)
+    }
+    .paymentCancel p{
+        text-align: center;
+        font-size: 20px;
+    }
+</style>
+  
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="paymentCancel">
+                <img src="/static/publisher_app/images/payment_cancel.png" alt="">
+                <h2>Your payment has been canceled</h2>
+                <p>Thank you for stay with us. </p>
+                <p><a href="/" class="btn btn-success">Go to homepage</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

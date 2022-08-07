@@ -5,7 +5,9 @@
 <style>
     #dataTable_filter{
         display:none !important;
-    } 
+    }
+        
+
     .fg_product_pagination {
         clear: both;
         overflow: hidden;
@@ -56,7 +58,9 @@
         width: 100%;
         height: 100%;
         border: 1px solid #ddd;
-    } 
+    }
+
+    
     .fg_product_pagination ul.pagination li.list.first-place {
         position: relative;
         margin-right:40px;
@@ -154,24 +158,7 @@
                         <form method="POST"> {% csrf_token %}
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <label>Book Name </label>
-                                    <input style="padding: 3px 8px;" type="text" class="form-control" name="book_name" {% if book_name %} value="{{book_name}}" {% endif %} >
-                                </div>
-                                <div class="col-sm-3">
-                                    <label>Author </label>
-                                    <select class="form-control" name="author_name" id="author_name">
-                                        <option value=""><strong>Select Author</strong></option> 
-                                        {% for auth in author_list %}
-                                            {% if auth.pk == author_id %}
-                                                <option value="{{ auth.pk }}" selected>{{ auth.writter_name_bangla }} {{ auth.writter_name_english }}</option>
-                                            {% else %}
-                                                <option value="{{ auth.pk }}">{{ auth.writter_name_bangla }} {{ auth.writter_name_english }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label>Category </label>
+                                    <label>ক্যাটাগরি </label>
                                     <select class="form-control" id="category_name" name="category_name" >
                                         <option value=""><strong>Select Category</strong></option> 
                                         {% for cat in category_list %}
@@ -184,8 +171,8 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-3">
-                                    <label> Sub Category </label>
-                                    <select style="padding: 3px 8px;" class="form-control CategoryWiseSubcategoyLoad" name="subcategory_name" id="subcategory_name" >
+                                    <label> সাব ক্যাটাগরি </label>
+                                    <select class="form-control CategoryWiseSubcategoyLoad" name="subcategory_name" id="subcategory_name" >
                                           
                                         <!-- {% for sub in sub_category_list %}
                                             {% if sub.pk == subcategory_id %}
@@ -198,25 +185,17 @@
                                 </div>
                                 
                                 <div class="col-sm-3"> 
-                                    <label>Publication</label>
+                                    <label>পাবলিকেশন</label>
                                     <select class="form-control" name="publisher_name" id="publisher_name" >
-                                        <option value=""><strong> Publication </strong></option>
+                                        <option value=""><strong> পাবলিকেশন </strong></option>
                                         {% for pub in publisher_list %}
                                             {% if pub.pk == publisher_id %}
-                                                <option value="{{ pub.pk }} " selected>{{ pub.publisher_name_bangla }} {{ pub.publisher_name_english }} </option>
+                                                <option value="{{ pub.pk }} " selected>{{ pub.publisher_name_bangla }} </option>
                                             {% else %}
-                                                <option value="{{ pub.pk }}">{{ pub.publisher_name_bangla }} {{ pub.publisher_name_english }}</option>
+                                                <option value="{{ pub.pk }}">{{ pub.publisher_name_bangla }} </option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>
-                                </div>
-                                <div class="col-sm-2"> 
-                                    <label>Price Min</label>
-                                    <input style="padding: 3px 8px;" type="number" class="form-control" name="price_min" {% if price_max %} value="{{price_min}}" {% endif %}>
-                                </div>
-                                <div class="col-sm-2"> 
-                                    <label>Price Max</label>
-                                    <input style="padding: 3px 8px;" type="number" class="form-control" name="price_max" {% if price_max %} value="{{price_max}}" {% endif %} > 
                                 </div>
                                 <div class="col-sm-1"> 
                                     <input style="margin-top: 25px;" type="submit" class="btn btn-success" value="Search">
@@ -308,21 +287,8 @@
 
 </div>
 
-<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>  
-<script src="{% static 'publisher_app/admin_dashboard/js/select2.js' %}"></script>
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script> 
 <script> 
-    $("#author_name").select2({
-        placeholder: "Select Author",
-        allowClear: true
-    });
-    $("#category_name").select2({
-        placeholder: "Select Category",
-        allowClear: true
-    });
-    $("#publisher_name").select2({
-        placeholder: "Select Publisher",
-        allowClear: true
-    });
     function pagination_sales_list(){
         $(".pagination li.list:lt(5)").css({'display':'inline', 'margin-right':'0px'});
         $(".pagination li.list").first().css({'display':'inline'});

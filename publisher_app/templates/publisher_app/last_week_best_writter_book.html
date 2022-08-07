@@ -142,7 +142,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-3" style="padding-right: 0;">
-                <div class="product_filtering_sidebar">
+                <div class="product_filtering_sidebar" id="product_filtering_sidebar">
                     <div class="filtering_header">
                         <h4> <i class="fa fa-filter"></i> Filter <span>Clear All</span></h4>
                     </div>
@@ -152,38 +152,38 @@
                             <input type="text" class="js-range-slider" name="my_range" value=""/>    
                         </div>
                     </div>
-                    <div class="reating_filter_box">
+                    <!-- <div class="reating_filter_box">
                         <h5>Ratings</h5>
-                        <p> <label><input type="checkbox"> <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
-                        <p> <label><input type="checkbox"> <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
-                        <p> <label><input type="checkbox"> <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
-                        <p> <label><input type="checkbox"> <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i> </label> </p>
-                        <p> <label><input type="checkbox"> <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i> </label> </p>
-                    </div>
+                        <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
+                        <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
+                        <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i>  <i class="fa fa-star"></i> </label> </p>
+                        <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star"></i> </label> </p>
+                        <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i> </label> </p>
+                    </div> -->
                      
                     <div class="top_publisher_book">
-                        <h5>Book Types   <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
-                        <div class="display_top_books"> 
+                        <h5>Book Types <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
+                        <div class="display_top_books" id="loadPublish"> 
                             {% for publi in publisher_load|book_publisher %}
-                                <p> <label> <input type="checkbox" onclick="filter_publisher('{{publi.id}}')" > <a href="/book/publisher/{{ publi.pk }}/{{publi.menu_url}}"> {{ publi.publisher_name_bangla }} </a></label></p>
+                                <p> <label> <input id="publisher_{{publi.id}}" class="check_uncheck" type="checkbox" > <a href="/book/publisher/{{ publi.pk }}/{{publi.menu_url}}"> {{ publi.publisher_name_bangla }} </a></label></p>
                             {% endfor %}
                         </div> 
                     </div>
                     <div class="top_publisher_book">
-                        <h5>Authors  <!--  <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i>--> </h5>
+                        <h5>Authors <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books"> 
                             {% for writer in writter_load|book_writter %}
-                                <p> <label> <input type="checkbox"  onclick="filter_writter('{{writer.id}}')" ><a href="/book/author/{{ writer.pk }}/{{writer.menu_url}}"> {{ writer.writter_name_bangla }}</a></label></p>
+                                <p> <label> <input type="checkbox" id="writer_{{writer.id}}" class="check_uncheck"  onclick="filter_writter('{{writer.id}}')" ><a href="/book/author/{{ writer.pk }}/{{writer.menu_url}}"> {{ writer.writter_name_bangla }}</a></label></p>
                             {% endfor %}
                              
                         </div> 
                     </div>
                     <div class="top_publisher_book">
-                        <h5>Categories  <!--  <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
+                        <h5>Categories <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books">
                             <p> <label> <input type="checkbox" > Meena book House </label></p>
                             {% for category in category_load|book_category %}
-                                <p> <label> <input type="checkbox" ><a href="/book/category/{{ category.pk }}/{{category.menu_url}}">  {{ category.cat_name_bangla }} </a> </label></p>
+                                <p> <label> <input type="checkbox" id="category_{{category.id}}" class="check_uncheck" ><a href="/book/category/{{ category.pk }}/{{category.menu_url}}">  {{ category.cat_name_bangla }} </a> </label></p>
                             {% endfor %}
                         </div> 
                     </div> 
@@ -201,7 +201,10 @@
                         <h4>{{ cat_info.cat_name_bangla }}</h4> <hr>
                         <input type="text" id="category_id" value="{{ cat_info.id }}" hidden>
                         <input type="text" id="category_menu_url" value="{{ cat_info.menu_url }}" hidden>
-                        <div class="row" id="publisher_app_category_books_items_row">
+                        <div class="row" id="publisher_app_category_books_items_row1">
+
+                        </div>
+                        <div class="row" style="" id="publisher_app_category_books_items_row">
                             {% for book in last_week_best_writter_book %}  
                                 <div class="col-lg-3 col-md-3 col-xs-6" id="publisher_app_category_books_items">
                                     <div class="category_book_item"> 
@@ -707,6 +710,82 @@
             }
         });
     }
+</script>
+<script>
+    const publisher_id = []
+    const writer_id = []
+    const category_id = []
+    $(".check_uncheck").click(function(){
+        
+        var isChecked = $(this).prop('checked');
+        if(isChecked){
+            var ids =($(this).attr('id').split("_"));
+            var name = ids[0]
+            var id = ids[1]
+            if (name=="publisher"){
+                publisher_id.push(id)
+            }
+            if (name=="writer"){
+                writer_id.push(id)
+            }
+            if (name=="category"){
+                category_id.push(id)
+            }
+            // publisher_id.push(ids)
+        }
+        else{
+            var ids =($(this).attr('id').split("_"));
+            var name = ids[0]
+            var id = ids[1]
+            if (name=="publisher"){
+                publisher_id.pop(id)
+            }
+            if (name=="writer"){
+                writer_id.pop(id)
+            }
+            if (name=="category"){
+                category_id.pop(id)
+            }
+            // publisher_id.push(ids)
+        }
+        
+        $.ajax({
+            url: "/get-load-publisher-list/",
+            type:'POST',
+            data : {
+                publisher_id : JSON.stringify(publisher_id), 
+                writer_id : JSON.stringify(writer_id), 
+                category_id : JSON.stringify(category_id), 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){ 
+                $("#publisher_app_category_books_items_row1").html("")
+                $("#publisher_app_category_books_items_row1").append(data.html)
+                if (data.showdata.length > 0){
+                    $("#publisher_app_category_books_items_row").css("display","block")
+                }
+                if (data.showdata.length > 0){
+                    $("#publisher_app_category_books_items_row").css("display","none")
+                }
+                    
+                for(i=0; i <= data.pub_book_list.length; i++){
+                    var book = data.pub_book_list[i].book_name_bangla
+                    let books = '<p>'+book+'</p>' 
+                    $("#publisher_app_category_books_items_row1").append(books);
+                }
+                for(i=0; i <= data.writer_book_list.length; i++){
+                    // console.log("name",data.writer_book_list[i])
+                }
+                for(i=0; i <= data.cat_book_list.length; i++){
+                    // console.log("name",data.cat_book_list[i])
+                }
+            },
+            error: function(data){ 
+
+            }
+        });
+        
+    })
 </script>
 
 {% endblock %}

@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'publisher_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecom3_ahsan',
+        'NAME': 'ahsan_live_db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

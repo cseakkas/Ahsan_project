@@ -85,10 +85,12 @@
                         <h4>{{ publisher_info.publisher_name_bangla }} এর বই সমূহ</h4> <hr>
                         <input type="text" id="publisher_id" value="{{ publisher_info.id }}" hidden>
                         <input type="text" id="publisher_menu_url" value="{{ publisher_info.menu_url }}" hidden>
-                        
-                        <div class="row" id="publisher_app_category_books_items_row">
+                        <div class="row" id="publisher_app_category_books_items_row1">
+
+                        </div>
+                        <div class="row" style="" id="publisher_app_category_books_items_row">
                                 {% for book in pub_book_list %}  
-                                 <!-- <div class="col-lg-3 col-md-3 col-xs-6" id="publisher_app_category_books_items">
+                                 <div class="col-lg-3 col-md-3 col-xs-6" id="publisher_app_category_books_items">
                                     <div class="category_book_item"> 
                                         <div class="product_image_display"> 
                                             {% if book.discount > 0 %}
@@ -112,9 +114,8 @@
                                                 </div>
                                             {% endif %}
 
-                                            {% if book.thumbnail %}
-                                                <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.thumbnail }}"></a>
-                                            {% elif book.book_image %}
+                                            
+                                            {% if book.book_image %}
                                                 <a href="/book/{{ book.pk }}/{{book.slug}}/"> <img src="/static/publisher_app/media/{{ book.book_image }}"></a>
                                             {% else %}
                                                 <a href="/book/{{ book.pk }}/{{book.slug}}/"><img src="/static/publisher_app/images/book_thamb.jpg" ></a>
@@ -146,7 +147,7 @@
                                             </center>
                                         </div>
                                     </div>
-                                </div> -->
+                                </div>
                                 {% endfor %}
                               </div>
 
@@ -339,6 +340,21 @@
             }
             // publisher_id.push(ids)
         }
+        else{
+            var ids =($(this).attr('id').split("_"));
+            var name = ids[0]
+            var id = ids[1]
+            if (name=="publisher"){
+                publisher_id.pop(id)
+            }
+            if (name=="writer"){
+                writer_id.pop(id)
+            }
+            if (name=="category"){
+                category_id.pop(id)
+            }
+            // publisher_id.push(ids)
+        }
         
         $.ajax({
             url: "/get-load-publisher-list/",
@@ -350,13 +366,19 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function(data){ 
-                console.log("length",data.pub_book_list.length)
-                console.log("length",data.cat_book_list.length)
-                console.log("length",data.writer_book_list.length)
+                $("#publisher_app_category_books_items_row1").html("")
+                $("#publisher_app_category_books_items_row1").append(data.html)
+                if (data.showdata.length > 0){
+                    $("#publisher_app_category_books_items_row").css("display","block")
+                }
+                if (data.showdata.length > 0){
+                    $("#publisher_app_category_books_items_row").css("display","none")
+                }
+                    
                 for(i=0; i <= data.pub_book_list.length; i++){
                     var book = data.pub_book_list[i].book_name_bangla
                     let books = '<p>'+book+'</p>' 
-                    $("#publisher_app_category_books_items_row").append(books);
+                    $("#publisher_app_category_books_items_row1").append(books);
                 }
                 for(i=0; i <= data.writer_book_list.length; i++){
                     // console.log("name",data.writer_book_list[i])

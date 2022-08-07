@@ -34,8 +34,9 @@ value = None
 import datetime
 import time 
 import random
-
+from django.views.decorators.csrf import csrf_exempt
 import io, os, xlsxwriter
+import pandas as pd
 
 @employeeLogin
 def dashboard_bind_district_wise_upozilla(request): 
@@ -850,35 +851,35 @@ def master_subcategory_delete(request, id):
     models.MastarSubCategory.objects.filter(id=id).delete()
     messages.success(request, "Sub Category delete successful.")
     return redirect('/master-subcategory-list/')
-
-
-from django.views.decorators.csrf import csrf_exempt
-
+ 
 @csrf_exempt
-def payment_success(request):
-
+def payment_success(request): 
     context = { 
         'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
-
-    }
-
-
+    } 
     return render(request, 'publisher_app/aamarpay/success.html', context) 
 
+@csrf_exempt
 def payment_cancel(request):
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    } 
+    return render(request, 'publisher_app/aamarpay/cancel.html', context) 
 
-    return 
-
-def payment_failed(request):
-
-    return 
-
-
-
-import pandas as pd
-
+@csrf_exempt
+def payment_failed(request): 
+    print(request.POST.__dict__)  
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
+    } 
+    return render(request, 'publisher_app/aamarpay/failed.html', context)  
+ 
 def importSubcategory(request):
     if request.method == "POST":
         xl = pd.read_excel(request.FILES["import_file"], "Sheet1") 

@@ -59,7 +59,7 @@
                     </div>
                     <div class="subCategory_menu">
                         {% for data in category.mastarsubcategory_set.all %}
-                            <a href="">{{ data.sub_category_bangla }}</a>
+                            <a href="/book/subcategory/{{data.pk}}/{{data.menu_url}}/">{{ data.sub_category_bangla }}</a>
                         {% endfor %}
                     </div>
                 </div>

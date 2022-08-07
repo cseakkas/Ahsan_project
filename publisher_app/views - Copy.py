@@ -34,10 +34,6 @@ import requests
 import json
 import datetime 
 from num2words import num2words 
-from aamarpay.aamarpay import aamarPay
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
- 
 
 def check_user_permission(request, menu_url):
     chk_privilege    = models.UserAccessControl.objects.filter(user_id = int(request.session.get("user_id")), menu_id__menu_url = menu_url, menu_id__status = True, status = True).first()
@@ -526,7 +522,12 @@ def user_logout(request):
 
     return redirect('/customer/login/')
  
-  
+ 
+
+from aamarpay.aamarpay import aamarPay
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
+
 @csrf_protect
 def checkout_order(request):   
     year = str(timezone.now().year) 
@@ -708,7 +709,7 @@ def checkout_order(request):
                         ) 
                         models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
                 
-                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
+                    models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
                 return redirect(paymentpath)
   
         else:                              ####----------- Other Payment options ------------- ####### 
@@ -800,7 +801,7 @@ def checkout_order(request):
     }
     return render(request, 'publisher_app/checkout.html', context)
 
- 
+
 def checkout_order_now(request, id, qty):   
     year = str(timezone.now().year) 
     sm_year = year[-2:]  
@@ -1777,8 +1778,6 @@ def publisher_wise_page(request, id, menu_url ):
     }
     return render(request, 'publisher_app/publisher.html', context)
 
-from iteration_utilities import unique_everseen
-
 def get_load_publisher_list(request):
     publisher_id_list = json.loads(request.POST.get('publisher_id'))
     writer_id_list = json.loads(request.POST.get('writer_id'))
@@ -1793,81 +1792,27 @@ def get_load_publisher_list(request):
 
 
     cat_book_list = [] 
-    category_book_list = [] 
     pub_book_list = []
-    writer_book_list = []
-    final_book_list = []
-    book_id0 = []
-    book_id1 = []
-    book_id2 = []
-    book_id3 = []
-         
-
-
-    
     for i in publisher_id_list:     
-        pub_book_list += models.BookList.objects.filter(publisher_id = int(i))
-
-    for book_list in pub_book_list:
-        book_id1.append(int(book_list.id))
-
+        pub_book_list = models.BookList.objects.filter(publisher_id = int(i))
+        
+    # for i in category_id_list:     
+    #     cat_book_list = models.CategoryWiseBook.objects.filter(category_name_id = int(i))
+    # for data in cat_book_list:
+    #     print("id",data.book_name.id)
+    #     pub_book_list = models.BookList.objects.filter(id = data.book_name.id) 
+ 
     for data in writer_id_list: 
-        writer_book_list += models.WritterWiseBook.objects.raw("SELECT bk.id, bk.book_name_bangla, bk.book_name_english, bwl.writter_name_bangla, bwl.writter_name_english FROM `writter_wise_book` wwb INNER JOIN book_writter_list bwl ON wwb.writter_name_id = bwl.id INNER JOIN book_list bk on bk.id = wwb.book_name_id WHERE bwl.id = %s", [data]) 
-        writer_book_list = list(writer_book_list)
-    
-    for book_list in writer_book_list:
-        book_id2.append(int(book_list.id))
+        writer_book_list = models.WritterWiseBook.objects.raw("SELECT bk.id, bk.book_name_bangla, bk.book_name_english, bwl.writter_name_bangla, bwl.writter_name_english FROM `writter_wise_book` wwb LEFT JOIN book_writter_list bwl ON wwb.writter_name_id = bwl.id left JOIN book_list bk on bk.id = wwb.book_name_id WHERE bwl.id = %s", [data]) 
+        for obj in writer_book_list: 
+            print("book id is : ", obj.id, " and Book name is : ", obj.book_name_english, " and writer is :", obj.writter_name_english) 
 
-    for data in category_id_list:  
-        cat_book_list += models.CategoryWiseBook.objects.filter(category_name_id = int(data))
-
-        category_book_list = list(cat_book_list)
-
-    for book_list in cat_book_list:
-        book_id3.append(int(book_list.book_name.id))
-
-    print(len(book_id1))
-    print(len(book_id2))
-    print(len(book_id3))   
-    book_id0 = set(book_id0)
-    book_id1 = set(book_id1)
-    book_id2 = set(book_id2)
-    book_id3 = set(book_id3)
-    showdata = ""
-    if len(book_id2) == 0 and len(book_id3) == 0 and len(book_id1) == 0:
-        final_id_list = []
-        showdata = 1
-    elif len(book_id2) == 0 and len(book_id3) == 0:
-        final_id_list = book_id1
-    elif len(book_id1) == 0 and len(book_id3) == 0:
-        final_id_list = book_id2
-    elif len(book_id1) == 0 and len(book_id2) == 0:
-        final_id_list = book_id3
-    elif len(book_id1) == 0:
-        final_id_list = set(book_id2.intersection(book_id3))
-    elif len(book_id2) == 0:
-        final_id_list = set(book_id1.intersection(book_id3))
-    elif len(book_id3) == 0:
-        final_id_list = set(book_id1.intersection(book_id2))
-    else:
-        set1 = set(book_id1.intersection(book_id2))
-        final_id_list = set(set1.intersection(book_id3))
-    
-    final_id_list = list(final_id_list)
-    
-    fitered_book_list = []
-    for id in final_id_list:
-        fitered_book_list += models.BookList.objects.filter(id = id)
-
-    
+    # pub_book_list = models.BookList.objects.filter(id = data.book_name.id)
+    print(type(pub_book_list))
     html,discount,wish_list_html,button,image, = "","","","",""
-    for counter, i in enumerate(fitered_book_list):
+    for counter, i in enumerate(pub_book_list):
 
         writer_name = models.WritterWiseBook.objects.filter(book_name_id = i.id).first()
-        if writer_name:
-            writer =  writer_name.writter_name
-        else:
-            writer =  ""
         # print(name)
 
         if i.discount > 0:
@@ -1917,7 +1862,7 @@ def get_load_publisher_list(request):
                     <div class="product-content"> 
                         
                         <h3 class=""><a href="/book/"""+str(i.pk)+"""/"""+str(i.slug)+"""/">"""+str(i.book_name_bangla)+"""</a></h3>
-                        <h6 class="writer">"""+str(writer)+"""</h6>
+                        <h6 class="writer">"""+str()+"""</h6>
                         <span class="price"> Tk. """+str(i.sale_price)+""" </span> 
                         <div class="cart_submit_add" id="cart_submit_add" hidden>
                             <input type="text" id='"""+str(i.pk)+"""_book_id' value='"""+str(i.pk)+"""'>
@@ -1939,7 +1884,6 @@ def get_load_publisher_list(request):
     
     data = {
         "html":html,
-        "showdata":showdata,
         # "pub_book_list":list(pub_book_list),
         # "cat_book_list":list(cat_book_list),
         # "writer_book_list":list(writer_book_list),
@@ -2896,7 +2840,6 @@ def bookWisePreviewImageClear(request):
         data = "success"
         return JsonResponse(data, safe=False)
 
-
 @employeeLogin
 def book_list(request):  
     chk_permission   = check_user_permission(request,'/products/book-list/')
@@ -2904,8 +2847,12 @@ def book_list(request):
         category_list       = models.BookCategory.objects.filter(status=True)
         sub_category_list   = models.MastarSubCategory.objects.filter(status=True)
         publisher_list      = models.Publisher.objects.filter(status=True)
-        author_list      = models.BookWritter.objects.filter(status=True)
-        if request.method == "GET": 
+        if request.method == "GET":
+            # book_list_total = models.BookList.objects.raw('''
+            #     SELECT * FROM book_list bk LEFT JOIN category_wise_book bwc ON bk.id = bwc.book_name_id LEFT JOIN book_category_list bc ON bwc.category_name_id = bc.id 
+            #     LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bw ON wwb.writter_name_id = bw.id
+            #     LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id GROUP BY bwc.book_name_id ORDER BY bk.id desc
+            # ''')
             book_list_total = models.BookList.objects.raw('''
                 SELECT bk.id, bk.book_name_bangla, bk.origin, bk.book_image, bk.book_price, bk.sale_price, bk.stock_info, 
                 pub.publisher_name_bangla, bcl.cat_name_bangla, msc.sub_category_bangla, bwl.writter_name_bangla 
@@ -2942,56 +2889,35 @@ def book_list(request):
                 "category_list": category_list,  
                 "sub_category_list": sub_category_list,  
                 "publisher_list": publisher_list,  
-                "author_list": author_list,  
             }
             return render(request, 'publisher_app/admin_dashboard/products/book_list.html', context)
         
         else:   
-            book_name           = request.POST.get("book_name")
-            category_id         = request.POST.get("category_name") 
-            subcategory_id      = request.POST.get("subcategory_name") 
-            publisher_id        = request.POST.get("publisher_name")  
-            author_id           = request.POST.get("author_name")  
-            price_min           = request.POST.get("price_min")  
-            price_max           = request.POST.get("price_max")  
-  
+            category_id = request.POST.get("category_name") 
+            subcategory_id = request.POST.get("subcategory_name") 
+            publisher_id = request.POST.get("publisher_name")  
+
+            print("publisher_id :", publisher_id)
+
             arr = []
             query_str = ""
             book_list_total = ""
-
-            if book_name:  
-                book_name_search = str("%")+book_name+str("%")
-                arr.append(book_name_search) 
-                query_str += " and bk.book_name_bangla like %s"
 
             if category_id:
                 category_id = int(category_id)
                 arr.append(category_id)
                 query_str += " and bcl.id = %s" 
 
-            if author_id:
-                author_id = int(author_id)
-                arr.append(author_id)
-                query_str += " and bwl.id = %s" 
-
             if subcategory_id:
                 subcategory_id = int(subcategory_id)
                 arr.append(subcategory_id)
                 query_str += " and msc.id = %s"
-            if price_min: 
-                price_min = int(price_min)
-                arr.append(price_min)
-                query_str += " and bk.sale_price >= %s"
-            if price_max: 
-                price_max = int(price_max)
-                arr.append(price_max)
-                query_str += " and bk.sale_price <= %s"
 
             if publisher_id:
                 publisher_id = int(publisher_id)
                 arr.append(publisher_id)
                 query_str += " and bk.publisher_id = %s"
-          
+           
             book_list_total = models.BookList.objects.raw(''' 
                 SELECT bk.id, bk.book_name_bangla, bk.origin, bk.book_image, bk.book_price, bk.sale_price, 
                 bk.stock_info, pub.publisher_name_bangla, bcl.cat_name_bangla, msc.sub_category_bangla, 
@@ -3003,8 +2929,9 @@ def book_list(request):
                 LEFT JOIN book_writter_list bwl ON bwl.id = wwb.writter_name_id
                 WHERE bk.status = 1 and bcl.status = 1 and bwl.status = 1 '''+str(query_str)+''' ORDER BY bcl.id asc ''', arr
             ) 
-            print("query_str : ", book_list_total.query)
- 
+
+            print("book_list_total : ", book_list_total.query)
+              
             to_entry = models.BookList.objects.raw("SELECT id, COUNT(id) as total_entry FROM `book_list`") 
             
             page_number = request.GET.get('page')
@@ -3030,15 +2957,10 @@ def book_list(request):
                 "current_page_no": page_number,  
                 "category_list": category_list,  
                 "sub_category_list": sub_category_list,  
-                "author_list": author_list,  
                 "publisher_list": publisher_list,    
                 "category_id": category_id,    
                 "publisher_id": publisher_id,    
                 "subcategory_id": subcategory_id,    
-                "book_name": book_name,    
-                "author_id": author_id,    
-                "price_min": price_min,    
-                "price_max": price_max,    
             }
             return render(request, 'publisher_app/admin_dashboard/products/book_list.html', context)
 
