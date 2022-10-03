@@ -1,3 +1,4 @@
+from csv import writer
 import os
 from socket import create_connection
 from unicodedata import category
@@ -21,12 +22,15 @@ class PublisherProfile(models.Model):
     mobile1      = models.CharField(max_length=15,  blank=True)
     mobile2      = models.CharField(max_length=15,  blank=True)
     address      = models.TextField(blank=True)
-    pro_details  = models.TextField(blank=True)
+    pro_details  = RichTextField(blank=True)
     logo           = models.ImageField(upload_to='images/logo')
     favicon_logo   = models.ImageField(upload_to='images/logo')
-    about_content  = models.TextField(blank=True)
+    about_content  = RichTextField(blank=True)
+    about_content  = RichTextField(blank=True)
     about_images   = models.ImageField(upload_to='images/about_images')
-    why_buy        = models.TextField(blank=True)
+    why_buy        = models.TextField(blank=True) 
+    shipping_policy  = RichTextField(blank=True)
+    terms_condition  = RichTextField(blank=True) 
     map_locationo  = models.TextField(blank=True)
     facebook_link  = models.TextField(blank=True)
     instagram_link  = models.TextField(blank=True)
@@ -227,7 +231,7 @@ class BookList(models.Model):
     edition        = models.CharField(max_length=50,blank=True, null = True)
     language       = models.CharField(max_length=100, blank=True, null = True)
     unit_price     = models.IntegerField(default=0) 
-    purchase_discount   = models.CharField(max_length=15, default=0)
+    purchase_discount   = models.CharField(max_length=15, blank=True, null = True)
     book_price     = models.CharField(max_length=15, blank=True, null = True) 
     sale_price     = models.CharField(max_length=15, blank=True, null = True)
     coupon_price   = models.IntegerField(default = 0, blank=True, null = True)
@@ -251,6 +255,7 @@ class BookList(models.Model):
     detail         = RichTextField(blank=True, null = True)
     video_link     = models.TextField(blank=True, null = True)
     is_pre_image   = models.BooleanField(default=0)
+    is_package     = models.BooleanField(default=0) # is_package = 1 means Package else single book is_package = 0
     status         = models.BooleanField(default=1)
  
 
@@ -300,8 +305,7 @@ class WritterWiseBook(models.Model):
     writter_name     = models.ForeignKey(BookWritter, on_delete=models.DO_NOTHING, blank = True, null=True)
     status           = models.BooleanField(default=True)
 
-    def __int__(self):
-        return self.writter_name
+    
     
     class Meta:
         db_table = 'writter_wise_book'
@@ -342,7 +346,7 @@ class AddToCart(models.Model):
     discount    = models.IntegerField(default = 0)
     quantity    = models.IntegerField(default = 1)
     add_date    = models.DateTimeField(auto_now_add = True)
-    session_key = models.CharField(max_length=230)
+    session_key = models.CharField(max_length=230) 
 
     def __str__(self):
         return str(self.book_name)
@@ -557,6 +561,7 @@ class GatewayePayment(models.Model):
     amount          = models.IntegerField(default=0)   
     transaction_id  = models.CharField(max_length=100,blank = True, null=True)
     created         = models.DateTimeField(auto_now_add=True, null=True)
+    order_number    = models.IntegerField(default=0)
     status          = models.BooleanField(default=1)
 
     def __str__(self):
@@ -566,19 +571,31 @@ class GatewayePayment(models.Model):
         db_table = 'gatewaye_payment_list'
 
  
-class BookPackageDetails(models.Model): 
-    package_name = models.CharField(max_length=30)
-    booklist_master_id  = models.IntegerField(blank=True, null = True)
-    book_name           = models.ForeignKey(BookList, on_delete=models.DO_NOTHING, blank = True, null=True)
-    package_price       = models.IntegerField(default = 0)
-    package_discount    = models.IntegerField(default = 0)  
-    status        = models.BooleanField(default=1) 
+class PackageList(models.Model): 
+    bangla_name                = models.CharField(max_length=230) 
+    english_name               = models.CharField(max_length=230) 
+    product                    = models.ForeignKey(BookList, on_delete = models.DO_NOTHING, null=True)
+    unit_price                 = models.IntegerField(default = 0)
+    sale_price                 = models.IntegerField(default = 0)
+    discount_percent           = models.IntegerField(default = 0)
+    package_image              = models.CharField(max_length=300, blank=True, null = True)  
+    cover_t = (
+        ('1', 'পেপারব্যাক'),
+        ('2', 'হার্ডকভার'),    
+    )
+    cover_type                 = models.CharField(max_length=10, choices=cover_t, default=1)
+    details                    = RichTextField(blank=True, null=True)
+    video_link                 = models.TextField(blank=True,null=True)
+    total_sale                 = models.IntegerField(default = 0)  
+    is_book_package            = models.BooleanField(default = 0)  
+    status                     = models.BooleanField(default=1) 
+    created                    = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.package_name
+        return self.bangla_name
 
     class Meta:
-        db_table = 'book_package_list'
+        db_table = 'package_list'
 
 class CourierService(models.Model): 
     courier_name    = models.CharField(max_length=60, blank=True, null = True)
@@ -785,5 +802,83 @@ class BlogComment(models.Model):
         db_table = 'blog_wise_comments'
         verbose_name = "Blog Comment"
         verbose_name_plural = "Blog Comment List"
+
+class ProductCategory(models.Model): 
+    category_name       = models.CharField(max_length=100, blank=True, null = True) 
+    create_date     = models.DateTimeField(auto_now_add = True) 
+    status          = models.BooleanField(default=True) 
+
+    def __str__(self):
+        return self.category_name
+
+    class Meta:
+        db_table = 'product_category_list'
+        verbose_name = "Product Category"
+        verbose_name_plural = "Product Category List"
+
+class ProductSubCategory(models.Model): 
+    sub_category_name   = models.CharField(max_length=100, blank=True, null = True) 
+    category            = models.ForeignKey(ProductCategory, on_delete=models.DO_NOTHING, blank=True, null=True)  
+    create_date         = models.DateTimeField(auto_now_add = True) 
+    status              = models.BooleanField(default=True) 
+
+    def __str__(self):
+        return self.sub_category_name
+
+    class Meta:
+        db_table = 'product_sub_category_list'
+        verbose_name = "Product Sub Category"
+        verbose_name_plural = "Product Sub Category List"
+
+class ProductList(models.Model): 
+    p_type= (
+        ('1', 'Book'),
+        ('2', 'Other'), 
+    )
+    product_type            = models.CharField(max_length=1, choices=p_type, default=1)
+    product_name_bangla     = models.CharField(max_length=256, blank=True, null = True)
+    product_name_english    = models.CharField(max_length=256, blank=True, null = True) 
+    origin                  = models.CharField(max_length=256, blank=True, null = True) 
+    product_url             = models.CharField(max_length=256, blank=True, null = True) 
+       
+    book_name               = models.ForeignKey(BookList, on_delete=models.DO_NOTHING, blank=True, null=True)  
+     
+    mrp_price               = models.FloatField(default=0, blank=True, null = True) 
+    unit_price              = models.FloatField(default=0, blank=True, null = True) 
+    qty                     = models.FloatField(default=0, blank=True, null = True) 
+    purchase_discount       = models.FloatField(default=0, blank=True, null = True) 
+    sale_discount           = models.FloatField(default=0, blank=True, null = True) 
+    sale_price              = models.FloatField(default=0, blank=True, null = True) 
+    cover_t = (
+        ('1', 'পেপারব্যাক'),
+        ('2', 'হার্ডকভার'),    
+        ('3', 'NANE'),  
+    )
+    cover_type      = models.CharField(max_length=10, choices=cover_t, default=1)
+    stock_info      = models.CharField(max_length=56,blank = True, null=True)
+    product_image   = models.CharField(max_length=256,blank = True, null=True)
+    details         = RichTextField(blank = True, null=True)
+    video_link      = models.TextField(blank=True,null=True)
+
+    edition        = models.CharField(max_length=56,blank = True, null=True)
+    weight         = models.CharField(max_length=56,blank = True, null=True)
+    language        = models.CharField(max_length=56,blank = True, null=True)
+    number_of_page  = models.CharField(max_length=56,blank = True, null=True)
+    country         = models.CharField(max_length=56,blank = True, null=True)
+    ISBN            = models.CharField(max_length=56,blank = True, null=True)
+    is_preview_img  = models.CharField(max_length=56,blank = True, null=True) 
+    publisher       = models.ForeignKey(Publisher, on_delete=models.DO_NOTHING, blank=True, null=True)  
+    category        = models.ForeignKey(ProductCategory, on_delete=models.DO_NOTHING, blank=True, null=True)  
+    sub_category    = models.ForeignKey(ProductSubCategory, on_delete=models.DO_NOTHING, blank=True, null=True)  
+ 
+    create_date     = models.DateTimeField(auto_now_add = True) 
+    status          = models.BooleanField(default=True) 
+
+    def __str__(self):
+        return self.product_name_bangla
+
+    class Meta:
+        db_table = 'product_list'
+        verbose_name = "Product List" 
 
  

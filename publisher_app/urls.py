@@ -10,6 +10,7 @@ urlpatterns = [
     path('about-us/', views.about_us, name="about_us"),
     path('complain/', views.complain_page, name="complain_page"),
     path('refund-policy/', views.refund_policy, name="refund_policy"),
+    path('terms-of-service/', views.terms_and_service, name="terms_and_service"),
     path('book/<int:id>/<str:slug>/', views.book_details, name="book_details"),
     path('my-cart/', views.add_to_cart_page),
     path('cart/delete-item/', views.delete_to_cart),
@@ -114,6 +115,9 @@ urlpatterns = [
 
     ########  Product Urls ###########
     path('products/add-new-book/', views.add_new_book, name="add_new_book"),
+    path('products/add-new-product/', views.add_new_product, name="add_new_product"),
+    path('products/product-list/', views.product_list, name="product_list"),
+    path('products/add-package-book/', views.add_package_book, name="add_package_book"),
     path('products/book-list/', views.book_list, name="book_list"),
     path('products/book/<int:id>/update-book/', views.dashboard_update_book_item),
 
@@ -165,9 +169,9 @@ urlpatterns = [
     path('master-subcategory-add/', order_views.master_subcategory_add), 
     path('master-subcategory/<int:id>/edit/', order_views.master_subcategory_update), 
     path('master-subcategory/<int:id>/delete/', order_views.master_subcategory_delete), 
-    path('payment-success/', order_views.payment_success), 
-    path('payment-cancel/', order_views.payment_cancel), 
-    path('payment-failed/', order_views.payment_failed), 
+    path('payment-success/<str:order_number>/<str:session_key>/', order_views.payment_success), 
+    path('payment-cancel/<str:order_number>/<str:session_key>/', order_views.payment_cancel), 
+    path('payment-failed/<str:order_number>/<str:session_key>/', order_views.payment_failed), 
     path('importSubcategory/', order_views.importSubcategory), 
     path('importcategorywisebook/', order_views.importcategorywisebook), 
     path('importsubcategorywisebook/', order_views.importsubcategorywisebook), 

@@ -20,7 +20,7 @@
                     <div class="price_filter_box">
                         <div class='container mt-4'>
                             <h5>Price</h5>
-                            <input type="text" class="js-range-slider" name="my_range" value=""/>    
+                            <input type="text" class="js-range-slider range_slider" id="price_range" name="my_range" oninput="DisplayChange(this.value)" value=""/>    
                         </div>
                     </div>
                     <!-- <div class="reating_filter_box">
@@ -40,7 +40,7 @@
                             {% endfor %}
                         </div> 
                     </div>
-                    <div class="top_publisher_book">
+                    {% comment %} <div class="top_publisher_book">
                         <h5>Authors <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books"> 
                             {% for writer in writter_load|book_writter %}
@@ -48,7 +48,7 @@
                             {% endfor %}
                              
                         </div> 
-                    </div>
+                    </div> {% endcomment %}
                     <div class="top_publisher_book">
                         <h5>Categories <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books">
@@ -293,11 +293,23 @@
     }
 </script> 
 <script>
+    
     const publisher_id = []
-    const writer_id = []
+    const author_id = []
     const category_id = []
+    const price_range_id = []
+    function DisplayChange(newvalue) {
+        var price_range = $("#price_range").val()
+        price_range_id.push(price_range)
+    }
     $(".check_uncheck").click(function(){
-        
+        function DisplayChange(newvalue) {
+            var price_range = $("#price_range").val()
+            price_range_id.push(price_range)
+            
+        }
+        console.log(price_range_id)
+        var author_id = $("#author_id").val()
         var isChecked = $(this).prop('checked');
         if(isChecked){
             var ids =($(this).attr('id').split("_"));
@@ -306,9 +318,7 @@
             if (name=="publisher"){
                 publisher_id.push(id)
             }
-            if (name=="writer"){
-                writer_id.push(id)
-            }
+            
             if (name=="category"){
                 category_id.push(id)
             }
@@ -321,9 +331,7 @@
             if (name=="publisher"){
                 publisher_id.pop(id)
             }
-            if (name=="writer"){
-                writer_id.pop(id)
-            }
+            
             if (name=="category"){
                 category_id.pop(id)
             }
@@ -335,7 +343,7 @@
             type:'POST',
             data : {
                 publisher_id : JSON.stringify(publisher_id), 
-                writer_id : JSON.stringify(writer_id), 
+                writer_id : JSON.stringify(author_id), 
                 category_id : JSON.stringify(category_id), 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
@@ -348,18 +356,10 @@
                 if (data.showdata.length > 0){
                     $("#publisher_app_category_books_items_row").css("display","none")
                 }
-                    
-                for(i=0; i <= data.pub_book_list.length; i++){
-                    var book = data.pub_book_list[i].book_name_bangla
-                    let books = '<p>'+book+'</p>' 
-                    $("#publisher_app_category_books_items_row1").append(books);
-                }
-                for(i=0; i <= data.writer_book_list.length; i++){
-                    // console.log("name",data.writer_book_list[i])
-                }
-                for(i=0; i <= data.cat_book_list.length; i++){
-                    // console.log("name",data.cat_book_list[i])
-                }
+                if (data.showdata.length == 0){
+                    $("#publisher_app_category_books_items_row").html("BOOK NOT FOUND")
+                }      
+                
             },
             error: function(data){ 
 

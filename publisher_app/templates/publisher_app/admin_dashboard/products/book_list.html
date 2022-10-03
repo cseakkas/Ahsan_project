@@ -274,7 +274,14 @@
  
                         <form method="POST"> {% csrf_token %} 
                             <input type="text" id="active_page" value="{{ current_page_no }}" hidden />
-                            <input type="text" name="book_content_search" value="{{ book_txt}}" hidden />
+                            <input type="text" name="book_name" value="{{ book_name }}" hidden />
+                            <input type="text" name="author_name" value="{{ author_id}}" hidden />
+                            <input type="text" name="category_name" value="{{ category_id }}" hidden />
+                            <input type="text" name="subcategory_name" value="{% if subcategory_id %}{{ subcategory_id }} {% endif %}" hidden />
+                            <input type="text" name="publisher_name" value="{{ publisher_id }}" hidden />
+                            <input type="text" name="price_min" value="{{ price_min}}" hidden />
+                            <input type="text" name="price_max" value="{{ price_max}}" hidden />
+
                             <div class="fg_product_pagination">
                                 {% if page_number.has_other_pages %}
                                     <ul class="pagination">

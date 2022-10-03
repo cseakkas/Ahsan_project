@@ -37,8 +37,7 @@ def my_account(request):
 
     customer_id = request.session.get('userid')
     session_key = request.session.get("abcd")  
-    cart_item = models.AddToCart.objects.filter(session_key = session_key)
-    print("cart_item :", len(cart_item))
+    cart_item = models.AddToCart.objects.filter(session_key = session_key) 
     total_price =  cart_item.aggregate(Sum('qt_price'))['qt_price__sum']
     customer  = models.CustomarAccount.objects.filter(id = request.session.get('userid'), status = True).first()
     
@@ -57,8 +56,7 @@ def my_account(request):
         else:
             data = "Current Password Not Match"
             return JsonResponse(data, safe=False) 
-    
-    
+     
     context = {
         'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
         'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
@@ -135,7 +133,7 @@ def my_order_list(request):
 
     if request.method == "GET": 
         orderlist = ""
-        order_list = models.SalesOrder.objects.filter( customer_name_id = user_id)
+        order_list = models.SalesOrder.objects.filter( customer_name_id = user_id).order_by('-id')
         total_order_list = len(list(order_list))
 
         page_number = request.GET.get('page')

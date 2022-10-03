@@ -1,0 +1,27 @@
+{% extends 'publisher_app/base.html' %}
+{% block title %}  Terms Services {% endblock %}
+{% load data_load %}
+{% load static %}
+{% block content %}
+
+<section>
+    <div class="about_page_content">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-10 terms_service_page">
+                    <div class="about_content">
+                        <h2><strong> Terms Of Service </strong></h2>  
+                    </div>
+                    <div class="why_buy_book_on_durbarshop">
+                         {{profile.terms_condition|safe}}
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

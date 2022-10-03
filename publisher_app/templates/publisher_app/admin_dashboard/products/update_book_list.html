@@ -143,7 +143,7 @@
                         <tr>
                             <td>
                                 <label>Book Sub Category </label>
-                                <select class="form-control" id="subcategory_name" required>
+                                <select class="form-control" name="subcategory_name" id="subcategory_name" required>
                                     <option value="0"><strong>Select Sub Category</strong></option> 
                                     {% for cat in subcate_list %}
                                         <option value="{{ cat.pk }}">{{ cat.sub_category_bangla }}</option>
@@ -157,8 +157,8 @@
                         {% for data in book_wise_subcate %}
                         <tr id="{{ data.subcategory_name_id }}" class="tr_class cartItem_{{ data.subcategory_name_id }}"> 
                             <td id="mycategoryname">
-                                <input name="subcategory_name" id="subcategoryName" type="text" value="{{ data.sub_category_bangla}}" hidden>  
-                                <span> {{ data.subcategory_name  }}</span>
+                                <input name="subcategory_list" id="subcategoryName" type="text" value="{{ data.subcategory_name_id }}" hidden>  
+                                <span> {{ data.subcategory_name }}</span>
                             </td>  
                             <td>
                                 <i class='fas fa-trash delete-row' style='cursor:pointer;color:red;text-align:center'></i> 
@@ -757,7 +757,7 @@ $("#appnd_book").click(function(){
             alert("Please Select a Sub Category");
         }
         else {
-            var markup = "<tr id='" + subcategory_name_id + "' class='tr_class cartItem_" + subcategory_name_id + "'> <td><input name='subcategory_name' type='text' value='" + subcategory_name_id + "' hidden>  <span>" + subcategory_name + "</span></td>  <td><i class='fas fa-trash delete-row'  style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            var markup = "<tr id='" + subcategory_name_id + "' class='tr_class cartItem_" + subcategory_name_id + "'> <td><input name='subcategory_list' type='text' value='" + subcategory_name_id + "' hidden>  <span>" + subcategory_name + "</span></td>  <td><i class='fas fa-trash delete-row'  style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
             $("#SubCategorylistAppand").append(markup); 
         }
         $(".delete-row").click(function () {

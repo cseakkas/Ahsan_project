@@ -371,7 +371,7 @@
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                               <a class="nav-link active" id="ProductDetailsTab" data-toggle="tab" href="#ProductDetails" role="tab" aria-controls="nav-home" aria-selected="true">Summary</a>
                               <a class="nav-link" id="Reviews-tab" data-toggle="tab" href="#Reviews" role="tab" aria-controls="nav-profile" aria-selected="false">Reviews</a>
-                              <a class="nav-link" id="ShoppingPolicy-tab" data-toggle="tab" href="#ShoppingPolicy" role="tab" aria-controls="nav-contact" aria-selected="false">Shopping Policy</a>
+                              <a class="nav-link" id="ShoppingPolicy-tab" data-toggle="tab" href="#ShoppingPolicy" role="tab" aria-controls="nav-contact" aria-selected="false">Shipping Policy</a>
                             </div>
                           </nav>
                         <div class="tab-content" id="nav-tabContent">
@@ -489,7 +489,7 @@
                                 </section> 
                             </div>
                             <div class="tab-pane fade" id="ShoppingPolicy" role="tabpanel" aria-labelledby="ShoppingPolicy-tab">
-                                <h3>This page is under processing</h3>
+                                {{profile.shipping_policy|safe}}
                             </div>
                         </div>
                     </div>

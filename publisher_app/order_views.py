@@ -1,7 +1,8 @@
 from unicodedata import category
 from django.shortcuts import render, redirect
 #from grpc import Status
-from . import models
+from . import models 
+import requests
 from publisher_app.utils import render_to_pdf
 from django.http import HttpResponse
 from django.http import HttpRequest   
@@ -246,8 +247,7 @@ def dashboard_hold_order_list(request):
     }
     return render(request, 'publisher_app/admin_dashboard/orders/hold_order_list.html', context)
  
-
-
+ 
 @employeeLogin
 def dashboard_order_items_views(request, order_number):  
     request.session['previous_url_get'] = None  
@@ -459,43 +459,65 @@ import random
 @employeeLogin
 def dashboard_update_order(request):   
     if request.method=="POST":
+        msg_status = ""
         order_number = request.POST['order_number']
         order_status    = request.POST['order_status']
-        delivery_method_id = int(request.POST.get('delivery_method')) 
-        print(delivery_method_id)
+        delivery_per_name    = request.POST['del_per_name']
+        customer_mobile = request.POST.get('customer_mobile')
          
+        panel_username = "ahsan"
+        panel_password = "ahsan@522"
+        sendder_id = "8809612441424" 
+        
+             
+        delivery_method_id = int(request.POST.get('delivery_method'))  
         previous_url_get    = request.POST['previous_url_get']
         request.session['previous_url_get'] = previous_url_get
-        
- 
-        customer_info = models.SalesOrder.objects.filter(order_number = order_number)
-          
+         
+        customer_info = models.SalesOrder.objects.filter(order_number = order_number) 
         models.SalesOrder.objects.filter(order_number = order_number).update(
-            delivery_per_name    = request.POST['del_per_name'],
-            customer_mobile = request.POST.get('customer_mobile'),
-            optional_number = request.POST.get('optional_number'),
-            customer_email  = request.POST.get('customer_email'), 
-            delivery_method_id = delivery_method_id,
-            order_status    = order_status,
-            payment_status  = request.POST['payment_status'],
-            service_code    = request.POST['service_code'],
-            service_charge  = request.POST['service_charge'],
-            payment_method  = request.POST['payment_method'], 
-            shipping_address = request.POST['address'],
-            district_id     = int(request.POST['district_name']),
-            upozilla_id     = int(request.POST['upozilla_name']),
-            postal_code_id  = request.POST['postal_code'], 
-            order_remarks   = request.POST['customer_note'],
-            shipping_charge = request.POST['shipping_charge'],
-            less_amount     = request.POST['less_amount'],
-            update_date     = datetime.datetime.now(), 
+            delivery_per_name    = delivery_per_name, customer_mobile = customer_mobile,
+            optional_number = request.POST.get('optional_number'), customer_email  = request.POST.get('customer_email'), 
+            delivery_method_id = delivery_method_id, order_status    = order_status,
+            payment_status  = request.POST['payment_status'], service_code    = request.POST['service_code'],
+            service_charge  = request.POST['service_charge'], payment_method  = request.POST['payment_method'], 
+            shipping_address = request.POST['address'], district_id     = int(request.POST['district_name']),
+            upozilla_id     = int(request.POST['upozilla_name']), postal_code_id  = request.POST['postal_code'], 
+            order_remarks   = request.POST['customer_note'], shipping_charge = request.POST['shipping_charge'],
+            less_amount     = request.POST['less_amount'], update_date     = datetime.datetime.now(), 
         ) 
+        if order_status == "1": #Pending
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl) 
+        elif order_status == "2": #Confirmed
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" is processing stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl) 
+        elif order_status == "3": #Packed
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" is packing stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl) 
+        elif order_status == "4": #Shipping
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" is shipping stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl) 
+        elif order_status == "5": #Delivered
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" has been successfully Delivered. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl)
+        elif order_status == "6": #Returned
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" is Returned. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl)
+        elif order_status == "7": #Returned
+            msg_status = "Dear "+str(delivery_per_name)+", \n Your order id "+str(order_number)+" has been Canceled. \n  -- www.ahsan.com.bd --"
+            smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+            sent_otp = requests.post(smsurl)
  
         messages.success(request, "Order Info Update Successful")
         return redirect('/dashboard-orders-details/'+order_number)
-
-    
- 
+  
 # Sales Reports  
 @employeeLogin
 def dashboard_sales_history(request):   
@@ -853,29 +875,46 @@ def master_subcategory_delete(request, id):
     return redirect('/master-subcategory-list/')
  
 @csrf_exempt
-def payment_success(request): 
+def payment_success(request, order_number, session_key):    
+    print(session_key)    
+    models.SalesOrder.objects.filter(order_number = order_number, status = 0).update(status = 1)
+    models.GatewayePayment.objects.filter(order_number = order_number, status = 0).update(status = 1)
+      
+    checkout_item = models.AddToCart.objects.raw("SELECT id, book_name_id, quantity, qt_price, book_price, (quantity*qt_price) as total_price FROM add_to_cart WHERE session_key = %s", [session_key])
+    if len(checkout_item) > 0:
+        for i in checkout_item: 
+            models.SalesDetails.objects.create(
+                order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
+            ) 
+            models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
     context = { 
-        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
-        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = session_key).count(),
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/aamarpay/success.html', context) 
 
 @csrf_exempt
-def payment_cancel(request):
+def payment_cancel(request, order_number, session_key):
+    session_key = request.session.get("abcd")  
+    models.SalesOrder.objects.filter(order_number = order_number, status = 0).delete()
+    models.GatewayePayment.objects.filter(order_number = order_number, status = 0).delete()
+
     context = { 
-        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
-        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = session_key).count(),
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/aamarpay/cancel.html', context) 
 
 @csrf_exempt
-def payment_failed(request): 
-    print(request.POST.__dict__)  
+def payment_failed(request, order_number, session_key):   
+    print(session_key)    
+    models.SalesOrder.objects.filter(order_number = order_number, status = 0).delete()
+    models.GatewayePayment.objects.filter(order_number = order_number, status = 0).delete()  
     context = { 
-        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
-        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+        'count' : models.AddToCart.objects.filter(session_key = session_key).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = session_key).count(),
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/aamarpay/failed.html', context)  

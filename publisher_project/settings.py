@@ -17,7 +17,7 @@ SECRET_KEY = '0f36filxv1q4iob-t&i9b2(cs3)%!1y%myhjb6ystf&#4xlbgi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'publisher_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ahsan_live_db',
+        'NAME': 'ecom_ahsan',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -113,6 +113,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
  
@@ -128,8 +130,7 @@ STATIC_ROOT = 'publisher_app/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'publisher_app/static/publisher_app/media/'
-
-
+ 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 
@@ -143,3 +144,17 @@ MESSAGE_TAGS = {
 
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = "akkas.cse49@gmail.com"
+# EMAIL_HOST_PASSWORD = "ocapsubjgchxiyvn"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'mail.ahsan.com.bd'
+EMAIL_HOST_USER = "sales@ahsan.com.bd"
+EMAIL_HOST_PASSWORD = "Mp$#z6-BrmF]"
+EMAIL_PORT = 587

@@ -3515,7 +3515,22 @@ api_login {
     border:1px solid #ccc; 
     background: url('../images/book_thamb_small.jpg');
 }
-
+.terms_service_page{
+  background-color: #ffffff !important;
+  padding: 20px;
+  box-shadow: 0px 2px 5px gray;
+  margin-top: 50px;
+}
+.terms_service_page h2{
+  text-align: center;
+  font-size: 25px;
+}
+.terms_service_page p{
+  text-align: justify;
+}
+.terms_service_page p span{
+  text-align: justify;
+}
 
 
 

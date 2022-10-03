@@ -77,6 +77,14 @@ class CourierServiceAdmin(admin.ModelAdmin):
 # class MastarSubCategoryAdmin(admin.ModelAdmin):
 #     list_display  = ['sub_category', 'category_name', 'created', 'status']
 #     search_fields = ['sub_category', 'category_name',]
+
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display  = ['category_name', 'create_date', 'status']
+    search_fields = ['category_name', 'create_date',]
+
+class ProductSubCategoryAdmin(admin.ModelAdmin):
+    list_display  = ['sub_category_name','category', 'create_date', 'status']
+    search_fields = ['sub_category_name','category', 'create_date',]
      
     
 admin.site.register(models.PublisherProfile, PublisherProfileAdmin)
@@ -94,3 +102,5 @@ admin.site.register(models.UserAccessControl, UserAccessControlAdmin)
 # admin.site.register(models.MastarCategorySetup, MastarCategorySetupAdmin) 
 # admin.site.register(models.MastarSubCategory, MastarSubCategoryAdmin) 
 admin.site.register(models.CourierService, CourierServiceAdmin) 
+admin.site.register(models.ProductCategory, ProductCategoryAdmin) 
+admin.site.register(models.ProductSubCategory, ProductSubCategoryAdmin) 

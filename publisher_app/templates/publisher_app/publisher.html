@@ -32,19 +32,19 @@
                         <p> <label><input type="checkbox" class="check_uncheck" > <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i>  <i class="fa fa-star star-yellow"></i> </label> </p>
                     </div> -->
                      
-                    <div class="top_publisher_book">
+                    {% comment %} <div class="top_publisher_book">
                         <h5>Book Types <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books" id="loadPublish"> 
                             {% for publi in publisher_load|book_publisher %}
                                 <p> <label> <input id="publisher_{{publi.id}}" class="check_uncheck" type="checkbox" > <a href="/book/publisher/{{ publi.pk }}/{{publi.menu_url}}"> {{ publi.publisher_name_bangla }} </a></label></p>
                             {% endfor %}
                         </div> 
-                    </div>
+                    </div> {% endcomment %}
                     <div class="top_publisher_book">
                         <h5>Authors <!-- <input type="text" name="" id="searchFixedSearchBox"> <i class="fa fa-search" id="searchIconFixedSearchBox"></i> --> </h5>
                         <div class="display_top_books"> 
                             {% for writer in writter_load|book_writter %}
-                                <p> <label> <input type="checkbox" id="writer_{{writer.id}}" class="check_uncheck"  onclick="filter_writter('{{writer.id}}')" ><a href="/book/author/{{ writer.pk }}/{{writer.menu_url}}"> {{ writer.writter_name_bangla }}</a></label></p>
+                                <p> <label> <input type="checkbox" id="writer_{{writer.id}}" class="check_uncheck" ><a href="/book/author/{{ writer.pk }}/{{writer.menu_url}}"> {{ writer.writter_name_bangla }}</a></label></p>
                             {% endfor %}
                              
                         </div> 
@@ -323,15 +323,12 @@
     const writer_id = []
     const category_id = []
     $(".check_uncheck").click(function(){
-        
+        var get_publisher_id = $("#publisher_id").val()
         var isChecked = $(this).prop('checked');
         if(isChecked){
             var ids =($(this).attr('id').split("_"));
             var name = ids[0]
             var id = ids[1]
-            if (name=="publisher"){
-                publisher_id.push(id)
-            }
             if (name=="writer"){
                 writer_id.push(id)
             }
@@ -344,9 +341,7 @@
             var ids =($(this).attr('id').split("_"));
             var name = ids[0]
             var id = ids[1]
-            if (name=="publisher"){
-                publisher_id.pop(id)
-            }
+            
             if (name=="writer"){
                 writer_id.pop(id)
             }
@@ -360,7 +355,7 @@
             url: "/get-load-publisher-list/",
             type:'POST',
             data : {
-                publisher_id : JSON.stringify(publisher_id), 
+                publisher_id : JSON.stringify(get_publisher_id), 
                 writer_id : JSON.stringify(writer_id), 
                 category_id : JSON.stringify(category_id), 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -374,18 +369,11 @@
                 if (data.showdata.length > 0){
                     $("#publisher_app_category_books_items_row").css("display","none")
                 }
+                if (data.showdata.length == 0){
+                    $("#publisher_app_category_books_items_row").html("BOOK NOT FOUND")
+                }
                     
-                for(i=0; i <= data.pub_book_list.length; i++){
-                    var book = data.pub_book_list[i].book_name_bangla
-                    let books = '<p>'+book+'</p>' 
-                    $("#publisher_app_category_books_items_row1").append(books);
-                }
-                for(i=0; i <= data.writer_book_list.length; i++){
-                    // console.log("name",data.writer_book_list[i])
-                }
-                for(i=0; i <= data.cat_book_list.length; i++){
-                    // console.log("name",data.cat_book_list[i])
-                }
+                
             },
             error: function(data){ 
 

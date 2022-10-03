@@ -1,0 +1,933 @@
+{% extends 'publisher_app/admin_dashboard/dash_base.html' %}
+{% block title %} Add New Product || Dadhboard {% endblock %}
+{% load static %}
+{% block content %}
+
+<style>
+    .card-body form input{margin-bottom: 10px;}
+    .card-body form select{ height:36px}
+
+    form input,
+    button {
+        padding: 3px;
+    }
+
+    table {
+        width: 70%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #cdcdcd;
+    } 
+    table th,
+    table td {
+        padding: 5px;
+        text-align: left;
+    }
+
+    .select2-dropdown {
+        top: 10px !important;
+        left: 8px !important;
+    }
+    #Products_common_feature{
+        margin-top:20px
+    }
+</style>
+
+<div class="container-fluid page_container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow mb-4"> 
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <h4 class="page_header_bar">Add Product Information </span> </h4>
+                <div class="card-body"> 
+                    <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Product Type</label>
+                                            <select name="product_type" id="product_type" class="form-control">
+                                                <option value="">------Select Type------</option>
+                                                <option value="1">Books</option>
+                                                <option value="2">Other</option>
+                                            </select>
+                                         </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" id="ProductCommonFeature">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Name (Bangla)</label>
+                                            <input type="text" name="book_name_bangla" class="form-control" required >
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Name (English)</label>
+                                            <input type="text" name="book_name_english" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Sub Name</label>
+                                            <input type="text" name="book_origin" class="form-control">
+                                        </div>
+                                    </div>  
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product MRP</label>
+                                            <!-- <input type="number" id="book_price" name="book_price" class="form-control" required readonly>  -->
+                                            <input type="number" id="book_price" name="book_price" class="form-control"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4" id="purchase_discount_box">
+                                        <div class="form-group">
+                                            <label>Purchase Discount</label>
+                                            <input type="number" id="purchase_discount" name="purchase_discount"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4" id="unit_price_box">
+                                        <div class="form-group">
+                                            <label>Unit Price</label>
+                                            <input type="number" id="unit_price" name="unit_price" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Sale Discount </label>
+                                            <input type="number" id="discount_offer" name="discount_offer"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Sale Price</label>
+                                            <input type="number" id="sale_price" name="sale_price" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Coupon Price</label>
+                                            <input type="number" id="coupon_price" name="coupon_price"
+                                                class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Books Feature -->
+                                <div class="row" id="BooksFeature">
+                                    <div class="col-sm-12">
+                                        <h3>Books Additional Feature</h3>
+                                    </div>
+                                    
+                                    <div class="col-sm-6">
+                                        <table id="CategorylistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Book Category <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewCategory">Add New</span></label>
+                                                    <select class="form-control" id="category_name" required>
+                                                        <option value="0"><strong>Select Category</strong></option> 
+                                                        {% for cat in cate_list %}
+                                                            <option value="{{ cat.pk }}">{{ cat.cat_name_bangla }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_category">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                     
+                                    <div class="col-sm-6">
+                                        <table id="SubCategorylistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Book Sub Category </label>
+                                                    <select class="form-control CategoryWiseSubcategoyLoad" id="subcategory_name" required>
+                                                        <!-- <option value="0"><strong>Select Sub Category</strong></option> 
+                                                        {% for cat in subcate_list %}
+                                                            <option value="{{ cat.pk }}">{{ cat.sub_category_bangla }}</option>
+                                                        {% endfor %} -->
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_subcategory">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="col-sm-6">
+                                        <table id="WritterlistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Book Writer <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewWriter">Add New</span></label>
+                                                    <select class="form-control" id="writter_name" required>
+                                                        <option value="0"><strong>Select Writer</strong></option>
+                                                        <option value="1894"><strong>No Writer</strong></option>
+                                                        {% for wri in writter_list %}
+                                                            <option value="{{ wri.pk }}">{{ wri.writter_name_bangla }} </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_writter">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <table id="TranslatorlistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Select Translator <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewWriter">Add New</span></label>
+                                                    <select class="form-control" id="book_translator">
+                                                        <option value="0"><strong>Select Translator</strong></option>
+                                                        {% for wri in translatorlist %}
+                                                        <option value="{{ wri.pk }}">{{ wri.writter_name_bangla }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_translator">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <table id="editorlistAppand" class="col-sm-12">
+                                            <tr>
+                                                <td>
+                                                    <label>Select Editor <span style="padding:1px 3px;font-size: 11px;" class="btn btn-primary" data-toggle="modal" data-target="#AddNewWriter">Add New</span></label>
+                                                    <select class="form-control" name="book_editor" id="book_editor">
+                                                        <option value="0">Select Editor</option>
+                                                        {% for wri in editorlist %}
+                                                        <option value="{{ wri.pk }}">{{ wri.writter_name_bangla }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td style="width:70px;"> <br>
+                                                    <span class="btn btn-success" id="appnd_editor">Add</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Product Publisher</label>
+                                            <select class="form-control" name="publisher_name" id="publisher_name" required>
+                                                <option value="313" selected><strong> আহসান পাবলিকেশন - Ahsan Publication</strong></option>
+                                                {% for pub in publisher %}
+                                                    <option value="{{ pub.pk }}">{{ pub.publisher_name_bangla }}- {{ pub.publisher_name_english }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Cover Type</label>
+                                            <select class="form-control" name="cover_type">
+                                                <option value="1">পেপারব্যাক</option>
+                                                <option value="2">হার্ডকভার</option>
+                                                <option value="3">অন্যান্য </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Number of Page</label>
+                                            <input type="text" name="number_of_page" class="form-control">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Edition</label>
+                                            <input type="text" name="book_edition" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>ISBN Code</label>
+                                            <input type="text" name="isbn_code" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Language</label>
+                                            <input type="text" name="book_language" value="Bangla" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Stock Info</label>
+                                            <select class="form-control" name="stock_info" id="stockInfoselect"> 
+                                                <option value="1">In Publisher</option>
+                                                <option value="2">In Stock</option> 
+                                                <option value="3">Out of Stock</option> 
+                                                <option value="4">Pre Order</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Country</label>
+                                            <input type="text" name="country" value="Bangladesh" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Weight</label>
+                                            <input type="text" id="book_weight" name="book_weight" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="OthersProductFeature">
+                                    <div class="col-sm-12">
+                                        <h3>Others Products Feature</h3>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Category</label>
+                                            <select class="form-control" name="product_category" id="publisher_name" required>
+                                                <option value="" selected><strong>Select Category</strong></option> 
+                                                {% for data in product_category %}
+                                                    <option value="{{data.pk}}">{{data.category_name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Sub Category</label>
+                                            <select class="form-control" name="sub_category" id="publisher_name" required>
+                                                <option value="" selected><strong>Select Sub Category</strong></option> 
+                                                {% for data in product_sub_cate %}
+                                                    <option value="{{data.pk}}">{{data.sub_category_name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Product Brand</label>
+                                            <select class="form-control" name="product_brand" id="publisher_name" required>
+                                                <option value="0" selected><strong>Select Brand</strong></option> 
+                                            </select>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+  
+
+                                <div class="row" id="ProductCommonFeature2">
+                                    <div class="col-sm-4">
+                                        <fieldset>
+                                            <legend>Product Cover Image</legend>
+                                            <div class="img_box">
+                                                <img id="product_image_load" src="" alt="book image" />
+                                            </div>
+                                            <input type='file' id="product_image" name="product_image" required />
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <fieldset>
+                                            <legend>Preview File</legend> 
+                                            <input type='file' name="prev_file" />
+                                        </fieldset>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <br>
+                                        <div class="form-group">
+                                            <label>Product Details</label>
+                                            <textarea name="product_details" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <br>
+                                        <div class="form-group">
+                                            <label> Video Link for Product Details </label>
+                                            <textarea name="video_link" rows="3"
+                                                class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            <input type="submit" id="AddBookBtn" class="btn btn-success" name="submit" value="Add Book" style="margin-top:7px">
+                                            <a href="/products/add-new-book/" class="btn btn-secondary">Cancel </a>
+                                        </div>
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add New Category Modal  --> 
+<div class="modal fade" id="AddNewCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="width: 600px; margin: 10% auto;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New Book Category</h5>
+          <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> 
+            <table class="table table-bordered">
+                <tr>
+                    <th style="width: 210px;"> Category Name (Bangla)</th>
+                    <td>
+                        <input type="text" class="form-control" id="category_name_bangla">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Category Name (English)</th>
+                    <td>
+                        <input type="text" class="form-control" id="category_name_english">
+                    </td>
+                </tr> 
+                <tr>
+                    <th></th>
+                    <td>
+                        <button type="button" id="AddBookCategory" class="btn btn-info">Submit </button>
+                    </td>
+                </tr>
+            </table> 
+        </div>
+        
+      </div>
+    </div>
+</div>
+
+<!-- Add New Writer Modal  --> 
+<div class="modal fade" id="AddNewWriter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="width: 600px; margin: 10% auto;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New Writer</h5>
+          <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> 
+            <form action="/NewBookWriterEntry/" method="POST" enctype="multipart/form-data"> {% csrf_token %} 
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width: 200px;">Writer Name (Bangla)</th>
+                        <td>
+                            <input type="text" class="form-control" name="author_name_bangla" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Writer Name (English)</th>
+                        <td>
+                            <input type="text" class="form-control" name="author_name_english" required>
+                        </td>
+                    </tr>  
+                    <tr>
+                        <th>Email</th>
+                        <td>
+                            <input type="email" class="form-control" name="author_email">
+                        </td>
+                    </tr> 
+                    <tr>
+                        <th>Mobile</th>
+                        <td>
+                            <input type="number" class="form-control" name="author_mobile">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Author Photo</th>
+                        <td>
+                            <input type="file" name="author_photo">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
+                            <button type="submit" class="btn btn-info">Submit </button>
+                        </td>
+                    </tr>
+                </table> 
+            </form>
+        </div>
+        
+      </div>
+    </div>
+</div>
+
+
+<script src="{% static 'publisher_app/admin_dashboard/js/jquery.min.js' %}"></script>
+<script src="{% static 'publisher_app/admin_dashboard/js/select2.js' %}"></script>
+<script src="//cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
+
+<script> 
+    // AddBookCategory 
+    $("#AddBookCategory").click(function(){
+        var category_name_bangla = $("#category_name_bangla").val()
+        var category_name_english = $("#category_name_english").val()
+        // if (category_name_bangla == "" || category_name_english == ""){
+        //     alert("Please insert category name!");
+        //     return false
+        // }
+        $.ajax({
+            url: "/NewBookCategoryEntry/", 
+            type:'GET',
+            data: {
+                category_name_bangla : category_name_bangla,
+                category_name_english : category_name_english,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (data) {
+                if(data == "success"){
+                    window.location.reload()
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    })
+
+    // AddBookWriter 
+    $("#AddBookWriter").click(function(){
+        var author_name_bangla = $("#author_name_bangla").val()
+        var author_name_english = $("#author_name_english").val()
+        // if (author_name_bangla == "" || author_name_english == ""){
+        //     alert("Please insert Writer name!");
+        //     return false
+        // }
+        $.ajax({
+            url: "/NewBookWriterEntry/", 
+            type:'GET',
+            data: {
+                author_name_bangla : author_name_bangla,
+                author_name_english : author_name_english,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (data) {
+                if(data == "success"){
+                    window.location.reload()
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+    })
+</script>
+
+<script> 
+    $("#AddBookBtn").click(function () {
+        var category_name = $("#category_name").val();
+        var subcategory_name = $("#subcategory_name").val();
+        var writter_name = $("#writter_name").val();
+        var publisher_name = $("#publisher_name").val();
+
+        // if (category_name == "0") {
+        //     alert("Please Enter Category Name");
+        //     return false
+        // }
+        // else if (subcategory_name == "0") {
+        //     alert("Please Enter Sub Category Name");
+        //     return false
+        // }
+        // else if (writter_name == "0") {
+        //     alert("Please Enter Writter Name");
+        //     return false
+        // }
+        // else if (publisher_name == "0") {
+        //     alert("Please Enter Publisher Name");
+        //     return false
+        // }
+
+        // else {
+        //     return true
+        // }
+
+    })
+
+    $("#publisher_name").select2({
+        placeholder: "Select Publisher",
+        allowClear: true
+    }); 
+</script>
+
+<script>
+    $("#category_name").select2({
+        placeholder: "Select Category",
+
+    });
+    $("#subcategory_name").select2({
+        placeholder: "Select Sub Category",
+
+    });
+</script>
+<script>
+    $("#book_name").select2({
+        placeholder: "Select Book",
+    });
+</script>
+
+<script>
+    $("#writter_name").select2({
+        placeholder: "Select Writter",
+    });
+</script>
+
+<script>
+    $("#book_translator").select2({
+        placeholder: "Select Translator",
+    });
+</script>
+
+<script>
+    $("#book_editor").select2({
+        placeholder: "Select Editor",
+    });
+</script>
+ 
+
+<script>
+    $("#appnd_book").click(function () {
+        var book_name_id = $("#book_name option:selected").val();
+        var book_name = $("#book_name option:selected").text();
+        var book_price = $("#book_name option:selected").text().split(' ')[0];
+        var book_sale = $("#book_name option:selected").text().split(' ')[2];
+        var book_discount = $("#book_name option:selected").text().split(' ')[4];
+
+        var check_ext = 0;
+        $('#BooklistAppand tr').each(function () {
+            var exit_book_id = this.id
+            if (exit_book_id == book_name_id) {
+                check_ext = 1;
+                alert("Book Already Exit");
+            }
+        })
+
+        if (check_ext == 0) {
+            if (book_name_id == 0) {
+                alert("Please Select a Book");
+            }
+            else {
+                var book_price_ex = 0
+                if ($("#book_price").val() != "") {
+                    book_price_ex = $("#book_price").val();
+                }
+                var sale_price_ex = 0
+                if ($("#sale_price").val() != "") {
+                    sale_price_ex = $("#sale_price").val();
+                }
+
+                // Total Book Price 
+                var total_book_price = parseInt(book_price_ex) + parseInt(book_price);
+                $("#book_price").val(total_book_price);
+
+                // Total Sale Price
+                var total_sale_price = parseInt(sale_price_ex) + parseInt(book_sale);
+                $("#sale_price").val(total_sale_price);
+
+                var discount_taka = 0;
+                var discount_offer = 0;
+                discount_taka = parseInt(total_book_price) - parseInt(total_sale_price);
+                discount_offer = Math.round(parseInt(100) - (parseInt(total_sale_price) * parseInt(100) / parseInt(total_book_price)));
+                $("#discount_offer").val(discount_offer);
+
+                var markup = "<tr id='" + book_name_id + "' class='tr_class cartItem_" + book_name_id + "'> <td><input name='book_name' type='text' value='" + book_name_id + "' hidden> <input id='book_name_price_" + book_name_id + "' type='text' value='" + book_price + "' hidden> <input id='book_sale_price_" + book_name_id + "' type='text' value='" + book_sale + "' hidden> <span>" + book_name + "</span></td>  <td><i class='fas fa-trash delete-row_" + book_name_id + "' style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+                $("#BooklistAppand").append(markup);
+                $("#book_name").val('0');
+            }
+            $(".delete-row_" + book_name_id).click(function () {
+                // Total price after book delete 
+                var book_price_ex2 = $("#book_price").val();
+                var delete_book_price = $("#book_name_price_" + book_name_id).val();
+
+                // Total sale price after book delete 
+                var sale_price_ex2 = $("#sale_price").val();
+                var delete_book_sale_price = $("#book_sale_price_" + book_name_id).val();
+
+                $(this).closest("#BooklistAppand tr").remove();
+
+                // Total price after book delete  
+                var total_price22 = parseInt(book_price_ex2) - parseInt(delete_book_price);
+                $("#book_price").val(total_price22);
+
+                // Total sale price after book delete 
+                var total_sale_price22 = parseInt(sale_price_ex2) - parseInt(delete_book_sale_price);
+                $("#sale_price").val(total_sale_price22);
+
+                var discount_taka = 0;
+                var discount_offer = 0;
+                discount_taka = parseInt(total_price22) - parseInt(total_sale_price22);
+                discount_offer = Math.round(parseInt(100) - (parseInt(total_sale_price22) * parseInt(100) / parseInt(total_price22)));
+                $("#discount_offer").val(discount_offer);
+            });
+        }
+    });
+
+    $("#appnd_category").click(function () {
+        var category_name_id = $("#category_name option:selected").val();
+        var category_name = $("#category_name option:selected").text();
+        if (category_name_id == 0) {
+            alert("Please Select a Category");
+        }
+        else {
+            var markup = "<tr id='" + category_name_id + "' class='tr_class cartItem_" + category_name_id + "'> <td><input name='category_name' type='text' value='" + category_name_id + "' hidden>  <span>" + category_name + "</span></td>  <td><i class='fas fa-trash delete-row'  style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#CategorylistAppand").append(markup);
+            // $("#category_name").val('0');
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#CategorylistAppand tr").remove();
+
+        });
+    });
+
+    $("#appnd_subcategory").click(function () {
+        var subcategory_name_id = $("#subcategory_name option:selected").val();
+        var subcategory_name = $("#subcategory_name option:selected").text();
+        if (subcategory_name_id == 0) {
+            alert("Please Select a Sub Category");
+        }
+        else {
+            var markup = "<tr id='" + subcategory_name_id + "' class='tr_class cartItem_" + subcategory_name_id + "'> <td><input name='subcategory_name' type='text' value='" + subcategory_name_id + "' hidden>  <span>" + subcategory_name + "</span></td>  <td><i class='fas fa-trash delete-row'  style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#SubCategorylistAppand").append(markup); 
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#SubCategorylistAppand tr").remove();
+
+        });
+    });
+</script>
+<script>
+    $("#appnd_writter").click(function () {
+        var writter_name_id = $("#writter_name option:selected").val();
+        var writter_name = $("#writter_name option:selected").text();
+        if (writter_name_id == 0) {
+            alert("Please Select a Writter");
+        }
+        else {
+            var markup = "<tr id='" + writter_name_id + "' class='tr_class cartItem_" + writter_name_id + "'> <td><input name='writter_name' type='text' value='" + writter_name_id + "' hidden>  <span>" + writter_name + "</span></td>  <td><i class='fas fa-trash delete-row' style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#WritterlistAppand").append(markup);
+            // $("#writter_name").val('0');
+
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#WritterlistAppand tr").remove();
+        });
+    });
+
+</script>
+
+<script>
+    $("#appnd_translator").click(function () {
+        var book_translator_id = $("#book_translator option:selected").val();
+        var book_translator = $("#book_translator option:selected").text();
+        if (book_translator_id == 0) {
+            alert("Please Select a Translator");
+        }
+        else {
+            var markup = "<tr id='" + book_translator_id + "' class='tr_class cartItem_" + book_translator_id + "'> <td><input name='book_translator' type='text' value='" + book_translator_id + "' hidden>  <span>" + book_translator + "</span></td>  <td><i class='fas fa-trash delete-row' style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#TranslatorlistAppand").append(markup);
+            // $("#book_translator").val('0');
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#TranslatorlistAppand tr").remove();
+        });
+    });
+
+</script>
+
+<script>
+    $("#appnd_editor").click(function () {
+        var book_editor_id = $("#book_editor option:selected").val();
+        var book_editor = $("#book_editor option:selected").text();
+        if (book_editor_id == 0) {
+            alert("Please Select a Translator");
+        }
+        else {
+            var markup = "<tr id='" + book_editor_id + "' class='tr_class cartItem_" + book_editor_id + "'> <td><input name='editor_name' type='text' value='" + book_editor_id + "' hidden>  <span>" + book_editor + "</span></td>  <td><i class='fas fa-trash delete-row' style='cursor:pointer;color:red;text-align:center'></i> </td> </tr>";
+            $("#editorlistAppand").append(markup);
+            // $("#book_editor").val('0');
+        }
+        $(".delete-row").click(function () {
+            $(this).closest("#editorlistAppand tr").remove();
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    CKEDITOR.replace('book_details');
+
+    function product_image(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#product_image_load').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+        }
+    }
+
+    $("#product_image").change(function () {
+        product_image(this);
+    });
+
+</script>
+<script>
+
+
+    function prev_image1(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#prev_image_load1').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+        }
+    }
+
+    $("#prev_image1").change(function () {
+        prev_image1(this);
+    });
+
+    function prev_image2(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#prev_image_load2').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+        }
+    }
+
+    $("#prev_image2").change(function () {
+        prev_image2(this);
+    });
+
+    function prev_image3(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#prev_image_load3').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+        }
+    }
+
+    $("#prev_image3").change(function () {
+        prev_image3(this);
+    });
+
+</script>
+<script>
+    $("#discount_offer").change(function () {
+        var book_price = $("#book_price").val();
+        var discount_offer = $("#discount_offer").val();
+
+        var discount = parseInt(book_price / 100 * discount_offer);
+
+        var sale_price = parseInt(book_price - discount);
+
+        $("#sale_price").val(sale_price.toString());
+    });
+    $("#purchase_discount").change(function () {
+        var book_price = $("#book_price").val();
+        var purchase_discount = $("#purchase_discount").val();
+        var pur_discount = parseInt(book_price / 100 * purchase_discount);
+        var unit_price = parseInt(book_price - pur_discount);
+        $("#unit_price").val(unit_price);
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.mdb-select').materialSelect();
+    });
+</script>
+
+<script>
+    $("#category_name").change(function(){
+        var category_id = $("#category_name").val();
+        $.ajax({
+            url: "/category-wise-subcategory/",
+            type:'POST',
+            data : {
+                category_id : category_id, 
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(results){ 
+                $(".CategoryWiseSubcategoyLoad").html("")
+                for(i = 0; i < results.length; i++){
+                    var subcat_id = results[i]['subcat_id'];
+                    var category_bangla = results[i]['subcat_bangla'];
+                    var subcat_english = results[i]['subcat_english'];
+                    appendItemOption = `
+                        <option value="`+subcat_id+`">`+category_bangla+`</option>
+                    `
+                    $(".CategoryWiseSubcategoyLoad").append(appendItemOption);
+                }
+            },
+            error: function(data){
+                alert(data);
+            }
+        });
+
+    });
+</script>
+<script>
+    $("#ProductCommonFeature").hide()
+    $("#ProductCommonFeature2").hide()
+    $("#BooksFeature").hide()
+    $("#OthersProductFeature").hide()
+    $("#product_type").change(function(){
+        var product_type = $("#product_type").val();
+        if(product_type == "1"){
+            $("#ProductCommonFeature").show()
+            $("#ProductCommonFeature2").show()
+            $("#BooksFeature").show()
+            $("#OthersProductFeature").hide()
+        }
+        else if(product_type == "2"){
+            $("#ProductCommonFeature").show()
+            $("#ProductCommonFeature2").show()
+            $("#OthersProductFeature").show()
+            $("#BooksFeature").hide()
+        }
+        else{
+            $("#ProductCommonFeature").hide()
+            $("#ProductCommonFeature2").hide()
+            $("#BooksFeature").hide()
+            $("#OthersProductFeature").hide()
+        }
+    })
+</script>
+  
+
+{% endblock %}

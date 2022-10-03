@@ -36,9 +36,8 @@ import datetime
 from num2words import num2words 
 from aamarpay.aamarpay import aamarPay
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
- 
-
+from django.views.decorators.csrf import csrf_protect 
+  
 def check_user_permission(request, menu_url):
     chk_privilege    = models.UserAccessControl.objects.filter(user_id = int(request.session.get("user_id")), menu_id__menu_url = menu_url, menu_id__status = True, status = True).first()
     
@@ -53,7 +52,7 @@ def index_page(request):
     slider_list = models.SliderInfo.objects.filter(status = True).order_by('slider_order')  
     today_date = date.today()  
     one_month_ago = today_date - datetime.timedelta(days=130) 
-    
+  
     new_pub_book_list = models.BookList.objects.raw('''
         SELECT bk.id, bk.book_name_bangla, bk.book_name_english, bk.sale_price, bk.book_price, bk.discount, bc.cat_name_bangla, cwb.category_name_id, bc.menu_url, bw.writter_name_bangla FROM book_list bk 
         LEFT JOIN category_wise_book cwb ON bk.id = cwb.book_name_id
@@ -67,6 +66,8 @@ def index_page(request):
         LEFT JOIN book_category_list bc ON cwb.category_name_id = bc.id LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
         LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id WHERE bk.status = 1 and bc.Is_homepage = 1 GROUP by wwb.book_name_id ORDER BY bc.ordering asc, bc.cat_name_bangla ASC, bk.id desc 
     ''')
+    
+    
     writer_book = models.BookList.objects.raw('''
         SELECT bw.id, bw.writter_name_bangla, COUNT(bw.id) as total_book, bw.menu_url,bw.writter_images FROM `book_list` bk 
         LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
@@ -150,6 +151,15 @@ def complain_page(request):
         'website_menu': models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True).order_by('master_category', 'regular_category'),
     } 
     return render(request, 'publisher_app/complain_page.html', context)
+
+def terms_and_service(request): 
+
+    context = { 
+        'count' : models.AddToCart.objects.filter(session_key = request.session.get("abcd")).count(),
+        'wishlist_count' : models.AddToWishlist.objects.filter(session_key = request.session.get("abcd")).count(),
+    }
+     
+    return render(request, 'publisher_app/terms_and_service.html',context)
 
 def refund_policy(request):
 
@@ -256,15 +266,17 @@ def book_details(request, id, slug):
     ''', [id, parent_cat])
 
     ### Package Book List 
-    package_book_list = models.BookPackageDetails.objects.raw("""
-        SELECT bk.id, bpd.book_name_id as book_id, bk.book_name_bangla,bk.slug as book_url, bk.book_price, bk.sale_price, bk.discount, bw.writter_name_bangla, bc.cat_name_bangla, bk.book_image  FROM `book_package_list` bpd 
-        LEFT JOIN book_list bk ON bpd.book_name_id = bk.id
-        LEFT JOIN category_wise_book cwb ON bk.id = cwb.book_name_id  
-        LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
-        LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id  
-        LEFT JOIN book_category_list bc ON cwb.category_name_id = bc.id
-        WHERE bpd.booklist_master_id = %s GROUP by bk.id ORDER BY bk.id asc
-    """,[getcatid.id])
+    package_book_list = models.PackageList.objects.all()
+    # package_book_list = models.PackageList.objects.raw("""
+    #     SELECT bk.id, bpd.book_name_id as book_id, bk.book_name_bangla,bk.slug as book_url, 
+    #     bk.book_price, bk.sale_price, bk.discount, bw.writter_name_bangla, bc.cat_name_bangla, bk.book_image  FROM `package_list` bpd 
+    #     LEFT JOIN book_list bk ON bpd.book_name_id = bk.id
+    #     LEFT JOIN category_wise_book cwb ON bk.id = cwb.book_name_id  
+    #     LEFT JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id
+    #     LEFT JOIN book_writter_list bw ON  wwb.writter_name_id = bw.id  
+    #     LEFT JOIN book_category_list bc ON cwb.category_name_id = bc.id
+    #     WHERE bpd.booklist_master_id = %s GROUP by bk.id ORDER BY bk.id asc
+    # """,[getcatid.id])
  
     total_package_price = models.BookList.objects.raw("SELECT id, book_price as total_book_price, sale_price as total_sale_price, (book_price - sale_price) as total_save_price FROM book_list  WHERE id = %s", [getcatid.id])
     
@@ -532,7 +544,7 @@ def checkout_order(request):
     year = str(timezone.now().year) 
     sm_year = year[-2:]  
     customer_info = ""
-    session_key = request.session.get("abcd") 
+    session_key = request.session.get("abcd")  
       
     if request.session.get('userid'):   
         customer_info = models.CustomarAccount.objects.filter(id = request.session.get('userid'), status = True).first()
@@ -543,7 +555,8 @@ def checkout_order(request):
     subtotal_amount = models.AddToCart.objects.raw("SELECT id, quantity, qt_price, (quantity*qt_price) as total_price, sum((quantity*qt_price)) as subtotal FROM add_to_cart WHERE session_key = %s  GROUP BY session_key", [session_key])
     sutotalamount = int(subtotal_amount[0].subtotal)
       
-    shipping_charge = 50
+    shipping_charge = 0
+    # shipping_charge = 50
     # if sutotalamount > 2000:
     #     shipping_charge = 0
 
@@ -570,6 +583,7 @@ def checkout_order(request):
  
         customer_email  = request.POST.get('customer_email')
         password  = request.POST.get('password')
+        # total_amount    = 1
         total_amount    = grand_total 
         payment_method  = request.POST.get('payment_type')
         payment_number_b  = request.POST.get('accounts_number_b')
@@ -601,16 +615,31 @@ def checkout_order(request):
         # today           = datetime.now()
         request.session['redirect_session'] = None 
 
+        # For Local ##################
+        # successUrl = "http://127.0.0.1:8000/payment-success/"+str(order_number)+"/"+str(session_key)+"/"
+        # cancelUrl = "http://127.0.0.1:8000/payment-cancel/"+str(order_number)+"/"+str(session_key)+"/"
+        # failUrl = "http://127.0.0.1:8000/payment-failed/"+str(order_number)+"/"+str(session_key)+"/"
+         
+        # For Live #################
         
-        successUrl = "https://ahsan.com.bd/payment-success/"
-        cancelUrl = "https://ahsan.com.bd/payment-cancel/"
-        failUrl = "https://ahsan.com.bd/payment-failed/"
+        successUrl = "https://ahsan.com.bd/payment-success/"+str(order_number)+"/"+str(session_key)+"/"
+        cancelUrl = "https://ahsan.com.bd/payment-cancel/"+str(order_number)+"/"+str(session_key)+"/"
+        failUrl = "https://ahsan.com.bd/payment-failed/"+str(order_number)+"/"+str(session_key)+"/"
+        
         transactionID = randint(100001, 999999999) 
         storeID = "ahsan" 
         signature_key  = "74870a2fd40b4d9926a5849f64fa2fca"
         
         description = 'This is Aamarpay Payment'
-         
+        request.session['success_payment'] = None 
+        request.session['order_number']= None
+        panel_username = "ahsan"
+        panel_password = "ahsan@522"
+        sendder_id = "8809612441424"
+
+        email_content = "Dear "+str(del_per_name)+", We have received your order request. Our team will contact with you soon to confirm your order. -- www.ahsan.com.bd --"
+
+        
         if aamarpay_payment == "5": 
             payment_method = 5  
 
@@ -630,7 +659,7 @@ def checkout_order(request):
                         transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = del_per_name,
                         customerMobile = customer_mobile, customerEmail = customer_email, description = description,
                     )
-                    paymentpath = pay.payment() 
+                    paymentpath = pay.payment()  
                     if paymentpath: 
                         models.SalesOrder.objects.create(
                             order_number = order_number, customer_name_id = customer_id.id, 
@@ -638,48 +667,54 @@ def checkout_order(request):
                             shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
                             upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
                             total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
-                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
-                        ) 
-                        for i in checkout_item:    
-                            models.SalesDetails.objects.create(
-                                order_number = order_number, book_name_id = int(i.book_name_id), sale_price = i.qt_price,
-                                book_quantity = i.quantity, session_key = session_key 
-                            ) 
-                            models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-                    
-                    models.GatewayePayment.objects.create(customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
-
-                    # return redirect(paymentpath)
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
+                        )  
+                    models.GatewayePayment.objects.create(order_number = order_number, customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0)
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order id "+order_number+" is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                
+                    # Send Email for customer :
+                    if customer_id.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [customer_id.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+     
                 else:  
                     pay = aamarPay(
                         isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
                         transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = chk_customer.customer_name,
                         customerMobile = chk_customer.mobile, customerEmail = chk_customer.email, description = description,
                     )
-                    paymentpath = pay.payment() 
+                    paymentpath = pay.payment()  
                     if paymentpath:
                         models.SalesOrder.objects.create(
                             order_number = order_number, customer_name_id = chk_customer.id, 
                             delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
                             optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
                             total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  order_date = datetime.datetime.now(),
-                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
-                        ) 
-                        for i in checkout_item:   
-                            models.SalesDetails.objects.create(
-                                order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
-                            ) 
-                            models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-                        
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
+                        )  
                         if chk_customer:
                             request.session['userid'] = chk_customer.id
                             request.session['usermobile'] = chk_customer.mobile
                             request.session['customername'] = chk_customer.customer_name 
                 
-                    models.GatewayePayment.objects.create( customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
-                return redirect(paymentpath)
-
-            else: 
+                    models.GatewayePayment.objects.create(order_number = order_number, customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0)
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                         
+                    # Send Email for customer :
+                    if chk_customer.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [chk_customer.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+     
+                return redirect(paymentpath, order_number = order_number, session_key = session_key) 
+            else:  
                 exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
                 if exit_customer:
                     request.session['userid'] = exit_customer.id
@@ -691,27 +726,32 @@ def checkout_order(request):
                     transactionID = str(transactionID), transactionAmount = total_amount, signature = signature_key, customerName = exit_customer.customer_name,
                     customerMobile = exit_customer.mobile, customerEmail = exit_customer.email, description = description,
                 )
-                paymentpath = pay.payment() 
-                if paymentpath:
-
-                    models.SalesOrder.objects.create(
-                        order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
-                        upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
-                        delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
-                        optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
-                        shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
-                    )  
-
-                    for i in checkout_item: 
-                        models.SalesDetails.objects.create(
-                            order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
-                        ) 
-                        models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
+                paymentpath = pay.payment()   
                 
-                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
-                return redirect(paymentpath)
-  
+                models.SalesOrder.objects.create(
+                    order_number = order_number, customer_name_id = int(request.session.get('userid')),district_id = request.POST.get('district_name'),
+                    upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
+                    delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
+                    optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, order_date = datetime.datetime.now(),
+                    shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
+                )   
+                models.GatewayePayment.objects.create(order_number = order_number, customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0) 
+                # Send mobile sms for new order
+                msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                sent_otp = requests.post(smsurl) 
+                        
+                # Send Email for customer :
+                if exit_customer.email:
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = [exit_customer.email]
+                    send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+    
+                return redirect(paymentpath, order_number = order_number, session_key = session_key) 
+        
+        
         else:                              ####----------- Other Payment options ------------- ####### 
+            
             if not request.session.get('userid'):
                 chk_customer = models.CustomarAccount.objects.filter(mobile = customer_mobile, status = True).first()
                 if not chk_customer: 
@@ -723,8 +763,7 @@ def checkout_order(request):
                         request.session['userid'] = customer_id.id
                         request.session['usermobile'] = customer_id.mobile
                         request.session['customername'] = customer_id.customer_name 
-
-                    
+ 
                     models.SalesOrder.objects.create(
                         order_number = order_number, customer_name_id = customer_id.id, 
                         delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email,  
@@ -740,6 +779,17 @@ def checkout_order(request):
                         ) 
                         models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
                     
+                     
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order id "+order_number+" is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                    
+                    # Send Email for customer :
+                    if customer_id.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [customer_id.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+     
                 else:  
                     models.SalesOrder.objects.create(
                         order_number = order_number, customer_name_id = chk_customer.id, 
@@ -758,6 +808,17 @@ def checkout_order(request):
                         request.session['userid'] = chk_customer.id
                         request.session['usermobile'] = chk_customer.mobile
                         request.session['customername'] = chk_customer.customer_name 
+                    
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order id "+str(order_number)+" is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+
+                    # Send Email for customer :
+                    if chk_customer.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [chk_customer.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+    
 
             else: 
                 exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
@@ -779,7 +840,17 @@ def checkout_order(request):
                         order_number = order_number, book_name_id = int(i.book_name_id), book_price = i.book_price, sale_price = i.qt_price, book_quantity = i.quantity,
                     ) 
                     models.AddToCart.objects.filter(session_key = session_key, book_name_id = i.book_name.id).delete()
-            
+                
+                
+                msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                sent_otp = requests.post(smsurl) 
+                # Send Email for customer :
+                if exit_customer.email:
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = [exit_customer.email]
+                    send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+ 
             context = {
                 'order_number':order_number,
                 'customer_info':customer_info, 
@@ -800,7 +871,6 @@ def checkout_order(request):
     }
     return render(request, 'publisher_app/checkout.html', context)
 
- 
 def checkout_order_now(request, id, qty):   
     year = str(timezone.now().year) 
     sm_year = year[-2:]  
@@ -867,12 +937,27 @@ def checkout_order_now(request, id, qty):
 
         # today           = datetime.now()
         request.session['redirect_session'] = None 
-        successUrl = "https://ahsan.com.bd/payment-success/"
-        cancelUrl = "https://ahsan.com.bd/payment-cancel/"
-        failUrl = "https://ahsan.com.bd/payment-failed/"
+        
+        # For Local ##################
+        # successUrl = "http://127.0.0.1:8000/payment-success/"+str(order_number)+"/"+str(session_key)+"/"
+        # cancelUrl = "http://127.0.0.1:8000/payment-cancel/"+str(order_number)+"/"+str(session_key)+"/"
+        # failUrl = "http://127.0.0.1:8000/payment-failed/"+str(order_number)+"/"+str(session_key)+"/"
+         
+        # For Live #################
+        
+        successUrl = "https://ahsan.com.bd/payment-success/"+str(order_number)+"/"+str(session_key)+"/"
+        cancelUrl = "https://ahsan.com.bd/payment-cancel/"+str(order_number)+"/"+str(session_key)+"/"
+        failUrl = "https://ahsan.com.bd/payment-failed/"+str(order_number)+"/"+str(session_key)+"/"
+        
         transactionID = randint(100001, 999999999) 
         storeID = "ahsan" 
         signature_key  = "74870a2fd40b4d9926a5849f64fa2fca"
+
+        panel_username = "ahsan"
+        panel_password = "ahsan@522"
+        sendder_id = "8809612441424"
+        email_content = "Dear "+str(del_per_name)+", We have received your order request. Our team will contact with you soon to confirm your order. -- www.ahsan.com.bd --"
+
         
         description = 'This is Aamarpay Payment'
 
@@ -902,15 +987,26 @@ def checkout_order_now(request, id, qty):
                             shipping_address = shipping_address, optional_number = optional_number, district_id = request.POST.get('district_name'),
                             upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),shipping_charge = shipping_charge, 
                             total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
                         )     
                         models.SalesDetails.objects.create(
-                            order_number = order_number, book_name_id = int(customer_id.id), sale_price = checkout_item.sale_price,
+                            order_number = order_number, book_name_id = id, sale_price = checkout_item.sale_price,
                             book_quantity = or_book_quantity, session_key = session_key 
                         )
                         models.SalesOrderPaymentDetails.objects.create( order_number = order_number, payment_method = payment_method, payment_status = 2 ) 
-                    models.GatewayePayment.objects.create(customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
-
+                    models.GatewayePayment.objects.create(customer_id = customer_id.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0)
+                    
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                
+                    # Sent Customer Order Email 
+                    if customer_id.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [customer_id.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+    
                 else:  
                     pay = aamarPay(
                         isSandbox=False, storeID = str(storeID), successUrl = str(successUrl), cancelUrl= str(cancelUrl), failUrl= str(failUrl), 
@@ -924,7 +1020,7 @@ def checkout_order_now(request, id, qty):
                             delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address,  
                             optional_number = optional_number, district_id = int(request.POST.get('district_name')), upozilla_id = upozilla_id, postal_code_id = int(request.POST.get('postal_code')),
                             total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, shipping_charge = shipping_charge,  
-                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                            service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
                         )    
                         models.SalesDetails.objects.create(
                             order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
@@ -937,8 +1033,19 @@ def checkout_order_now(request, id, qty):
                             request.session['userid'] = chk_customer.id
                             request.session['usermobile'] = chk_customer.mobile
                             request.session['customername'] = chk_customer.customer_name 
-                    models.GatewayePayment.objects.create( customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID)
-                return redirect(paymentpath)
+                        # Send mobile sms for new order
+                        msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                        smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                        sent_otp = requests.post(smsurl) 
+                    
+                        # Sent Customer Order Email 
+                        if chk_customer.email:
+                            email_from = settings.EMAIL_HOST_USER
+                            recipient_list = [chk_customer.email]
+                            send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+        
+                    models.GatewayePayment.objects.create( customer_id = chk_customer.id, payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0)
+                return redirect(paymentpath, order_number = order_number, session_key = session_key) 
     
             else: 
                 exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
@@ -959,7 +1066,7 @@ def checkout_order_now(request, id, qty):
                         upozilla_id = upozilla_id, postal_code_id = request.POST.get('postal_code'),
                         delivery_per_name = del_per_name, customer_mobile = customer_mobile, customer_email = customer_email, shipping_address = shipping_address, 
                         optional_number = optional_number, total_amount = total_amount, vat_amount = 0, discount_amount = 0, less_amount = 0, due_amount = 0, 
-                        shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key
+                        shipping_charge = shipping_charge, service_charge = 0, payment_method = payment_method, payment_status = 3, order_status = 1, session_key = session_key, status = 0
                     )  
                     models.SalesDetails.objects.create(
                         order_number = order_number, book_name_id = int(checkout_item.id), sale_price = checkout_item.sale_price,
@@ -968,8 +1075,20 @@ def checkout_order_now(request, id, qty):
                     models.SalesOrderPaymentDetails.objects.create(
                         order_number = order_number, payment_method = payment_method, payment_status = 2
                     ) 
-                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID) 
-                return redirect(paymentpath)
+
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                
+                    # Sent Customer Order Email 
+                    if exit_customer.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [exit_customer.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+        
+                models.GatewayePayment.objects.create( customer_id = int(request.session.get('userid')), payment_type = payment_method, amount = total_amount, transaction_id = transactionID, status = 0) 
+                return redirect(paymentpath, order_number = order_number, session_key = session_key) 
              
         else:                              ####----------- Other Payment options ------------- ####### 
             if not request.session.get('userid'):
@@ -998,7 +1117,19 @@ def checkout_order_now(request, id, qty):
                     )
                     models.SalesOrderPaymentDetails.objects.create(
                         order_number = order_number, payment_method = payment_method, payment_status = 3, 
-                    )  
+                    ) 
+
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+                
+                    # Sent Customer Order Email 
+                    if customer_id.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [customer_id.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+         
                 else:  
                     models.SalesOrder.objects.create(
                         order_number = order_number, customer_name_id = chk_customer.id, 
@@ -1019,6 +1150,18 @@ def checkout_order_now(request, id, qty):
                         request.session['userid'] = chk_customer.id
                         request.session['usermobile'] = chk_customer.mobile
                         request.session['customername'] = chk_customer.customer_name 
+                    
+                    # Send mobile sms for new order
+                    msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                    smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                    sent_otp = requests.post(smsurl) 
+
+                    # Sent Customer Order Email 
+                    if chk_customer.email:
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [chk_customer.email]
+                        send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+         
  
             else: 
                 exit_customer = models.CustomarAccount.objects.filter(id = int(request.session.get('userid'))).first()
@@ -1040,7 +1183,18 @@ def checkout_order_now(request, id, qty):
                 )
                 models.SalesOrderPaymentDetails.objects.create(
                     order_number = order_number, payment_method = payment_method, payment_status = 3, 
-                ) 
+                )
+                
+                # Send mobile sms for new order
+                msg_status = "Dear "+str(del_per_name)+", \n Your order is pending stage now. We will notify you next update. \n  -- www.ahsan.com.bd --"
+                smsurl = "http://api.icombd.com/api/v1/campaigns/sendsms/plain?username="+str(panel_username)+"&password="+str(panel_password)+"&sender="+str(sendder_id)+"&text="+msg_status+"&to=88"+str(customer_mobile)
+                sent_otp = requests.post(smsurl)  
+                # Sent Customer Order Email 
+                if exit_customer.email:
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = [exit_customer.email]
+                    send_mail( "Your order has been confirmed", email_content, email_from, recipient_list )
+        
                 
         context = {
             'order_number':order_number,
@@ -1783,7 +1937,7 @@ def get_load_publisher_list(request):
     publisher_id_list = json.loads(request.POST.get('publisher_id'))
     writer_id_list = json.loads(request.POST.get('writer_id'))
     category_id_list = json.loads(request.POST.get('category_id'))
-
+    
     mysession = random.random()
     if "abcd" not in request.session:
         request.session["abcd"] = str(mysession)
@@ -1802,8 +1956,6 @@ def get_load_publisher_list(request):
     book_id2 = []
     book_id3 = []
          
-
-
     
     for i in publisher_id_list:     
         pub_book_list += models.BookList.objects.filter(publisher_id = int(i))
@@ -1838,6 +1990,7 @@ def get_load_publisher_list(request):
         final_id_list = []
         showdata = 1
     elif len(book_id2) == 0 and len(book_id3) == 0:
+        print("xxxx")
         final_id_list = book_id1
     elif len(book_id1) == 0 and len(book_id3) == 0:
         final_id_list = book_id2
@@ -1862,12 +2015,13 @@ def get_load_publisher_list(request):
     
     html,discount,wish_list_html,button,image, = "","","","",""
     for counter, i in enumerate(fitered_book_list):
-
-        writer_name = models.WritterWiseBook.objects.filter(book_name_id = i.id).first()
-        if writer_name:
-            writer =  writer_name.writter_name
-        else:
-            writer =  ""
+        writer = ""
+        writer_name_list = models.WritterWiseBook.objects.filter(book_name_id = i.id).first()
+        
+        # if writer_name_list:
+        #     writer =  str(writer_name_list.writter_name.writter_name_english)
+        # else:
+        #     writer =  ""
         # print(name)
 
         if i.discount > 0:
@@ -1936,7 +2090,7 @@ def get_load_publisher_list(request):
                 </div>
             </div>
         """
-    
+    print("len",len(showdata))
     data = {
         "html":html,
         "showdata":showdata,
@@ -2764,7 +2918,7 @@ def book_publisher_update(request, id):
     else:
         return redirect('/accessDeny')
 
-
+# Add New Books
 def add_new_book(request): 
     chk_permission   = check_user_permission(request,'/products/add-new-book/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
@@ -2802,7 +2956,236 @@ def add_new_book(request):
             book_weight             = request.POST.get('book_weight')
             book_details            = request.POST.get('book_details')  
             video_link_book_details = request.POST.get('video_link_book_details') 
-            book_id_list            = request.POST.getlist('book_name')  
+            category_list           = request.POST.getlist('category_name') 
+            sub_cat_list            = request.POST.getlist('subcategory_name') 
+            writter_lst             = request.POST.getlist('writter_name') 
+            translator_list         = request.POST.getlist('book_translator') 
+            editor_list             = request.POST.getlist('editor_name') 
+ 
+  
+            if bool(request.FILES.get('book_image', False)) == True:
+                file = request.FILES['book_image']   
+                if not os.path.exists("book_image/"):
+                    os.mkdir("book_image/")
+
+                document_path = default_storage.save("book_image/"+file.name, ContentFile(file.read()))
+                if document_path:
+                    document_path = str("book_image/")+str(document_path).split("/")[-1] 
+                 
+            is_pre_image = 0
+            preview_pdf = request.FILES.get('prev_file') 
+            if preview_pdf:
+                is_pre_image = 1
+                if bool(request.FILES.get('prev_file', False)) == True:
+                    file = request.FILES['prev_file']   
+                    if not os.path.exists("preview_pdf/"):
+                        os.mkdir("preview_pdf/")
+
+                    pdf_path = default_storage.save("preview_pdf/"+file.name, ContentFile(file.read()))
+                    if pdf_path:
+                        pdf_path = str("preview_pdf/")+str(pdf_path).split("/")[-1]
+                 
+                     
+            book_name_id = models.BookList.objects.create(
+                publisher_id = publisher_name, is_pre_image = is_pre_image, slug = book_url,
+                book_name_bangla = book_name_bangla, book_name_english = book_name_english, origin = book_origin, stock_info = stock_info, quantity = 0,
+                book_idendity = book_idendity, video_link = video_link_book_details,  purchase_discount = purchase_discount, unit_price = unit_price,
+                country = country, number_of_page = number_of_page, cover_type = cover_type, ISBN = isbn_code, book_price = book_price, discount = discount_offer, 
+                sale_price = sale_price, language = book_language, edition = edition, book_image = document_path, detail = book_details, weight = book_weight,
+            ).id
+
+            if preview_pdf:
+                models.PreviewPdfFile.objects.create(book_name_id = book_name_id, pdf_file = pdf_path )
+             
+            for cat in category_list: 
+                models.CategoryWiseBook.objects.create(book_name_id = book_name_id, category_name_id = int(cat))
+            
+            for subcat in sub_cat_list: 
+                models.SubCategoryWiseBook.objects.create(book_name_id = book_name_id, subcategory_name_id = int(subcat))
+            
+            for wri in writter_lst: 
+                models.WritterWiseBook.objects.create(book_name_id = book_name_id, writter_name_id = int(wri))
+            
+            for tra in translator_list:
+                models.TranslatorWiseBook.objects.create(book_name_id = book_name_id, translator_name_id = int(tra))
+
+            for edit in editor_list:
+                models.EditorWiseBook.objects.create(book_name_id = book_name_id, editor_name_id = int(edit))
+  
+            messages.success(request, "Book Entry Success.")
+            return redirect("/products/book-list/")
+
+        context = {
+            'cate_list': cate_list,
+            'writter_list': writter_list,
+            'publisher': publisher,
+            'book_list': book_list,
+            'subcate_list': subcate_list,
+            'editorlist': editorlist,
+            'translatorlist': translatorlist,
+        }
+        return render(request, 'publisher_app/admin_dashboard/products/add_new_book.html', context) 
+
+    else:
+        return redirect('/accessDeny')
+
+# Add New Product
+def add_new_product(request): 
+    chk_permission   = check_user_permission(request,'/products/add-new-book/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action:  
+        cate_list  = models.BookCategory.objects.filter(status = True, master_category_id = 1)
+        subcate_list  = models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True)
+        writter_list  = models.BookWritter.objects.filter(status = True, is_writer = 1)
+        editorlist  = models.BookWritter.objects.filter(status = True, is_editor = 1)
+        translatorlist  = models.BookWritter.objects.filter(status = True, is_translator = 1)
+        publisher  = models.Publisher.objects.filter(status = True)
+
+        product_category = models.ProductCategory.objects.filter(status=True)
+        product_sub_cate = models.ProductSubCategory.objects.filter(status=True)
+        
+        
+        if request.method == "POST":
+            book_idendity           = random.randint(1000, 1499149999) 
+            publisher_name          = request.POST.get('publisher_name')
+            book_name_bangla        = request.POST.get('book_name_bangla')
+            book_name_english       = request.POST.get('book_name_english')
+            book_origin             = request.POST.get('book_origin')
+            lowletter               = book_name_english.lower()
+            usehipen                = (lowletter.replace(" ", "-")) 
+            book_url                = usehipen 
+            book_language           = request.POST.get('book_language')
+            edition                 = request.POST.get('book_edition') 
+            isbn_code               = request.POST.get('isbn_code')
+            cover_type              = request.POST['cover_type'] 
+            stock_info              = request.POST['stock_info'] 
+            number_of_page          = request.POST.get('number_of_page')
+            country                 = request.POST.get('country')
+            book_price              = request.POST.get('book_price')
+            discount_offer          = request.POST.get('discount_offer')
+            purchase_discount       = request.POST.get('purchase_discount')
+            unit_price              = request.POST.get('unit_price')
+            sale_price              = request.POST.get('sale_price')
+            book_weight             = request.POST.get('book_weight')
+            book_details            = request.POST.get('book_details')  
+            video_link_book_details = request.POST.get('video_link_book_details') 
+            category_list           = request.POST.getlist('category_name') 
+            sub_cat_list            = request.POST.getlist('subcategory_name') 
+            writter_lst             = request.POST.getlist('writter_name') 
+            translator_list         = request.POST.getlist('book_translator') 
+            editor_list             = request.POST.getlist('editor_name') 
+ 
+  
+            if bool(request.FILES.get('book_image', False)) == True:
+                file = request.FILES['book_image']   
+                if not os.path.exists("book_image/"):
+                    os.mkdir("book_image/")
+
+                document_path = default_storage.save("book_image/"+file.name, ContentFile(file.read()))
+                if document_path:
+                    document_path = str("book_image/")+str(document_path).split("/")[-1] 
+                 
+            is_pre_image = 0
+            preview_pdf = request.FILES.get('prev_file') 
+            if preview_pdf:
+                is_pre_image = 1
+                if bool(request.FILES.get('prev_file', False)) == True:
+                    file = request.FILES['prev_file']   
+                    if not os.path.exists("preview_pdf/"):
+                        os.mkdir("preview_pdf/")
+
+                    pdf_path = default_storage.save("preview_pdf/"+file.name, ContentFile(file.read()))
+                    if pdf_path:
+                        pdf_path = str("preview_pdf/")+str(pdf_path).split("/")[-1]
+                 
+                     
+            book_name_id = models.BookList.objects.create(
+                publisher_id = publisher_name, is_pre_image = is_pre_image, slug = book_url,
+                book_name_bangla = book_name_bangla, book_name_english = book_name_english, origin = book_origin, stock_info = stock_info, quantity = 0,
+                book_idendity = book_idendity, video_link = video_link_book_details,  purchase_discount = purchase_discount, unit_price = unit_price,
+                country = country, number_of_page = number_of_page, cover_type = cover_type, ISBN = isbn_code, book_price = book_price, discount = discount_offer, 
+                sale_price = sale_price, language = book_language, edition = edition, book_image = document_path, detail = book_details, weight = book_weight,
+            ).id
+
+            # if preview_pdf:
+            #     models.PreviewPdfFile.objects.create(book_name_id = book_name_id, pdf_file = pdf_path )
+             
+            # for cat in category_list: 
+            #     models.CategoryWiseBook.objects.create(book_name_id = book_name_id, category_name_id = int(cat))
+            
+            # for subcat in sub_cat_list: 
+            #     models.SubCategoryWiseBook.objects.create(book_name_id = book_name_id, subcategory_name_id = int(subcat))
+            
+            # for wri in writter_lst: 
+            #     models.WritterWiseBook.objects.create(book_name_id = book_name_id, writter_name_id = int(wri))
+            
+            # for tra in translator_list:
+            #     models.TranslatorWiseBook.objects.create(book_name_id = book_name_id, translator_name_id = int(tra))
+
+            # for edit in editor_list:
+            #     models.EditorWiseBook.objects.create(book_name_id = book_name_id, editor_name_id = int(edit))
+  
+            # messages.success(request, "Book Entry Success.")
+            # return redirect("/products/book-list/")
+
+        context = {
+            'cate_list': cate_list,
+            'writter_list': writter_list,
+            'publisher': publisher, 
+            'subcate_list': subcate_list,
+            'editorlist': editorlist,
+            'translatorlist': translatorlist,
+            'product_category':product_category,
+            'product_sub_cate':product_sub_cate,
+        }
+        return render(request, 'publisher_app/admin_dashboard/products/add_new_product.html', context) 
+
+    else:
+        return redirect('/accessDeny')
+
+
+
+# Add Package Books
+def add_package_book(request): 
+    chk_permission   = check_user_permission(request,'/products/add-package-book/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+
+        book_list = models.BookList.objects.raw("""SELECT bk.id, bk.book_name_bangla, bwr.writter_name_bangla, pub.publisher_name_bangla 
+            FROM `book_list` bk left JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id 
+            LEFT JOIN book_writter_list bwr ON wwb.writter_name_id = bwr.id 
+            LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id"""
+        )
+        cate_list  = models.BookCategory.objects.filter(status = True, master_category_id = 1)
+        subcate_list  = models.MastarSubCategory.objects.filter(status = True, regular_category__Is_top_category = True)
+        writter_list  = models.BookWritter.objects.filter(status = True, is_writer = 1)
+        editorlist  = models.BookWritter.objects.filter(status = True, is_editor = 1)
+        translatorlist  = models.BookWritter.objects.filter(status = True, is_translator = 1)
+        publisher  = models.Publisher.objects.filter(status = True)
+        
+        if request.method == "POST":
+            book_idendity           = random.randint(1000, 1499149999) 
+            publisher_name          = request.POST.get('publisher_name')
+            book_name_bangla        = request.POST.get('book_name_bangla')
+            book_name_english       = request.POST.get('book_name_english')
+            book_origin             = request.POST.get('book_origin')
+            lowletter               = book_name_english.lower()
+            usehipen                = (lowletter.replace(" ", "-"))
+            book_name_wo_space      = (lowletter.replace(" ", ""))
+            book_url                = usehipen 
+            book_language           = request.POST.get('book_language')
+            edition                 = request.POST.get('book_edition') 
+            isbn_code               = request.POST.get('isbn_code')
+            cover_type              = request.POST['cover_type'] 
+            stock_info              = request.POST['stock_info'] 
+            number_of_page          = request.POST.get('number_of_page')
+            country                 = request.POST.get('country')
+            book_price              = request.POST.get('book_price')
+            discount_offer          = request.POST.get('discount_offer')
+            purchase_discount       = request.POST.get('purchase_discount')
+            unit_price              = request.POST.get('unit_price')
+            sale_price              = request.POST.get('sale_price')
+            book_weight             = request.POST.get('book_weight')
+            book_details            = request.POST.get('book_details')  
+            video_link_book_details = request.POST.get('video_link_book_details') 
             category_list           = request.POST.getlist('category_name') 
             sub_cat_list            = request.POST.getlist('subcategory_name') 
             writter_lst             = request.POST.getlist('writter_name') 
@@ -2844,13 +3227,14 @@ def add_new_book(request):
             if preview_pdf:
                 models.PreviewPdfFile.objects.create(book_name_id = book_name_id, pdf_file = pdf_path )
  
+            book_id_list            = request.POST.getlist('book_name')  
             for bk in book_id_list: 
                 models.BookPackageDetails.objects.create(
                     package_name = book_name_bangla,
                     booklist_master_id = book_name_id, book_name_id = int(bk),
                     package_price = sale_price, package_discount = discount_offer
                 )
-            
+             
             for cat in category_list: 
                 models.CategoryWiseBook.objects.create(book_name_id = book_name_id, category_name_id = int(cat))
             
@@ -2878,7 +3262,7 @@ def add_new_book(request):
             'editorlist': editorlist,
             'translatorlist': translatorlist,
         }
-        return render(request, 'publisher_app/admin_dashboard/products/add_new_book.html', context) 
+        return render(request, 'publisher_app/admin_dashboard/products/add_package_book.html', context) 
 
     else:
         return redirect('/accessDeny')
@@ -2915,7 +3299,7 @@ def book_list(request):
                 LEFT JOIN book_category_list bcl ON msc.regular_category_id = bcl.id
                 LEFT JOIN writter_wise_book wwb ON wwb.book_name_id = bk.id
                 LEFT JOIN book_writter_list bwl ON bwl.id = wwb.writter_name_id
-                WHERE bk.status = 1 and bcl.status = 1 and msc.status = 1 ORDER BY bcl.id asc '''
+                WHERE bk.status = 1 and bcl.status = 1 and msc.status = 1 group by scwb.book_name_id ORDER BY bk.id desc '''
             )
              
             page_number = request.GET.get('page')
@@ -3001,10 +3385,9 @@ def book_list(request):
                 LEFT JOIN book_category_list bcl ON msc.regular_category_id = bcl.id
                 LEFT JOIN writter_wise_book wwb ON wwb.book_name_id = bk.id
                 LEFT JOIN book_writter_list bwl ON bwl.id = wwb.writter_name_id
-                WHERE bk.status = 1 and bcl.status = 1 and bwl.status = 1 '''+str(query_str)+''' ORDER BY bcl.id asc ''', arr
+                WHERE bk.status = 1 and bcl.status = 1 and bwl.status = 1 '''+str(query_str)+'''  group by scwb.book_name_id ORDER BY bk.id desc ''', arr
             ) 
-            print("query_str : ", book_list_total.query)
- 
+            
             to_entry = models.BookList.objects.raw("SELECT id, COUNT(id) as total_entry FROM `book_list`") 
             
             page_number = request.GET.get('page')
@@ -3021,7 +3404,7 @@ def book_list(request):
                 page_number = 1
                 
             book_list =  book_list_total[index_count:21 * int(page_number)]  
-
+            print("len:", len(book_list))
             context = { 
                 'book_list':book_list, 
                 'total_book':len(book_list_total),
@@ -3047,6 +3430,18 @@ def book_list(request):
 
  
 @employeeLogin
+def product_list(request):  
+    chk_permission   = check_user_permission(request,'/products/book-list/')
+    if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
+         
+         
+        return render(request, 'publisher_app/admin_dashboard/products/book_list.html')
+
+    else:
+        return redirect('/accessDeny')
+
+ 
+@employeeLogin
 def dashboard_update_book_item(request, id):
     chk_permission   = check_user_permission(request,'/products/add-new-book/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action:
@@ -3058,10 +3453,10 @@ def dashboard_update_book_item(request, id):
 
         book_wise_cate    = models.CategoryWiseBook.objects.filter(book_name_id = id)
         book_wise_subcate    = models.SubCategoryWiseBook.objects.filter(book_name_id = id)
-         
+          
         
         book_list  = models.BookList.objects.raw("SELECT bk.id, bk.book_price, bk.sale_price, bk.discount, bk.book_name_bangla, bwr.writter_name_bangla, pub.publisher_name_bangla FROM `book_list` bk left JOIN writter_wise_book wwb ON bk.id = wwb.book_name_id LEFT JOIN book_writter_list bwr ON wwb.writter_name_id = bwr.id LEFT JOIN book_publisher_list pub ON bk.publisher_id = pub.id")
-        package_book_list  = models.BookPackageDetails.objects.raw("SELECT * FROM `book_package_list` WHERE booklist_master_id = %s",[id])
+        package_book_list  = models.PackageList.objects.raw("SELECT * FROM `package_list` WHERE product_id = %s",[id])
         writter_list      = models.BookWritter.objects.filter(status = True)
         book_wise_writ    = models.WritterWiseBook.objects.filter(book_name_id = id)
         book_wise_trans   = models.TranslatorWiseBook.objects.filter(book_name_id = id)
@@ -3098,7 +3493,8 @@ def dashboard_update_book_item(request, id):
             video_link_book_details = request.POST.get('video_link_book_details')
 
             category_list = request.POST.getlist('categoryName') 
-            sub_cat_list = request.POST.getlist('subcategory_name') 
+            sub_cat_list = request.POST.getlist('subcategory_list') 
+            print("sub_cat_list:", sub_cat_list)
             writter_id = request.POST.getlist('writter_name')  
             translator_id = request.POST.getlist('translator_name')  
             editor_name = request.POST.getlist('editor_name')  

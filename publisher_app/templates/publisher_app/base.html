@@ -186,19 +186,13 @@
                                                 <ul class="mainmenu_sub_category">
                                                     {% for sub in data.mastarsubcategory_set.all|slice:30 %}
                                                         <li> <a href="/book/subcategory/{{ sub.pk }}/{{ sub.menu_url }}/">{{ sub.sub_category_bangla}}</a></li> 
-                                                    {% endfor %}
-
+                                                    {% endfor %} 
                                                     <span><a href="/category/{{data.id}}/all-subcategory/" style="text-align: center;"> সবগুলো দেখুন </a></span>
-                                                </ul> 
-
+                                                </ul>  
                                                 {% endif %}
                                             </li>   
-                                        {% endfor %}  
-                                       
-                                    </ul>
-                                    
-                                
-
+                                        {% endfor %}   
+                                    </ul> 
                                 </li>
                                 <li><a href="#">বই সম্পর্কিত তথ্য <i class="fa fa-angle-down"></i></a> 
                                     <ul class="mainmenu_regular_category" >
@@ -325,8 +319,7 @@
                                     <li><a href="#">ব্লগ</a></li>
                                     <li><a href="/my-cart/">শপিং ব্যাগ </a></li>
                                     <li><a href="/wishlist-item/">আপনার পছন্দের তালিকা </a></li>
-                                    <li><a href="#"> শর্তাবলী </a></li>
-                                    <li><a href="#"> প্রশ্নোত্তর </a></li>
+                                    <li><a href="/terms-of-service/"> টার্মস অফ সার্ভিস </a></li>
                                     <li><a href="/refund-policy/"> রিফান্ড নীতিমালা </a></li>
                                 </ul>
                             </div>
