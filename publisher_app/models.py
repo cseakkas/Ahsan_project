@@ -845,29 +845,31 @@ class ProductList(models.Model):
      
     mrp_price               = models.FloatField(default=0, blank=True, null = True) 
     unit_price              = models.FloatField(default=0, blank=True, null = True) 
+    sale_price              = models.FloatField(default=0, blank=True, null = True) 
     qty                     = models.FloatField(default=0, blank=True, null = True) 
     purchase_discount       = models.FloatField(default=0, blank=True, null = True) 
     sale_discount           = models.FloatField(default=0, blank=True, null = True) 
-    sale_price              = models.FloatField(default=0, blank=True, null = True) 
+    
+    details         = RichTextField(blank = True, null=True)
+    video_link      = models.TextField(blank=True,null=True)
+    product_image   = models.CharField(max_length=256,blank = True, null=True)
+    
     cover_t = (
         ('1', 'পেপারব্যাক'),
         ('2', 'হার্ডকভার'),    
         ('3', 'NANE'),  
     )
-    cover_type      = models.CharField(max_length=10, choices=cover_t, default=1)
-    stock_info      = models.CharField(max_length=56,blank = True, null=True)
-    product_image   = models.CharField(max_length=256,blank = True, null=True)
-    details         = RichTextField(blank = True, null=True)
-    video_link      = models.TextField(blank=True,null=True)
-
-    edition        = models.CharField(max_length=56,blank = True, null=True)
-    weight         = models.CharField(max_length=56,blank = True, null=True)
+    cover_type      = models.CharField(max_length=10, choices=cover_t, null=True)
+    stock_info      = models.CharField(max_length=56,blank = True, null=True) 
+    edition         = models.CharField(max_length=56,blank = True, null=True)
+    weight          = models.CharField(max_length=56,blank = True, null=True)
     language        = models.CharField(max_length=56,blank = True, null=True)
     number_of_page  = models.CharField(max_length=56,blank = True, null=True)
     country         = models.CharField(max_length=56,blank = True, null=True)
     ISBN            = models.CharField(max_length=56,blank = True, null=True)
     is_preview_img  = models.CharField(max_length=56,blank = True, null=True) 
     publisher       = models.ForeignKey(Publisher, on_delete=models.DO_NOTHING, blank=True, null=True)  
+    
     category        = models.ForeignKey(ProductCategory, on_delete=models.DO_NOTHING, blank=True, null=True)  
     sub_category    = models.ForeignKey(ProductSubCategory, on_delete=models.DO_NOTHING, blank=True, null=True)  
  

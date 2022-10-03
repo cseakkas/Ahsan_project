@@ -144,7 +144,7 @@
                     {% endif %}
                 <div class="card-body">
                     <div class="table-responsive all_book_list">  
-                        <h4 style="overflow: hidden;"> Product List ({{total_book }})
+                        <h4 style="overflow: hidden;"> Product List ({{product_list|length }})
                             <!-- <span style="float: right;">
                                 <form method="POST"> {% csrf_token %}
                                     <input type="text" name="book_content_search" class="form-control" value="{{book_txt}}" placeholder="Search..." style="width:250px;float:right;margin-bottom:10px">
@@ -230,7 +230,7 @@
                             <thead>
                                 <tr style="background-color: rgb(49, 196, 188);color:white">
                                     <th>ID</th>
-                                    <th>Book Name</th>
+                                    <th>product Name</th>
                                     <th>Origin</th>
                                     <th style="width:150px">Category</th>
                                     <th style="width:170px">Sub Category</th>
@@ -243,28 +243,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for book in book_list %}
+                            {% for product in product_list %}
                                 <tr>
-                                    <td>{{ book.id }}</td>
-                                    <td>{{ book.book_name_bangla }}</td>
-                                    <td>{% if book.origin %}{{ book.origin }}{% endif %}</td>
-                                    <td>{{ book.cat_name_bangla }}</td>
-                                    <td>{{ book.sub_category_bangla }}</td>
-                                    <td>{{ book.writter_name_bangla }}</td>
-                                    <td>{{ book.publisher_name_bangla }}</td> 
-                                    <td style="text-align:center">  {{ book.quantity }} </td>
-                                    <td style="text-align:center"> Tk. {{ book.sale_price }} {% if book.discount == 0 %} {% else %}  <del style="margin-left:5px;color:rgb(215, 25, 25)">{{ book.book_price }}</del> {% endif %} </td>
+                                    <td>{{ product.id }}</td>
+                                    <td>{{ product.book_name_bangla }}</td>
+                                    <td>{% if product.origin %}{{ product.origin }}{% endif %}</td>
+                                    <td>{{ product.cat_name_bangla }}</td>
+                                    <td>{{ product.sub_category_bangla }}</td>
+                                    <td>{{ product.writter_name_bangla }}</td>
+                                    <td>{{ product.publisher_name_bangla }}</td> 
+                                    <td style="text-align:center">  {{ product.qty }} </td>
+                                    <td style="text-align:center"> Tk. {{ product.sale_price }} {% if product.discount == 0 %} {% else %}  <del style="margin-left:5px;color:rgb(215, 25, 25)">{{ product.book_price }}</del> {% endif %} </td>
                                     <td style="width: 50px;">
                                         <center>
-                                                <img src="/static/publisher_app/media/{{ book.book_image }}" alt="" style="width:40px;height:50px">
+                                                <img src="/static/publisher_app/media/{{ product.product_image }}" alt="" style="width:40px;height:50px">
                                         </center>
                                     </td> 
                                     <td style="width:140px">
-                                        <a data-toggle="tooltip" title="" href="/products/book/{{ book.pk }}/update-book/" style="font-size:13px;padding: 4px 10px;" class="btn btn-warning" data-original-title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                        {% if book.status %}
-                                            <a data-toggle="tooltip" title="Active" onclick="return confirm('Are you sure to Inactive this Book?');" href="/products/book/{{ book.pk }}/active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-info" data-original-title="Active">Active</a>
+                                        <a data-toggle="tooltip" title="" href="/products/product/{{ product.pk }}/update-product/" style="font-size:13px;padding: 4px 10px;" class="btn btn-warning" data-original-title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                        {% if product.status %}
+                                            <a data-toggle="tooltip" title="Active" onclick="return confirm('Are you sure to Inactive this product?');" href="/products/product/{{ product.pk }}/active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-info" data-original-title="Active">Active</a>
                                         {% else %}
-                                            <a data-toggle="tooltip" title="In Active" onclick="return confirm('Are you sure to Active this Book?');" href="/products/book/{{ book.pk }}/in-active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-danger" data-original-title="Inactive">Inactive</a>
+                                            <a data-toggle="tooltip" title="In Active" onclick="return confirm('Are you sure to Active this product?');" href="/products/product/{{ product.pk }}/in-active/" style="font-size:13px;padding: 4px 10px; " class="btn btn-danger" data-original-title="Inactive">Inactive</a>
                                         {% endif %}
                                     </td>
                                 </tr>                        

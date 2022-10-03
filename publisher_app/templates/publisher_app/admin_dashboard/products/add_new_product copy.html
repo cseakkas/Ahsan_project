@@ -158,7 +158,10 @@
                                                 <td>
                                                     <label>Book Sub Category </label>
                                                     <select class="form-control CategoryWiseSubcategoyLoad" id="subcategory_name" required>
-                                                        <option value="0"><strong>Select Category</strong></option>
+                                                        <!-- <option value="0"><strong>Select Sub Category</strong></option> 
+                                                        {% for cat in subcate_list %}
+                                                            <option value="{{ cat.pk }}">{{ cat.sub_category_bangla }}</option>
+                                                        {% endfor %} -->
                                                     </select>
                                                 </td>
                                                 <td style="width:70px;"> <br>
@@ -242,7 +245,6 @@
                                         <div class="form-group">
                                             <label>Cover Type</label>
                                             <select class="form-control" name="cover_type">
-                                                <option value="">Select Cover</option>
                                                 <option value="1">পেপারব্যাক</option>
                                                 <option value="2">হার্ডকভার</option>
                                                 <option value="3">অন্যান্য </option>
@@ -271,14 +273,13 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Language</label>
-                                            <input type="text" name="book_language" class="form-control">
+                                            <input type="text" name="book_language" value="Bangla" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Stock Info</label>
                                             <select class="form-control" name="stock_info" id="stockInfoselect"> 
-                                                <option value="">Stock Status</option>
                                                 <option value="1">In Publisher</option>
                                                 <option value="2">In Stock</option> 
                                                 <option value="3">Out of Stock</option> 
@@ -289,7 +290,7 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Country</label>
-                                            <input type="text" name="country" class="form-control">
+                                            <input type="text" name="country" value="Bangladesh" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
@@ -370,11 +371,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row" id="ProductCommonFeature2">
+                                <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group" style="margin-top:15px">
                                             <input type="submit" id="AddProduct" class="btn btn-success" name="submit" value="Add Book" style="margin-top:7px">
-                                            <a href="/products/add-new-book/" class="btn btn-secondary">Cancel </a>
+                                            <!-- <a href="/products/add-new-book/" class="btn btn-secondary">Cancel </a> -->
                                         </div>
                                         <br>
                                     </div>

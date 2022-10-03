@@ -3043,31 +3043,41 @@ def add_new_product(request):
         product_category = models.ProductCategory.objects.filter(status=True)
         product_sub_cate = models.ProductSubCategory.objects.filter(status=True)
         
-        
-        if request.method == "POST":
+         
+        if request.method == "POST": 
             book_idendity           = random.randint(1000, 1499149999) 
-            publisher_name          = request.POST.get('publisher_name')
-            book_name_bangla        = request.POST.get('book_name_bangla')
-            book_name_english       = request.POST.get('book_name_english')
-            book_origin             = request.POST.get('book_origin')
-            lowletter               = book_name_english.lower()
-            usehipen                = (lowletter.replace(" ", "-")) 
-            book_url                = usehipen 
-            book_language           = request.POST.get('book_language')
-            edition                 = request.POST.get('book_edition') 
-            isbn_code               = request.POST.get('isbn_code')
-            cover_type              = request.POST['cover_type'] 
-            stock_info              = request.POST['stock_info'] 
-            number_of_page          = request.POST.get('number_of_page')
-            country                 = request.POST.get('country')
-            book_price              = request.POST.get('book_price')
-            discount_offer          = request.POST.get('discount_offer')
+            product_type            = request.POST.get('product_type')
+            product_name_bangla     = request.POST.get('product_name_bangla')
+            product_name_english    = request.POST.get('product_name_english') 
+            product_origin          = request.POST.get('origin')
+            lowletter               = product_name_english.lower()
+            product_url                = (lowletter.replace(" ", "-")) 
+                            
+             
+            sale_discount          = request.POST.get('sale_discount')
             purchase_discount       = request.POST.get('purchase_discount')
+            mrp_price              = request.POST.get('product_price')
             unit_price              = request.POST.get('unit_price')
             sale_price              = request.POST.get('sale_price')
-            book_weight             = request.POST.get('book_weight')
-            book_details            = request.POST.get('book_details')  
-            video_link_book_details = request.POST.get('video_link_book_details') 
+            
+            coupon_price            = request.POST.get('coupon_price')
+            publisher_id          = request.POST.get('publisher_name')
+            cover_type              = request.POST.get('cover_type')
+            number_of_page           = request.POST.get('number_of_page')
+            edition             = request.POST.get('book_edition')
+            isbn_code                = request.POST.get('isbn_code')
+            book_language            = request.POST.get('book_language')
+            stock_info               = request.POST.get('stock_info')
+            country                  = request.POST.get('country')
+            book_weight              = request.POST.get('book_weight')
+ 
+
+            details                 = request.POST.get('book_details')  
+            video_link              = request.POST.get('video_link_book_details') 
+
+            product_category_id = request.POST.get('product_category') 
+            product_sub_category_id = request.POST.get('product_sub_category') 
+
             category_list           = request.POST.getlist('category_name') 
             sub_cat_list            = request.POST.getlist('subcategory_name') 
             writter_lst             = request.POST.getlist('writter_name') 
@@ -3075,14 +3085,14 @@ def add_new_product(request):
             editor_list             = request.POST.getlist('editor_name') 
  
   
-            if bool(request.FILES.get('book_image', False)) == True:
-                file = request.FILES['book_image']   
-                if not os.path.exists("book_image/"):
-                    os.mkdir("book_image/")
+            if bool(request.FILES.get('product_image', False)) == True:
+                file = request.FILES['product_image']   
+                if not os.path.exists("product_image/"):
+                    os.mkdir("product_image/")
 
-                document_path = default_storage.save("book_image/"+file.name, ContentFile(file.read()))
+                document_path = default_storage.save("product_image/"+file.name, ContentFile(file.read()))
                 if document_path:
-                    document_path = str("book_image/")+str(document_path).split("/")[-1] 
+                    document_path = str("product_image/")+str(document_path).split("/")[-1] 
                  
             is_pre_image = 0
             preview_pdf = request.FILES.get('prev_file') 
@@ -3096,36 +3106,41 @@ def add_new_product(request):
                     pdf_path = default_storage.save("preview_pdf/"+file.name, ContentFile(file.read()))
                     if pdf_path:
                         pdf_path = str("preview_pdf/")+str(pdf_path).split("/")[-1]
-                 
-                     
-            book_name_id = models.BookList.objects.create(
-                publisher_id = publisher_name, is_pre_image = is_pre_image, slug = book_url,
-                book_name_bangla = book_name_bangla, book_name_english = book_name_english, origin = book_origin, stock_info = stock_info, quantity = 0,
-                book_idendity = book_idendity, video_link = video_link_book_details,  purchase_discount = purchase_discount, unit_price = unit_price,
-                country = country, number_of_page = number_of_page, cover_type = cover_type, ISBN = isbn_code, book_price = book_price, discount = discount_offer, 
-                sale_price = sale_price, language = book_language, edition = edition, book_image = document_path, detail = book_details, weight = book_weight,
+                         
+            product_id = models.ProductList.objects.create(
+                product_type = product_type, product_name_bangla = product_name_bangla,
+                product_name_english = product_name_english, origin = product_origin,
+                product_url = product_url, mrp_price = mrp_price, unit_price = unit_price,
+                purchase_discount = purchase_discount, sale_discount = sale_discount,
+                sale_price = sale_price, details = details, video_link = video_link,
+                category_id = product_category_id, sub_category_id = product_sub_category_id,
+                product_image = document_path, 
+ 
+                country = country, number_of_page = number_of_page, cover_type = cover_type, 
+                ISBN = isbn_code, language = book_language, edition = edition, 
+                weight = book_weight, stock_info = stock_info, publisher_id = publisher_id,
+
             ).id
-
-            # if preview_pdf:
-            #     models.PreviewPdfFile.objects.create(book_name_id = book_name_id, pdf_file = pdf_path )
+            if preview_pdf:
+                models.PreviewPdfFile.objects.create(book_name_id = product_id, pdf_file = pdf_path )
              
-            # for cat in category_list: 
-            #     models.CategoryWiseBook.objects.create(book_name_id = book_name_id, category_name_id = int(cat))
+            for cat in category_list: 
+                models.CategoryWiseBook.objects.create(book_name_id = product_id, category_name_id = int(cat))
             
-            # for subcat in sub_cat_list: 
-            #     models.SubCategoryWiseBook.objects.create(book_name_id = book_name_id, subcategory_name_id = int(subcat))
+            for subcat in sub_cat_list: 
+                models.SubCategoryWiseBook.objects.create(book_name_id = product_id, subcategory_name_id = int(subcat))
             
-            # for wri in writter_lst: 
-            #     models.WritterWiseBook.objects.create(book_name_id = book_name_id, writter_name_id = int(wri))
+            for wri in writter_lst: 
+                models.WritterWiseBook.objects.create(book_name_id = product_id, writter_name_id = int(wri))
             
-            # for tra in translator_list:
-            #     models.TranslatorWiseBook.objects.create(book_name_id = book_name_id, translator_name_id = int(tra))
+            for tra in translator_list:
+                models.TranslatorWiseBook.objects.create(book_name_id = product_id, translator_name_id = int(tra))
 
-            # for edit in editor_list:
-            #     models.EditorWiseBook.objects.create(book_name_id = book_name_id, editor_name_id = int(edit))
-  
-            # messages.success(request, "Book Entry Success.")
-            # return redirect("/products/book-list/")
+            for edit in editor_list:
+                models.EditorWiseBook.objects.create(book_name_id = product_id, editor_name_id = int(edit))
+   
+            
+            return redirect("/products/product-list/")
 
         context = {
             'cate_list': cate_list,
@@ -3433,9 +3448,12 @@ def book_list(request):
 def product_list(request):  
     chk_permission   = check_user_permission(request,'/products/book-list/')
     if chk_permission and chk_permission.view_action and chk_permission.insert_action: 
-         
-         
-        return render(request, 'publisher_app/admin_dashboard/products/book_list.html')
+        
+        product_list = models.ProductList.objects.raw("SELECT * FROM `product_list` order by id desc")
+        context = {
+            'product_list':product_list
+        } 
+        return render(request, 'publisher_app/admin_dashboard/products/product_list.html', context)
 
     else:
         return redirect('/accessDeny')
